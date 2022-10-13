@@ -4,15 +4,16 @@
 \alias{add_total}
 \title{Add row with total}
 \usage{
-add_total(df)
+add_total(data)
 }
 \arguments{
-\item{df}{data.frame or tibble}
+\item{data}{data.frame or tibble}
 }
 \value{
 df with additional row with all numeric
 columns summed up.
 }
 \description{
-Add row with total
+Brutally sums up all numeric columns and appends
+to data.
 }

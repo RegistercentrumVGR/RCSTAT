@@ -1,19 +1,21 @@
 #' Add row with total
 #'
-#' @param df data.frame or tibble
+#' Brutally sums up all numeric columns and appends
+#' to data.
+#'
+#' @param data data.frame or tibble
 #'
 #' @return df with additional row with all numeric
 #' columns summed up.
 #'
 #' @export add_total
-add_total <- function(df){
+add_total <- function(data){
 
-  cols <- unlist(lapply(df, is.numeric))
-  totals <- lapply(df[cols], sum, na.rm = TRUE)
+  cols <- unlist(lapply(data, is.numeric))
+  totals <- lapply(data[cols], sum, na.rm = TRUE)
   totals[names(cols[!cols])] <- NA
 
-  rbind(df, totals)
-
+  rbind(data, totals)
 }
 #' Time between dates
 #'

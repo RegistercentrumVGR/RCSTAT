@@ -21,7 +21,7 @@ group_proportions <- function(data, ...){
       n = dplyr::n()
     ) %>%
     dplyr::mutate(
-      N = sum(n),
+      N = sum(n, na.rm = TRUE),
       p = n/N
     ) %>%
     dplyr::rename(
@@ -82,11 +82,11 @@ proportion_missing <- function(data, ..., vars = names(data)){
       N = dplyr::n(),
       dplyr::across(
         .cols = all_of(vars),
-        .fns = ~ sum(is.na(.x)),
-        .names = "n_missing_{.col}"
+        .fns = ~ sum(is.na(.x), na.rm = TRUE)#,
+        #.names = "n_missing_{.col}"
       ),
       dplyr::across(
-        .cols = all_of(paste0("n_missing_", vars)),
+        .cols = all_of(vars),
         .fns = ~ .x/N,
         .names = "Proportion_missing_{.col}"
       )

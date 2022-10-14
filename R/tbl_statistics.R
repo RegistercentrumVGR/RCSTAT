@@ -73,7 +73,7 @@ group_means <- function(data, ..., vars = names(data)){
 #' @export proportion_missing
 proportion_missing <- function(data, ..., vars = names(data)){
   # Remove grouping-vars from vars if present
-  vars <- setdiff(vars, names(select(data, ...)))
+  vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
   result <- data %>%
     dplyr::group_by(...) %>%

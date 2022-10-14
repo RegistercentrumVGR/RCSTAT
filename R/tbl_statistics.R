@@ -29,7 +29,7 @@ group_proportions <- function(data, ...){
       Total = N,
       Proportion = p
     ) %>%
-    ungroup()
+    dplyr::ungroup()
 
   return(result)
 }
@@ -44,7 +44,7 @@ group_proportions <- function(data, ...){
 #' @export group_means
 group_means <- function(data, ..., vars = names(data)){
   # Remove grouping-vars from vars if present
-  vars <- setdiff(vars, names(select(data, ...)))
+  vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
   result <- data %>%
     dplyr::group_by(...) %>%

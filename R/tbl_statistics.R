@@ -21,12 +21,12 @@ group_proportions <- function(data, ...){
       n = dplyr::n()
     ) %>%
     dplyr::mutate(
-      N = sum(n, na.rm = TRUE),
-      p = n/N
+      Nt = sum(n, na.rm = TRUE),
+      p = n/Nt
     ) %>%
     dplyr::rename(
       Count = n,
-      Total = N,
+      Total = Nt,
       Proportion = p
     ) %>%
     dplyr::ungroup()

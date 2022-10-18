@@ -24,6 +24,6 @@ dummy_data <- data.frame(
   y = ifelse(rbinom(N, 1, 0.8) == 1, rexp(N, rate = 2), as.numeric(NA)),
   z = ifelse(rbinom(N, 1, 0.8) == 1, rnorm(N, mean = 0, sd = 1), as.numeric(NA))
 ) %>%
-  dplyr::arrange(id)
+  dplyr::arrange(id, adate)
 
 usethis::use_data(dummy_data, overwrite = TRUE)

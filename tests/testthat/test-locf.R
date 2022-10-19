@@ -19,9 +19,15 @@ test_that("locf works", {
   # Scramble
   df <- df[sample(1:nrow(df), size = nrow(df)),]
 
-  dfl <- locf(df, id, a, vars = c("x", "z"), orderby = "t")
+  dfl <- locf(df, vars = c("x", "z"), groupby = c("id", "a"), orderby = "t")
   testthat::expect_equal(dfl, dfres)
 
-  dfl <- locf(df, id, a, vars = c("x", "z"), orderby = "t", slice = TRUE)
+  dfl <- locfdt(df, vars = c("x", "z"), groupby = c("id", "a"), orderby = "t")
+  testthat::expect_equal(dfl, dfres)
+
+  dfl <- locf(df, vars = c("x", "z"), groupby = c("id", "a"), orderby = "t", slice = TRUE)
+  testthat::expect_equal(dfl, dfsres)
+
+  dfl <- locfdt(df, vars = c("x", "z"), groupby = c("id", "a"), orderby = "t", slice = TRUE)
   testthat::expect_equal(dfl, dfsres)
 })

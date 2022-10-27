@@ -12,9 +12,11 @@ Either `mobility,selfcare,usual,pain,anxiety`
 to [eq5d_3l_index_tto()] or [eq5d_5l_index_tto()]
 or `x` to [eq5d_3l_index_tto_old()]}
 
-\item{levels}{3 or 5 for the number of levels used}
+\item{levels}{numeric: 3 or 5 for the number of levels used}
 
-\item{old}{should [eq5d_3l_index_tto_old()] be used?}
+\item{type}{character: "TTO" or "VAS"}
+
+\item{old}{logic: should [eq5d_3l_index_tto_old()] be used?}
 
 \item{split}{
     character vector (or object which can be coerced to such)

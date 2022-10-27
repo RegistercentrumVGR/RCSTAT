@@ -2,8 +2,8 @@
 #'
 #' @param df data.frame or tibble with data
 #' @param vars variables to perform locf on
-#' @param group_by variables to group on
-#' @param order_by variable to sort each group on
+#' @param groupby variables to group on
+#' @param orderby variable to sort each group on
 #' @param slice keep only last row in each group
 #'
 #' @return data.frame or tibble with locf data
@@ -13,8 +13,8 @@
 locf <- function(
     df,
     vars,
-    orderby = "date",
     groupby = "id",
+    orderby = "date",
     slice = FALSE
 ){
   # TODO: Assert that groupby and order by
@@ -32,11 +32,10 @@ locf <- function(
   # Get index vector which indicates each
   # row for which we have a new groupby ID
   # i.e. "first" in sorting
-  first_row_of_each_group <- !duplicated(df[, groupby])
+  first_row_of_each_group <- !duplicated(subset(df, select = groupby))
   row_numbers <- seq_along(first_row_of_each_group)
 
-  df[,vars] <- lapply(
-    df[,vars],
+  df[vars] <- lapply(subset(df, select = vars),
     function(x) x[cummax(as.integer(first_row_of_each_group | !is.na(x))*row_numbers)]
   )
 
@@ -61,6 +60,7 @@ locf <- function(
 #' @param orderby Variable to sort on
 #' @param groupby Variable to group on
 #' @param slice If `TRUE` will select the last row in each group of `groupby`
+#' @param return_tibble wether to return a data.table or a tibble
 #' @return data.frame with LOCF imputation
 #' @export locfdt
 #' @examples
@@ -82,7 +82,7 @@ locfdt <- function(
 
   # Get group-change indicator vector
   # This is TRUE for the first row in each group.
-  idchg <- !duplicated(dt[, groupby, with = FALSE])
+  idchg <- !duplicated(subset(dt, select = groupby))
 
   if(requireNamespace("parallel", quietly = TRUE)){
     # locf all vars with parallel::mclapply

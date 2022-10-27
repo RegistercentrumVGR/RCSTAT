@@ -10,7 +10,7 @@ gender(x)
 \item{x}{Swedish social security number}
 }
 \value{
-1 if male, 2 if female
+1 if male, 2 if female.
 }
 \description{
 Derives gender from Swedish social security number

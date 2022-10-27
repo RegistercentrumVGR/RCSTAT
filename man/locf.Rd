@@ -4,18 +4,18 @@
 \alias{locf}
 \title{Performs memory efficient locf}
 \usage{
-locf(df, ..., vars, orderby = "date", slice = FALSE)
+locf(df, vars, groupby = "id", orderby = "date", slice = FALSE)
 }
 \arguments{
 \item{df}{data.frame or tibble with data}
 
-\item{...}{variables to group on}
-
 \item{vars}{variables to perform locf on}
 
-\item{slice}{keep only last row in each group}
+\item{groupby}{variables to group on}
 
-\item{order_by}{variable to sort each group on}
+\item{orderby}{variable to sort each group on}
+
+\item{slice}{keep only last row in each group}
 }
 \value{
 data.frame or tibble with locf data

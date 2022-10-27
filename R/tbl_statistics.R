@@ -52,7 +52,7 @@ group_means <- function(data, ..., vars = names(data)){
       .groups = "drop",
       n = dplyr::n(),
       dplyr::across(
-        .cols = all_of(vars),
+        .cols = tidyselect::all_of(vars),
         .fns = list(mean = mean, sd = sd),
         na.rm = TRUE
       )
@@ -81,12 +81,12 @@ proportion_missing <- function(data, ..., vars = names(data)){
       .groups = "drop",
       N = dplyr::n(),
       dplyr::across(
-        .cols = all_of(vars),
+        .cols = tidyselect::all_of(vars),
         .fns = ~ sum(is.na(.x), na.rm = TRUE)#,
         #.names = "n_missing_{.col}"
       ),
       dplyr::across(
-        .cols = all_of(vars),
+        .cols = tidyselect::all_of(vars),
         .fns = ~ .x/N,
         .names = "Proportion_missing_{.col}"
       )

@@ -1,6 +1,6 @@
-test_that("multiplication works", {
+test_that("Age can be calculated ", {
   df <- dummy_data
 
-  age <- mutate(df, age = age(adate, bdate))
+  age <- dplyr::mutate(df, age = age(adate, bdate))
 
 })

@@ -66,7 +66,7 @@ is_male <- function(x){
 #' Derives gender from Swedish social security number
 #'
 #' @param x Swedish social security number
-#' @return 1 if male, 2 if female
+#' @return 1 if male, 2 if female.
 #' @export gender
 gender <- function(x){
   if(is_female){

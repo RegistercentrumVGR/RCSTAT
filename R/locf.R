@@ -1,5 +1,3 @@
-
-
 #' Performs memory efficient locf
 #'
 #' @param df data.frame or tibble with data
@@ -19,25 +17,34 @@ locf <- function(
     groupby = "id",
     slice = FALSE
 ){
-  data.table::setorderv(df, cols = c(groupby, orderby))
+  # TODO: Assert that groupby and order by
+  # are character vectors and names which
+  # are present in df.
+
+  # create order(groupby, orderby) expression
+  sort_order <- paste0(
+    "order(",
+    paste(paste0("df$", groupby), collapse = ", "),
+    ", df$", orderby, ")"
+  )
+  df <- df[eval(parse(text = sort_order)),]
 
   # Get index vector which indicates each
   # row for which we have a new groupby ID
   # i.e. "first" in sorting
-  idchg <- !duplicated(df[,groupby])
-  row_numbers <- seq_along(idchg)
-  #index_vector <- as.integer((grp_change | id_change) | !is.na(x))*seq_along(x)
-  for(var in vars){
-    index_vector <- as.integer(idchg | !is.na(df[[var]]))*row_numbers
+  first_row_of_each_group <- !duplicated(df[, groupby])
+  row_numbers <- seq_along(first_row_of_each_group)
 
-    df[[var]] <- df[[var]][cummax(index_vector)]
-  }
+  df[,vars] <- lapply(
+    df[,vars],
+    function(x) x[cummax(as.integer(first_row_of_each_group | !is.na(x))*row_numbers)]
+  )
+
   if(slice){
-    data.table::setorderv(df, cols = c(groupby, orderby),
-              order = c(rep(1, length(groupby)), -1))
-    df <- df[idchg,]
+    last_row_of_each_group <- !duplicated(df[, groupby], fromLast = TRUE)
+    df <- df[last_row_of_each_group,]
   }
-  #row.names(df) <- 1:nrow(df)
+
   return(df)
 }
 
@@ -60,43 +67,59 @@ locf <- function(
 #' \dontrun{df <- locfdt(df, vars)}
 #'
 locfdt <- function(
-    df,
+    dt,
     vars,
     groupby = "id",
     orderby = "date",
-    slice = FALSE
+    slice = FALSE,
+    return_tibble = TRUE
 ){
 
-
-
-  dt <- data.table::data.table(df)
+  data.table::setDT(dt)
 
   # Sort data
   data.table::setorderv(dt, c(groupby, orderby))
 
   # Get group-change indicator vector
-  # This is TRUE for the first row in
-  # each group.
+  # This is TRUE for the first row in each group.
   idchg <- !duplicated(dt[, groupby, with = FALSE])
-  # locf all vars with parallel::mcapply
-  dt <- dt[
-    ,(vars) := parallel::mclapply(
-      .SD, function(x) x[cummax(as.integer(!is.na(x)|idchg)* .I)]
-    ),
-    .SDcols = vars
-  ]
+
+  if(requireNamespace("parallel", quietly = TRUE)){
+    # locf all vars with parallel::mclapply
+    dt <- dt[
+      ,(vars) := parallel::mclapply(
+        .SD, function(x) x[cummax(as.integer(!is.na(x)|idchg)* .I)]
+      ),
+      .SDcols = vars
+    ]
+  }else{
+    # locf with lapply
+    dt <- dt[
+      ,(vars) := lapply(
+        .SD, function(x) x[cummax(as.integer(!is.na(x)|idchg)* .I)]
+      ),
+      .SDcols = vars
+    ]
+  }
+  # Keep only last observation in each
+  # group if slice is TRUE
   if(slice){
+    # Reverse sorting with respect to orderby column
     data.table::setorderv(
       dt,
       cols = c(groupby, orderby),
       order = c(rep(1, length(groupby)), -1)
     )
+    # Take first row of each group (which is the last
+    # one with respect to orderby column).
     dt <- dt[idchg,]
   }
-  df <- tibble::as_tibble(dt)
 
-  attributes(df)$.internal.selfref <- NULL
+  if(return_tibble){
+    dt <- tibble::as_tibble(dt)
+    attributes(dt)$.internal.selfref <- NULL
+  }
 
-  return(df)
+  return(dt)
 }
 

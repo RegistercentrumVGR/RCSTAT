@@ -1,0 +1,84 @@
+stages:
+  - check:prod
+  - document
+  - check:release
+  - deploy_dev
+
+variables:
+  LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
+  RENV_PATHS_LIBRARY_ROOT: "$CI_PROJECT_DIR/ci/lib"
+  RENV_PATHS_CACHE: "$CI_PROJECT_DIR/ci/cache"
+
+cache:
+    paths:
+      - $LIBS_USER
+      - $RENV_PATHS_CACHE
+
+default:
+  before_script:
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS="${LIBS_USER}"' > .Renviron
+    - echo 'R_LIBS_USER="${LIBS_USER}"' >> .Renviron
+    - echo 'RENV_PATHS_CACHE = "${RENV_PATHS_CACHE}"' >> .Renviron
+    - echo 'RENV_PATHS_LIBRARY_ROOT = "${RENV_PATHS_LIBRARY_ROOT}"' >> .Renviron
+    - apt-get update
+    # This list of aptitude packages is getting long.
+    # Should consider using another image
+    - apt-get install -y
+      unixodbc-dev libssl-dev libcurl4-openssl-dev
+      libxml2-dev texlive-latex-base
+      libfontconfig1-dev libharfbuzz-dev libfribidi-dev
+      libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
+      pandoc pandoc-citeproc
+    - install2.r -l $LIBS_USER renv
+    - R -e 'renv::restore()'
+
+check-prod:
+  image: r-base:4.0.2
+  stage: check:prod
+  script:
+    - echo "Check package"
+    - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
+    # build the package
+    - echo "Build package"
+    - R CMD build . --resave-data --no-build-vignettes --no-manual
+  artifacts:
+    paths:
+      - "$(ls -rt *_*.tar.gz|tail -1)"
+
+
+pages:
+  image: r-base:4.0.2
+  stage: document
+  only:
+    refs:
+    - master
+  script:
+    - echo "Build pages"
+    - R -e 'renv::install("pkgdown")'
+    - R -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
+    # Fuling
+    - mv docs public
+  artifacts:
+    paths:
+      - public
+
+check-latest:
+  image: r-base:4.2.0
+  stage: check:release
+  script:
+    - echo "Check package"
+    - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
+
+deploy to dev:
+   stage: deploy_dev
+   tags:
+     - rc-r
+   before_script: []
+   script: .\PsScripts\deploy.ps1
+   environment:
+     name: dev
+   only:
+    refs:
+      - master
+   when: manual    

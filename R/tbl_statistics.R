@@ -12,7 +12,7 @@
 #' @param ... variables to group on
 #'
 #' @export group_proportions
-group_proportions <- function(data, ...){
+group_proportions <- function(data, ...) {
 
   result <- data %>%
     dplyr::group_by(...) %>%
@@ -22,12 +22,12 @@ group_proportions <- function(data, ...){
     ) %>%
     dplyr::mutate(
       Nt = sum(.data[["n"]], na.rm = TRUE),
-      p = .data[["n"]]/.data[["Nt"]]
+      p = .data[["n"]] / .data[["Nt"]]
     ) %>%
     dplyr::rename(
-      Count = .data[["n"]],
-      Total = .data[["Nt"]],
-      Proportion = .data[["p"]]
+      Count = "n",
+      Total = "Nt",
+      Proportion = "p"
     ) %>%
     dplyr::ungroup()
 
@@ -42,7 +42,7 @@ group_proportions <- function(data, ...){
 #' Defaults to all vars in data.
 #'
 #' @export group_means
-group_means <- function(data, ..., vars = names(data)){
+group_means <- function(data, ..., vars = names(data)) {
   # Remove grouping-vars from vars if present
   vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
@@ -71,7 +71,7 @@ group_means <- function(data, ..., vars = names(data)){
 #' data on. Defaults to all except grouping vars.
 #'
 #' @export proportion_missing
-proportion_missing <- function(data, ..., vars = names(data)){
+proportion_missing <- function(data, ..., vars = names(data)) {
   # Remove grouping-vars from vars if present
   vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
@@ -82,12 +82,11 @@ proportion_missing <- function(data, ..., vars = names(data)){
       N = dplyr::n(),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
-        .fns = ~ sum(is.na(.x), na.rm = TRUE)#,
-        #.names = "n_missing_{.col}"
+        .fns = ~ sum(is.na(.x), na.rm = TRUE)
       ),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
-        .fns = ~ .x/N,
+        .fns = ~ .x / N,
         .names = "Proportion_missing_{.col}"
       )
     )

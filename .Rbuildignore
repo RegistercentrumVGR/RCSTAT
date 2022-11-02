@@ -4,3 +4,6 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^LICENSE\.md$
+.gitlab-ci.yml
+.lintr
+^PsScripts$

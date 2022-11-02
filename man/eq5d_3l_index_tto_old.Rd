@@ -2,7 +2,8 @@
 % Please edit documentation in R/eq5d.R
 \name{eq5d_3l_index_tto_old}
 \alias{eq5d_3l_index_tto_old}
-\title{Convert EQ5D-3L-values stored in combined character vectors to Swedish EQ5D-index based on TTO}
+\title{Convert EQ5D-3L-values stored in combined character vectors to Swedish
+EQ5D-index based on TTO}
 \usage{
 eq5d_3l_index_tto_old(x, split = ",")
 }
@@ -22,7 +23,8 @@ eq5d_3l_index_tto_old(x, split = ",")
 numeric vector with EQ5D-indices based on TTO
 }
 \description{
-Convert EQ5D-3L-values stored in combined character vectors to Swedish EQ5D-index based on TTO
+Convert EQ5D-3L-values stored in combined character vectors to Swedish
+EQ5D-index based on TTO
 }
 \examples{
 eq5d_3l_index_tto_old(c("2,2,2,2,3", NA, "2,2,2,3,3", "2,2,2,2,2"))

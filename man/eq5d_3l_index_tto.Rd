@@ -7,7 +7,8 @@
 eq5d_3l_index_tto(mobility, selfcare, usual, pain, anxiety)
 }
 \arguments{
-\item{mobility, selfcare, usual, pain, anxiety}{numeric scale values for each dimension}
+\item{mobility, selfcare, usual, pain, anxiety}{numeric
+scale values for each dimension}
 }
 \value{
 numeric vector with calulated index-values

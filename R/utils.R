@@ -9,7 +9,7 @@
 #' columns summed up.
 #'
 #' @export add_total
-add_total <- function(data){
+add_total <- function(data) {
 
   cols <- unlist(lapply(data, is.numeric))
   totals <- lapply(data[cols], sum, na.rm = TRUE)
@@ -26,9 +26,8 @@ add_total <- function(data){
 #' (days, weeks, months, years)
 #'
 #' @export birthdate
-age <- function(from_date, to_date, unit = "years"){
+age <- function(from_date, to_date, unit = "years") {
   time_interval <- lubridate::interval(from_date, to_date)
-  #time_intervall <- difftime(to_date, from_date, unit = "days")
   lubridate::time_length(time_interval, unit = unit)
 }
 #' Derives birthdate from Swedish social security number
@@ -36,7 +35,7 @@ age <- function(from_date, to_date, unit = "years"){
 #' @param x Swedish social security number
 #'
 #' @export birthdate
-birthdate <- function(x){
+birthdate <- function(x) {
   as.Date(paste(
     #year
     substr(x, 1L, 4L),
@@ -52,7 +51,7 @@ birthdate <- function(x){
 #' @param x Swedish social security number
 #' @return boolean
 #' @export is_female
-is_female <- function(x){
+is_female <- function(x) {
   (as.integer(substr(x, 12L, 12L)) %% 2L == 0L)
 }
 #' Derives gender from Swedish social security number
@@ -60,7 +59,7 @@ is_female <- function(x){
 #' @param x Swedish social security number
 #' @return boolean
 #' @export is_male
-is_male <- function(x){
+is_male <- function(x) {
   !is_female(x)
 }
 #' Derives gender from Swedish social security number
@@ -68,10 +67,10 @@ is_male <- function(x){
 #' @param x Swedish social security number
 #' @return 1 if male, 2 if female.
 #' @export gender
-gender <- function(x){
-  if(is_female){
+gender <- function(x) {
+  if (is_female) {
     return(2L)
-  }else{
+  }else {
     return(1L)
   }
 }

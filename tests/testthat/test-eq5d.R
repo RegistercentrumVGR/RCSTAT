@@ -38,7 +38,7 @@ test_that("eq5d_3l_index_tto", {
     0.724
   )
   expect_equal(
-    eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1,3), rep(1, 3)),
+    eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3)),
     c(0.9694, 0.9694, 0.9694)
   )
   expect_equal(
@@ -58,11 +58,12 @@ test_that("eq5d_3l_index_tto", {
 
 test_that("eq5d_5l_index_tto", {
   expect_equal(
-    eq5d_5l_index_tto(3,4,5,4,3),
+    eq5d_5l_index_tto(3, 4, 5, 4, 3),
     0.5031
   )
   expect_equal(
-    eq5d_5l_index_tto(rep(3, 10), rep(4, 10),rep(5, 10), rep(4, 10), rep(3, 10)),
+    eq5d_5l_index_tto(rep(3, 10), rep(4, 10), rep(5, 10),
+                      rep(4, 10), rep(3, 10)),
     rep(0.5031, 10)
   )
   expect_error(

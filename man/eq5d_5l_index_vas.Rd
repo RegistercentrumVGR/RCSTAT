@@ -7,7 +7,8 @@
 eq5d_5l_index_vas(mobility, selfcare, usual, pain, anxiety)
 }
 \arguments{
-\item{mobility, selfcare, usual, pain, anxiety}{numeric scale values for each dimension}
+\item{mobility, selfcare, usual, pain, anxiety}{numeric
+scale values for each dimension}
 }
 \value{
 numeric vector with EQ5D-indices

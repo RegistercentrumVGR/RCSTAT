@@ -4,8 +4,8 @@
 \name{RCStat-package}
 \alias{RCStat}
 \alias{RCStat-package}
-\title{RCStat: What the Package Does (Title Case)}
+\title{RCStat: Commonly used}
 \description{
-More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
+Holds functions for standard tables and general data management for registers at Registercentrum.
 }
 \keyword{internal}

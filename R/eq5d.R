@@ -4,10 +4,10 @@ any_na <- function(...) apply(cbind(...), 1, anyNA)
 # Check that only valid numbers are used as EQ5D-levels
 valid <- function(..., ok) {
   check <- function(x) {
-  if (!is.numeric(x))
-    stop("EQ5D-values must be numeric!")
-  if (any(!x %in% c(NA, ok)))
-    stop("EQ5D-values must be: ", paste(ok, collapse = ", "))
+    if (!is.numeric(x))
+      stop("EQ5D-values must be numeric!")
+    if (any(!x %in% c(NA, ok)))
+      stop("EQ5D-values must be: ", paste(ok, collapse = ", "))
   }
   lapply(data.frame(...), check)
 }
@@ -48,7 +48,12 @@ eq5d_index <- function(..., levels, type, old = FALSE, split = ",") {
         eq5d_3l_index_tto(...)
       }
     } else if (levels == 5) {
-      if (old) warning("Argument `old` ignored (not implemented for `levels = 5`)!")
+      if (old) {
+        warning(paste0(
+          "Argument `old` ignored ",
+          "(not implemented for `levels = 5`)!"
+        ))
+      }
       eq5d_5l_index_tto(...)
     }
   } else if (type == "VAS") {
@@ -60,7 +65,8 @@ eq5d_index <- function(..., levels, type, old = FALSE, split = ",") {
 
 #' Calculate Swedish EQ5D-index based on TTO from EQ5D-3-level data
 #'
-#' @param mobility,selfcare,usual,pain,anxiety numeric scale values for each dimension
+#' @param mobility,selfcare,usual,pain,anxiety numeric
+#'        scale values for each dimension
 #' @return numeric vector with calulated index-values
 #' @export
 #' @references
@@ -88,7 +94,8 @@ eq5d_3l_index_tto <- function(mobility, selfcare, usual, pain, anxiety) {
 }
 
 
-#' Convert EQ5D-3L-values stored in combined character vectors to Swedish EQ5D-index based on TTO
+#' Convert EQ5D-3L-values stored in combined character vectors to Swedish
+#' EQ5D-index based on TTO
 #'
 #' @param x character vector with comma-separated vaslues for each dimension.
 #' @inheritParams base::strsplit

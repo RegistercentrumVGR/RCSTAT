@@ -55,12 +55,12 @@ locf <- function(
 #'
 #' @name locfdt
 #' @title locfdt
-#' @param df data.frame to do LOCF imputation on
+#' @param dt data.frame or data.table to do LOCF imputation on
 #' @param vars variables to impute with LOCF
 #' @param orderby Variable to sort on
 #' @param groupby Variable to group on
 #' @param slice If `TRUE` will select the last row in each group of `groupby`
-#' @param return_tibble wether to return a data.table or a tibble
+#' @param return_tibble whether to return a data.table or a tibble
 #' @return data.frame with LOCF imputation
 #' @export locfdt
 #' @examples

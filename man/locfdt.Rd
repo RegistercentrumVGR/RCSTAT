@@ -14,6 +14,8 @@ locfdt(
 )
 }
 \arguments{
+\item{dt}{data.frame or data.table to do LOCF imputation on}
+
 \item{vars}{variables to impute with LOCF}
 
 \item{groupby}{Variable to group on}
@@ -22,9 +24,7 @@ locfdt(
 
 \item{slice}{If `TRUE` will select the last row in each group of `groupby`}
 
-\item{return_tibble}{wether to return a data.table or a tibble}
-
-\item{df}{data.frame to do LOCF imputation on}
+\item{return_tibble}{whether to return a data.table or a tibble}
 }
 \value{
 data.frame with LOCF imputation

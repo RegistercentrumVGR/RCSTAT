@@ -7,3 +7,11 @@
 .gitlab-ci.yml
 .lintr
 ^PsScripts$
+^.github$
+^public$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^ci$
+deploy.ps1
+

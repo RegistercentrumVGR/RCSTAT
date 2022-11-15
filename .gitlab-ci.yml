@@ -29,7 +29,7 @@ default:
       libxml2-dev texlive-latex-base
       libfontconfig1-dev libharfbuzz-dev libfribidi-dev
       libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
-      pandoc pandoc-citeproc
+      pandoc pandoc-citeproc libstdc++-dev
     - install2.r -l $LIBS_USER renv
     - R -e 'renv::restore()'
 

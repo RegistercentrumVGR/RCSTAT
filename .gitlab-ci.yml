@@ -1,7 +1,6 @@
 stages:
-  - check:prod
+  - check
   - document
-  - check:release
   - deploy_dev
 
 variables:
@@ -19,7 +18,7 @@ cache:
 
 check-prod:
   image: rocker/r-ver:4.0.2
-  stage: check:prod
+  stage: check
   script:
     - mkdir -p $RENV_PATHS_LIBRARY
     - echo 'RENV_PATHS_LIBRARY="${RENV_PATHS_LIBRARY}"' > .Renviron
@@ -35,11 +34,32 @@ check-prod:
     - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
     # build the package
     - echo "Build package"
-    - R CMD build . --resave-data --no-build-vignettes --no-manual
+    - R CMD build . --no-build-vignettes --no-manual
+    - pwd
+    - ls -la
   artifacts:
     paths:
-      - "$(ls -rt *_*.tar.gz|tail -1)"
+      - "*.tar.gz"
 
+
+check-latest:
+  image: rocker/r-ver:4.2.1
+  stage: check
+  script:
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
+    # Do not use renv in this stage
+    - rm .Rprofile
+    - echo 'INSTALL SYSTEM DEPENDENCIES'
+    - apt-get update
+    - R -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - R -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
+    - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - R -e 'pak::pkg_install("rcmdcheck", lib = Sys.getenv("R_LIBS_USER"))'
+    - R -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
+    - echo "CHECK PACKAGE"
+    - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
 
 pages:
   image: rocker/r-ver:4.2.1
@@ -53,36 +73,21 @@ pages:
     - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
     # Do not use renv in this stage
     - rm .Rprofile
+    - echo 'INSTALL SYSTEM DEPENDENCIES'
     - apt-get update
-    - R -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - R -e 'pak::pkg_install("distro")'
+    - R -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - R -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
     - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - R -e 'pak::pkg_install(c("renv", "rcmdcheck", "pkgdown"))'
-    - R -e 'pak::local_install_dev_deps()'
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - R -e 'pak::pkg_install("pkgdown", lib = Sys.getenv("R_LIBS_USER"))'
+    - R -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
+    - echo 'BUILD DOCUMENTATION'
     - R -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
     # Fuling
     - mv docs public
   artifacts:
     paths:
       - public
-
-check-latest:
-  image: rocker/r-ver:4.2.1
-  stage: check:release
-  script:
-    - mkdir -p $LIBS_USER
-    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
-    # Do not use renv in this stage
-    - rm .Rprofile
-    - apt-get update
-    - R -e 'Sys.getenv("R_LIBS_USER")'
-    - R -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - R -e 'pak::pkg_install("distro")'
-    - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - R -e 'pak::pkg_install(c("renv", "rcmdcheck", "pkgdown"))'
-    - echo "Check package"
-    - R -e 'pak::local_install_dev_deps()'
-    - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
 
 deploy to dev:
    stage: deploy_dev

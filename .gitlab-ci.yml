@@ -6,37 +6,31 @@ stages:
 
 variables:
   LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
-  RENV_PATHS_LIBRARY_ROOT: "$CI_PROJECT_DIR/ci/lib"
+  RENV_PATHS_LIBRARY: "$CI_PROJECT_DIR/ci/renv/lib"
+  RENV_PATHS_LIBRARY_ROOT: "$CI_PROJECT_DIR/ci/renv"
   RENV_PATHS_CACHE: "$CI_PROJECT_DIR/ci/cache"
 
 cache:
     paths:
       - $LIBS_USER
       - $RENV_PATHS_CACHE
+      - $RENV_PATHS_LIBRARY_ROOT
+    
 
-default:
-  before_script:
-    - mkdir -p $LIBS_USER
-    - echo 'R_LIBS="${LIBS_USER}"' > .Renviron
-    - echo 'R_LIBS_USER="${LIBS_USER}"' >> .Renviron
+check-prod:
+  image: rocker/r-ver:4.0.2
+  stage: check:prod
+  script:
+    - mkdir -p $RENV_PATHS_LIBRARY
+    - echo 'RENV_PATHS_LIBRARY="${RENV_PATHS_LIBRARY}"' > .Renviron
     - echo 'RENV_PATHS_CACHE = "${RENV_PATHS_CACHE}"' >> .Renviron
     - echo 'RENV_PATHS_LIBRARY_ROOT = "${RENV_PATHS_LIBRARY_ROOT}"' >> .Renviron
     - apt-get update
-    # This list of aptitude packages is getting long.
-    # Should consider using another image
-    - apt-get install -y
-      unixodbc-dev libssl-dev libcurl4-openssl-dev
-      libxml2-dev texlive-latex-base
-      libfontconfig1-dev libharfbuzz-dev libfribidi-dev
-      libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
-      pandoc pandoc-citeproc libstdc++-12-dev
-    - install2.r -l $LIBS_USER renv
+    - R -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - R -e 'pak::pkg_install("distro")'
+    - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - R -e 'pak::pkg_install(c("renv", "rcmdcheck", "pkgdown"))'
     - R -e 'renv::restore()'
-
-check-prod:
-  image: r-base:4.0.2
-  stage: check:prod
-  script:
     - echo "Check package"
     - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
     # build the package
@@ -48,14 +42,23 @@ check-prod:
 
 
 pages:
-  image: r-base:4.0.2
+  image: rocker/r-ver:4.2.1
   stage: document
   only:
     refs:
     - master
   script:
     - echo "Build pages"
-    - R -e 'renv::install("pkgdown")'
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
+    # Do not use renv in this stage
+    - rm .Rprofile
+    - apt-get update
+    - R -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - R -e 'pak::pkg_install("distro")'
+    - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - R -e 'pak::pkg_install(c("renv", "rcmdcheck", "pkgdown"))'
+    - R -e 'pak::local_install_dev_deps()'
     - R -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
     # Fuling
     - mv docs public
@@ -64,10 +67,21 @@ pages:
       - public
 
 check-latest:
-  image: r-base:4.2.0
+  image: rocker/r-ver:4.2.1
   stage: check:release
   script:
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
+    # Do not use renv in this stage
+    - rm .Rprofile
+    - apt-get update
+    - R -e 'Sys.getenv("R_LIBS_USER")'
+    - R -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - R -e 'pak::pkg_install("distro")'
+    - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - R -e 'pak::pkg_install(c("renv", "rcmdcheck", "pkgdown"))'
     - echo "Check package"
+    - R -e 'pak::local_install_dev_deps()'
     - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
 
 deploy to dev:

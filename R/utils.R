@@ -25,7 +25,7 @@ add_total <- function(data) {
 #' @param unit Unit to use, passed to lubridate::time_length
 #' (days, weeks, months, years)
 #'
-#' @export birthdate
+#' @export age
 age <- function(from_date, to_date, unit = "years") {
   time_interval <- lubridate::interval(from_date, to_date)
   lubridate::time_length(time_interval, unit = unit)

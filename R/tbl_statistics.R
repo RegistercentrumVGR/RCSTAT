@@ -53,7 +53,7 @@ group_means <- function(data, ..., vars = names(data)) {
       n = dplyr::n(),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
-        .fns = list(mean = mean, sd = sd),
+        .fns = list(mean = mean, sd = stats::sd),
         na.rm = TRUE
       )
     )

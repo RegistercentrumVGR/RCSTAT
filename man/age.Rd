@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{age}
 \alias{age}
-\title{Time between dates}
+\title{Simple time between dates}
 \usage{
 age(from_date, to_date, unit = "years")
 }

@@ -17,9 +17,10 @@ add_total <- function(data) {
 
   rbind(data, totals)
 }
-#' Time between dates
+#' Simple time between dates
 #'
 #' Calculates time between two dates.
+#'
 #' @param from_date start date of interval
 #' @param to_date end date for interval
 #' @param unit Unit to use, passed to lubridate::time_length

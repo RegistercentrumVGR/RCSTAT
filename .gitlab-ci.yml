@@ -21,14 +21,17 @@ check-prod:
   stage: check
   script:
     - mkdir -p $RENV_PATHS_LIBRARY
-    - echo 'RENV_PATHS_LIBRARY="${RENV_PATHS_LIBRARY}"' > .Renviron
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
+    - echo 'RENV_PATHS_LIBRARY="${RENV_PATHS_LIBRARY}"' >> .Renviron
     - echo 'RENV_PATHS_CACHE = "${RENV_PATHS_CACHE}"' >> .Renviron
     - echo 'RENV_PATHS_LIBRARY_ROOT = "${RENV_PATHS_LIBRARY_ROOT}"' >> .Renviron
     - apt-get update
     - R -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
     - R -e 'pak::pkg_install("distro")'
     - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - R -e 'pak::pkg_install(c("renv", "rcmdcheck", "pkgdown"))'
+    - R -e 'pak::pkg_install("renv")'
+    - R -e 'pak::pkg_install(c("rcmdcheck", "pkgdown"))'
     - R -e 'renv::restore()'
     - echo "Check package"
     - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
@@ -59,7 +62,7 @@ check-latest:
     - R -e 'pak::pkg_install("rcmdcheck", lib = Sys.getenv("R_LIBS_USER"))'
     - R -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
     - echo "CHECK PACKAGE"
-    - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
+    - R -e '.libPaths(c(.libPaths(), Sys.getenv("R_LIBS_USER")));rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
 
 pages:
   image: rocker/r-ver:4.2.1

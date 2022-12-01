@@ -4,15 +4,14 @@
 \alias{age}
 \title{Simple time between dates}
 \usage{
-age(from_date, to_date, unit = "years")
+age(from_date, to_date, unit = "whole_years")
 }
 \arguments{
 \item{from_date}{start date of interval}
 
 \item{to_date}{end date for interval}
 
-\item{unit}{Unit to use, passed to lubridate::time_length
-(days, weeks, months, years)}
+\item{unit}{Unit to use, (whole_years, days, weeks, months, years)}
 }
 \description{
 Calculates time between two dates.

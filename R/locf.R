@@ -84,7 +84,7 @@ locfdt <- function(
 
   # Get group-change indicator vector
   # This is TRUE for the first row in each group.
-  idchg <- !data.table::duplicated(subset(dt, select = groupby))
+  idchg <- !duplicated(subset(dt, select = groupby))
 
   if (requireNamespace("parallel", quietly = TRUE)) {
     # locf all vars with parallel::mclapply
@@ -108,7 +108,7 @@ locfdt <- function(
   # Keep only last observation in each
   # group if slice is TRUE
   if (slice) {
-    last_row <- !data.table::duplicated(
+    last_row <- !duplicated(
       subset(dt, select = groupby),
       fromLast = TRUE
     )

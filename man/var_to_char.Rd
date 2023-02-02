@@ -7,24 +7,27 @@
 var_to_char(x, labels, name = NULL)
 }
 \arguments{
-\item{x}{Object with "map" attributes, where levels and labels exist}
+\item{x}{Vector with codes to decode}
+
+\item{labels}{data.frame with columns ValueCode and ValueName to use when
+decoding/translating.}
 
 \item{name}{name of input variable (optional)}
-
-\item{droplevels}{If `TRUE`, factor levels not present in data will be
-excluded.}
 }
 \value{
-Factor
+character vector
 }
 \description{
 Used to extract texts from a variable containing numeric values.
 }
 \examples{
-df <- data.frame(cars = 1:3)
+
+x <- sample(1:3, size = 10, replace = TRUE)
+
 labels <- data.frame(
-    levels = 1:3,
-    labels = c("Volvo", "Saab", "Opel")
- )
-var_to_char(df[["cars"]])
+  ValueCode = 1:3,
+  ValueName = c("Volvo", "Saab", "Opel")
+)
+var_to_char(x, labels, name = "cars")
+
 }

@@ -76,30 +76,30 @@ locfdt <- function(
     groupby = "id",
     orderby = "date",
     slice = FALSE,
-    return_tibble = TRUE
+    return_tibble = FALSE
 ) {
-
-  data.table::setDT(dt)
 
   # Sort data
   data.table::setorderv(dt, c(groupby, orderby))
 
   # Get group-change indicator vector
   # This is TRUE for the first row in each group.
-  idchg <- !duplicated(subset(dt, select = groupby))
+  idchg <- !data.table::duplicated(subset(dt, select = groupby))
 
   if (requireNamespace("parallel", quietly = TRUE)) {
     # locf all vars with parallel::mclapply
-    dt <- dt[
-      , (vars) := parallel::mclapply(
+    dt[
+      ,
+      (vars) := parallel::mclapply(
         .SD, function(x) x[cummax(as.integer(!is.na(x) | idchg) * .I)]
       ),
       .SDcols = vars
     ]
-  }else {
+  } else {
     # locf with lapply
-    dt <- dt[
-      , (vars) := lapply(
+    dt[
+      ,
+      (vars) := lapply(
         .SD, function(x) x[cummax(as.integer(!is.na(x) | idchg) * .I)]
       ),
       .SDcols = vars
@@ -108,15 +108,12 @@ locfdt <- function(
   # Keep only last observation in each
   # group if slice is TRUE
   if (slice) {
-    # Reverse sorting with respect to orderby column
-    data.table::setorderv(
-      dt,
-      cols = c(groupby, orderby),
-      order = c(rep(1, length(groupby)), -1)
+    last_row <- !data.table::duplicated(
+      subset(dt, select = groupby),
+      fromLast = TRUE
     )
-    # Take first row of each group (which is the last
-    # one with respect to orderby column).
-    dt <- dt[idchg, ]
+    # Take last row of each group
+    dt <- dt[last_row, ]
   }
 
   if (return_tibble) {

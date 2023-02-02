@@ -14,5 +14,6 @@ age(from_date, to_date, unit = "whole_years")
 \item{unit}{Unit to use, (whole_years, days, weeks, months, years)}
 }
 \description{
-Calculates time between two dates.
+Calculates time between two dates. unit whole_years will
+return age in years. Other units will returns numeric (decimal).
 }

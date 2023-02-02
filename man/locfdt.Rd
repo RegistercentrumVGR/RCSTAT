@@ -10,7 +10,7 @@ locfdt(
   groupby = "id",
   orderby = "date",
   slice = FALSE,
-  return_tibble = TRUE
+  return_tibble = FALSE
 )
 }
 \arguments{

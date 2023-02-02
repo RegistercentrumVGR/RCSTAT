@@ -14,10 +14,10 @@ cache:
       - $LIBS_USER
       - $RENV_PATHS_CACHE
       - $RENV_PATHS_LIBRARY_ROOT
-    
+
 
 check-prod:
-  image: rocker/r-ver:4.0.2
+  image: rocker/r-ver:4.2.0
   stage: check
   script:
     - mkdir -p $RENV_PATHS_LIBRARY
@@ -52,7 +52,7 @@ check-latest:
     - mkdir -p $LIBS_USER
     - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
     # Do not use renv in this stage
-    - rm .Rprofile
+    #- rm .Rprofile
     - echo 'INSTALL SYSTEM DEPENDENCIES'
     - apt-get update
     - R -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
@@ -103,4 +103,4 @@ deploy to dev:
    only:
     refs:
       - master
-   when: manual    
+   when: manual

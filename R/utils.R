@@ -1,3 +1,5 @@
+
+
 #' Add row with total
 #'
 #' Brutally sums up all numeric columns and appends
@@ -19,7 +21,8 @@ add_total <- function(data) {
 }
 #' Simple time between dates
 #'
-#' Calculates time between two dates.
+#' Calculates time between two dates. unit whole_years will
+#' return age in years. Other units will returns numeric (decimal).
 #'
 #' @param from_date start date of interval
 #' @param to_date end date for interval
@@ -67,7 +70,9 @@ birthdate <- function(x) {
 #' @return boolean
 #' @export is_female
 is_female <- function(x) {
-  (as.integer(substr(x, 12L, 12L)) %% 2L == 0L)
+  second_last_character <- nchar(x) - 1
+
+  (as.integer(substr(x, second_last_character, second_last_character)) %% 2L == 0L)
 }
 #' Derives gender from Swedish social security number
 #'

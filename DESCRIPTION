@@ -17,14 +17,17 @@ Suggests:
     rcmdcheck,
     usethis
 Config/testthat/edition: 3
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Imports: 
     data.table,
     dplyr,
     httr,
     lubridate,
     magrittr,
+    Rcpp,
     rlang (>= 0.4.11),
     stats,
     tibble,
     tidyselect
+LinkingTo: 
+    Rcpp

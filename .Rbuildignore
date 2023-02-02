@@ -14,4 +14,4 @@
 ^pkgdown$
 ^ci$
 deploy.ps1
-
+^dev$

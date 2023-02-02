@@ -4,15 +4,19 @@
 \alias{var_to_factor}
 \title{Convert object with attributes in "map" to factor}
 \usage{
-var_to_factor(x, labels)
+var_to_factor(x, labels, name = NULL, droplevels = TRUE)
 }
 \arguments{
-\item{x}{Object with "map" attributes, where levels and labels exist}
+\item{x}{Vector with codes to decode}
+
+\item{labels}{data.frame with columns ValueCode and ValueName to use
+when decoding.}
+
+\item{name}{name of input variable (optional). Used in the warning message
+only to print the name of variable with missing labels.}
 
 \item{droplevels}{If `TRUE`, factor levels not present in data will be
 excluded.}
-
-\item{name}{name of input variable (optional)}
 }
 \value{
 Factor
@@ -21,10 +25,12 @@ Factor
 Used to extract texts from a variable containing numeric values.
 }
 \examples{
-df <- data.frame(cars = 1:3)
-attr(df$cars, "map") <- data.frame(
-    levels = 1:3,
-    labels = c("Volvo", "Saab", "Opel")
- )
-attr_to_factor(df$cars)
+
+x <- sample(1:3, size = 10, replace = TRUE)
+
+labels <- data.frame(
+  ValueCode = 1:3,
+  ValueName = c("Volvo", "Saab", "Opel")
+)
+var_to_factor(x, labels, name = "cars")
 }

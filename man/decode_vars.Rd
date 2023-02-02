@@ -15,6 +15,8 @@ decode_data(
 )
 }
 \arguments{
+\item{data}{Data frame with Stratum register data}
+
 \item{labels}{Value labels for the same register}
 
 \item{droplevels}{If `TRUE`, factor levels not present in data will be
@@ -27,8 +29,6 @@ then the specified variables will have its levels dropped.}
 
 \item{as_character}{If `TRUE` variables
 will be set to characters. If `FALSE` variables will be factors.}
-
-\item{df}{Data frame with Stratum register data}
 }
 \value{
 data.frame with character values instead

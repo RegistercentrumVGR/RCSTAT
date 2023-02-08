@@ -109,11 +109,11 @@ eq5d_3l_index_tto <- function(mobility, selfcare, usual, pain, anxiety) {
 #' eq5d_3l_index_tto_old(c("22223", NA, "22233", "22222"), split = "")
 eq5d_3l_index_tto_old <- function(x, split = ",") {
   xx <-
-    x %>%
-    strsplit(split) %>%
-    lapply(as.numeric) %>%
-    data.frame() %>%
-    t() %>%
+    x |>
+    strsplit(split) |>
+    lapply(as.numeric) |>
+    data.frame() |>
+    t() |>
     data.frame()
   colnames(xx) <- c("mobility", "selfcare", "usual", "pain", "anxiety")
   do.call(eq5d_3l_index_tto, xx)

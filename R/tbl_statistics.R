@@ -14,21 +14,21 @@
 #' @export group_proportions
 group_proportions <- function(data, ...) {
 
-  result <- data %>%
-    dplyr::group_by(...) %>%
+  result <- data |>
+    dplyr::group_by(...) |>
     dplyr::summarise(
       .groups = "drop_last",
       n = dplyr::n()
-    ) %>%
+    ) |>
     dplyr::mutate(
       Nt = sum(.data[["n"]], na.rm = TRUE),
       p = .data[["n"]] / .data[["Nt"]]
-    ) %>%
+    ) |>
     dplyr::rename(
       Count = "n",
       Total = "Nt",
       Proportion = "p"
-    ) %>%
+    ) |>
     dplyr::ungroup()
 
   return(result)
@@ -46,8 +46,8 @@ group_means <- function(data, ..., vars = names(data)) {
   # Remove grouping-vars from vars if present
   vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
-  result <- data %>%
-    dplyr::group_by(...) %>%
+  result <- data |>
+    dplyr::group_by(...) |>
     dplyr::summarise(
       .groups = "drop",
       n = dplyr::n(),
@@ -75,8 +75,8 @@ proportion_missing <- function(data, ..., vars = names(data)) {
   # Remove grouping-vars from vars if present
   vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
-  result <- data %>%
-    dplyr::group_by(...) %>%
+  result <- data |>
+    dplyr::group_by(...) |>
     dplyr::summarise(
       .groups = "drop",
       N = dplyr::n(),

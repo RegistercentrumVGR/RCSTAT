@@ -46,7 +46,7 @@ check-prod:
 
 
 check-latest:
-  image: rocker/r-ver:4.2.1
+  image: rocker/r-ver:4.2.0
   stage: check
   script:
     - mkdir -p $LIBS_USER
@@ -65,7 +65,7 @@ check-latest:
     - R -e '.libPaths(c(.libPaths(), Sys.getenv("R_LIBS_USER")));rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
 
 pages:
-  image: rocker/r-ver:4.2.1
+  image: rocker/r-ver:4.2.0
   stage: document
   only:
     refs:

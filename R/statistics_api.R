@@ -49,26 +49,12 @@ statistics_api <- function(
     ) |>
     jsonlite::fromJSON()
 
-  print(json_list)
-
-  if (json_list[["code"]] == 400 & !is.null(json_list[["message"]])) {
-    stop(json_list[["message"]])
-  }
-
-  if (json_list[["code"]] == 401) {
-    stop("401: Athentication error, invalid credentials!")
-  }
-  if (json_list[["code"]] == 403) {
-    stop("403: Athentication error, permission denied!")
-  }
-  if (json_list[["code"]] == 404) {
-    stop("404: not found")
-  }
-  if (json_list[["code"]] == 405) {
-    stop("405: Disallowed operation!")
-  }
-  if (json_list[["code"]] == 500) {
-    stop("500: Non-existing functionality!")
+  if (json_list[["code"]] != 200 & !is.null(json_list[["message"]])) {
+    stop(paste0(
+      "\nError returned by server",
+      "\nCode: ", json_list[["code"]],
+      "\nMessage: ", json_list[["message"]]
+    ))
   }
 
   data <- json_list[["data"]]

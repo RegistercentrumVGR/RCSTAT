@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_labels.R
 \name{var_to_factor}
 \alias{var_to_factor}
-\title{Convert object with attributes in "map" to factor}
+\title{Convert vector to factor using supplied labels}
 \usage{
 var_to_factor(x, labels, name = NULL, droplevels = TRUE)
 }
@@ -22,7 +22,7 @@ excluded.}
 Factor
 }
 \description{
-Used to extract texts from a variable containing numeric values.
+Convert vector to factor using supplied labels
 }
 \examples{
 

@@ -1,6 +1,5 @@
-#' Convert object with attributes in "map" to factor
+#' Convert vector to factor using supplied labels
 #'
-#' Used to extract texts from a variable containing numeric values.
 #' @param x Vector with codes to decode
 #' @param labels data.frame with columns ValueCode and ValueName to use
 #' when decoding.

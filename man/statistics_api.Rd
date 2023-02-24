@@ -4,7 +4,14 @@
 \alias{statistics_api}
 \title{Get data from statistics API}
 \usage{
-statistics_api(register, script, arguments = NULL)
+statistics_api(
+  register,
+  script,
+  arguments = NULL,
+  api_key = "MpuYxfbtp5I=",
+  dev = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{register}{register short name}
@@ -12,6 +19,12 @@ statistics_api(register, script, arguments = NULL)
 \item{script}{script name}
 
 \item{arguments}{Arguments to include as named list}
+
+\item{api_key}{api-key to use}
+
+\item{dev}{if newr should be used}
+
+\item{verbose}{print query sent}
 }
 \description{
 Get data from statistics API

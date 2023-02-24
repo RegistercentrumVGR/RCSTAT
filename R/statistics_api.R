@@ -3,12 +3,18 @@
 #' @param register register short name
 #' @param script script name
 #' @param arguments Arguments to include as named list
+#' @param api_key api-key to use
+#' @param dev if newr should be used
+#' @param verbose print query sent
 #'
 #' @export statistics_api
 statistics_api <- function(
     register,
     script,
-    arguments = NULL
+    arguments = NULL,
+    api_key = "MpuYxfbtp5I=",
+    dev = FALSE,
+    verbose = FALSE
     ) {
 
   if(!is.null(arguments)){
@@ -34,9 +40,11 @@ statistics_api <- function(
       "stratum/api/statistics/",
       register, "/",
       script,
-      "?apikey=MpuYxfbtp5I=",
+      "?apikey=", api_key,
       arguments_str
     )
+  if (dev) q <- paste0(q, "&forcenewr=true")
+  if (verbose) print(q)
 
   json_list <-
     q |>

@@ -114,8 +114,7 @@ decode_data <- function(
   var_names <- colnames(data)
   label_names <- unique(labels[["ColumnName"]])
 
-  vars_int <- vapply(data, \(x) is.integer(x) && !is.factor(x), logical(1))
-  vars_to_decode <- var_names[var_names %in% label_names & vars_int]
+  vars_to_decode <- var_names[var_names %in% label_names]
 
   if (is.logical(droplevels)) {
     droplevels <- rep(droplevels, length(vars_to_decode))
@@ -127,6 +126,17 @@ decode_data <- function(
   for (var in vars_to_decode) {
     labels_list[[var]] <- labels[labels[["ColumnName"]] == var,]
   }
+
+  # Exclude variables which already have only values from their labels (See issue #6)
+  already_decoded <-
+    vapply(
+      vars_to_decode,
+      \(x) all(data[[x]] %in% c(NA, labels_list[[x]]$ValueName)),
+      logical(1)
+    )
+  vars_to_decode <- vars_to_decode[!already_decoded]
+  labels_list[already_decoded] <- NULL
+
 
   if (as_character) {
     if (add_cols) {

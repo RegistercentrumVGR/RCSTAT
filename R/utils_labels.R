@@ -116,13 +116,7 @@ decode_data <- function(
 
   vars_to_decode <- var_names[var_names %in% label_names]
 
-  if (is.logical(droplevels)) {
-    droplevels <- rep(droplevels, length(vars_to_decode))
-  } else {
-    droplevels <- vars_to_decode %in% droplevels
-  }
-
-  labels_list <- list()
+    labels_list <- list()
   for (var in vars_to_decode) {
     labels_list[[var]] <- labels[labels[["ColumnName"]] == var,]
   }
@@ -137,6 +131,11 @@ decode_data <- function(
   vars_to_decode <- vars_to_decode[!already_decoded]
   labels_list[already_decoded] <- NULL
 
+  if (is.logical(droplevels)) {
+    droplevels <- rep(droplevels, length(vars_to_decode))
+  } else {
+    droplevels <- vars_to_decode %in% droplevels
+  }
 
   if (as_character) {
     if (add_cols) {

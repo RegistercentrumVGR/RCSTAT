@@ -114,7 +114,8 @@ decode_data <- function(
   var_names <- colnames(data)
   label_names <- unique(labels[["ColumnName"]])
 
-  vars_to_decode <- var_names[var_names %in% label_names]
+  vars_int <- vapply(data, \(x) is.integer(x) && !is.factor(x), logical(1))
+  vars_to_decode <- var_names[var_names %in% label_names & vars_int]
 
   if (is.logical(droplevels)) {
     droplevels <- rep(droplevels, length(vars_to_decode))

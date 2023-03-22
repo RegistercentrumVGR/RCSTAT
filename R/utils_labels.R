@@ -122,10 +122,13 @@ decode_data <- function(
   }
 
   # Exclude variables which already have only values from their labels (See issue #6)
+  # Variables which are only NA should, however, still be included (see issue #7)
   already_decoded <-
     vapply(
       vars_to_decode,
-      \(x) all(data[[x]] %in% c(NA, labels_list[[x]]$ValueName)),
+      \(x)
+        all(data[[x]] %in% c(NA, labels_list[[x]]$ValueName)) &&
+        !all(is.na(data[[x]])),
       logical(1)
     )
   vars_to_decode <- vars_to_decode[!already_decoded]

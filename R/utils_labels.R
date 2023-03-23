@@ -36,13 +36,14 @@ var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
 
     n_obs <- sum(x %in% x_no_label)
 
-    rlang::warn(paste0(
-      "\nSome levels in variable does not have a label",
-      "\n Number of observations implicitly set to NA: ", n_obs,
-      "\n Variable name: ", name,
-      "\n Values: ", paste(x_no_label, collapse = ", "), "\n"
-    )
-    )
+    rlang::warn(c(
+      paste("No labels for value(s):",
+            cli::col_blue(paste(x_no_label, collapse = ", ")), "in",
+            cli::col_blue(name)),
+      "x" = paste(
+        cli::col_blue(sprintf("%d (%.0f%%)", n_obs, n_obs / length(x) * 100)),
+        "cells(s) set to", cli::style_underline("NA"))
+    ))
   }
 
   x <- factor(

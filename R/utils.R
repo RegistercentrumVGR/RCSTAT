@@ -30,7 +30,7 @@ add_total <- function(data) {
 #'
 #' @export age
 age <- function(from_date, to_date, unit = "whole_years") {
-  if(unit == "whole_years"){
+  if (unit == "whole_years") {
     age <- lubridate::year(to_date) - lubridate::year(from_date) - 1
     birthday_month <- lubridate::month(from_date)
     date_month <- lubridate::month(to_date)
@@ -38,7 +38,7 @@ age <- function(from_date, to_date, unit = "whole_years") {
       # Add a year if current years birthday is before to_dat
       (birthday_month < date_month |
          (birthday_month == date_month &
-            lubridate::day(from_date) <= lubridate::day(to_date)) ),
+            lubridate::day(from_date) <= lubridate::day(to_date))),
       age + 1,
       age
     )
@@ -119,7 +119,7 @@ gender <- function(x) {
 #' @examples \dontrun{rand_pass <- random_password(c("R", "N"), 10)}
 random_password <- function(
     char_types = c("R", "N", "!"),
-    password_length = 15){
+    password_length = 15) {
 
   # Generera slumpmässig struktur för lösenord
   schema_pass <- paste0(sample(char_types, size = password_length,
@@ -164,14 +164,10 @@ zip_dir_with_pass <- function(
     pass = random_password(),
     # TODO: get DNR from Environment variable instead?
     file = "output",
-    overwrite = TRUE
-){
+    overwrite = TRUE) {
 
   sink("password.txt")
-  # TODO: add this additional info to password.txt
-  # if(exists(sos_dnr)){
-  #   cat("Skickas till registerservice@socialstyrelsen.se, ange sos_dnr")
-  # }
+  # TODO: add additional info to password.txt
   cat(pass)
   sink()
 

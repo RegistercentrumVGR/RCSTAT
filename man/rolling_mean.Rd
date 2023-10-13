@@ -4,7 +4,7 @@
 \alias{rolling_mean}
 \title{Rolling average over vector}
 \usage{
-rolling_mean(x, n, align = c("left", "center", "right")[3], na.rm = FALSE)
+rolling_mean(x, n, align = c("left", "center", "right")[3], na_rm = FALSE)
 }
 \arguments{
 \item{x}{numeric vector to compute rolling average on}
@@ -13,7 +13,7 @@ rolling_mean(x, n, align = c("left", "center", "right")[3], na.rm = FALSE)
 
 \item{align}{start window at the left, right or middle}
 
-\item{na.rm}{remove NA when computing mean (consider them to be 0)}
+\item{na_rm}{remove NA when computing mean (consider them to be 0)}
 }
 \description{
 Rolling average over vector

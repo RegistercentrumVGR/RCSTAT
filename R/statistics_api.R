@@ -14,14 +14,13 @@ statistics_api <- function(
     arguments = NULL,
     api_key = "MpuYxfbtp5I=",
     dev = FALSE,
-    verbose = FALSE
-    ) {
+    verbose = FALSE) {
 
-  if(!is.null(arguments)){
+  if (!is.null(arguments)) {
     # Remove NULL elements from list
     arguments[sapply(arguments, is.null)] <- NULL
 
-    arguments_str = paste0(
+    arguments_str <- paste0(
       # Add all arguments
       paste0(
         "&", names(arguments), "=",
@@ -57,7 +56,7 @@ statistics_api <- function(
     ) |>
     jsonlite::fromJSON()
 
-  if (json_list[["code"]] != 200 & !is.null(json_list[["message"]])) {
+  if (json_list[["code"]] != 200 && !is.null(json_list[["message"]])) {
     stop(paste0(
       "\nError returned by server",
       "\nCode: ", json_list[["code"]],

@@ -15,8 +15,7 @@ locf <- function(
     vars,
     groupby = "id",
     orderby = "date",
-    slice = FALSE
-) {
+    slice = FALSE) {
   # TODO: Assert that groupby and order by
   # are character vectors and names which
   # are present in df.
@@ -38,8 +37,7 @@ locf <- function(
   df[vars] <- lapply(
     subset(df, select = vars),
     function(x) {
-      x[cummax(
-      as.integer(first_row_of_each_group | !is.na(x)) * row_numbers)]
+      x[cummax(as.integer(first_row_of_each_group | !is.na(x)) * row_numbers)]
     }
   )
 
@@ -76,8 +74,7 @@ locfdt <- function(
     groupby = "id",
     orderby = "date",
     slice = FALSE,
-    return_tibble = FALSE
-) {
+    return_tibble = FALSE) {
 
   # Sort data
   data.table::setorderv(dt, c(groupby, orderby))

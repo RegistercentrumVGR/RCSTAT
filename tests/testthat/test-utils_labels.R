@@ -33,10 +33,8 @@ test_that("decode_data works on data.frames", {
   dff <- data.frame(x = 1:40, y = 1:10)
   expect_warning(decode_data(dff, vl))
 
-  # droplevels = TRUE,
-  # add_cols = FALSE,
-  # suffix = "_label",
-  # as_character = FALSE
+  #- Test with options droplevels = TRUE,
+  #- add_cols = FALSE, suffix = "_label", as_character = FALSE
   df <- data.frame(x = 1:10, y = 1:10)
 
   dfc <- decode_data(df, vl, as_character = TRUE)

@@ -60,7 +60,21 @@ test_that("Gender can be calculated from pnr ", {
     "202001011111"
   )
 
-  calculated_genders <- c(F, F, T, F, F, F, F, T, T, F, F, F)
+  calculated_genders <-
+    c(
+      FALSE,
+      FALSE,
+      TRUE,
+      FALSE,
+      FALSE,
+      FALSE,
+      FALSE,
+      TRUE,
+      TRUE,
+      FALSE,
+      FALSE,
+      FALSE
+    )
 
   testthat::expect_equal(
     is_female(dummy_pnr),

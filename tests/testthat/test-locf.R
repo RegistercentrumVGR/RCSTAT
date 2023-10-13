@@ -86,13 +86,15 @@ test_that("locf and locfdt works", {
 
   data.table::setDT(dt)
   # data.table locf, group by 1 variable, order by 1
-  dfldt <- locfdt(
-    dt,
-    vars = c("x", "z"),
-    groupby = "id",
-    orderby = "t",
-    slice = FALSE,
-    return_tibble = FALSE)
+  dfldt <-
+    locfdt(
+      dt,
+      vars = c("x", "z"),
+      groupby = "id",
+      orderby = "t",
+      slice = FALSE,
+      return_tibble = FALSE
+    )
   testthat::expect_identical(dfldt, data.table::setDT(dfres))
 
 })

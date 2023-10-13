@@ -24,7 +24,7 @@ check-prod:
     - R -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
     - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
     - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - R -e 'pak::pkg_install("rcmdcheck", lib = Sys.getenv("R_LIBS_USER"))'
+    - R -e 'pak::pkg_install(c("Rcpp", "rcmdcheck"), lib = Sys.getenv("R_LIBS_USER"))'
     - R -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
     - echo "CHECK PACKAGE"
     - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'

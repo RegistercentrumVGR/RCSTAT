@@ -27,7 +27,7 @@ check-prod:
     - R -e 'pak::pkg_install("rcmdcheck", lib = Sys.getenv("R_LIBS_USER"))'
     - R -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
     - echo "CHECK PACKAGE"
-    - R -e '.libPaths(c(.libPaths(), Sys.getenv("R_LIBS_USER")));rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
+    - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
 
 pages:
   image: rocker/r-ver:4.2.0

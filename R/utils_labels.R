@@ -36,14 +36,19 @@ var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
 
     n_obs <- sum(x %in% x_no_label)
 
-    rlang::warn(c(
-      paste("No labels for value(s):",
-            cli::col_blue(paste(x_no_label, collapse = ", ")), "in",
-            cli::col_blue(name)),
-      "x" = paste(
-        cli::col_blue(sprintf("%d (%.0f%%)", n_obs, n_obs / length(x) * 100)),
-        "cells(s) set to", cli::style_underline("NA"))
-    ))
+    rlang::warn(
+      c(
+        paste(
+          "No labels for value(s):",
+          cli::col_blue(paste(x_no_label, collapse = ", ")), "in",
+          cli::col_blue(name)
+        ),
+        "x" = paste(
+          cli::col_blue(sprintf("%d (%.0f%%)", n_obs, n_obs / length(x) * 100)),
+          "cells(s) set to", cli::style_underline("NA")
+        )
+      )
+    )
   }
 
   x <- factor(
@@ -117,9 +122,30 @@ decode_data <- function(
 
   vars_to_decode <- var_names[var_names %in% label_names]
 
-    labels_list <- list()
+  labels_list <- list()
+
+  if (add_cols && !as_character) {
+    as_character <- TRUE
+    warning(
+      paste0(
+        "add_cols is TRUE while as_character is FALSE. ",
+        "No method for adding columns as factors, ",
+        "added columns will be character."
+      )
+    )
+
+  }
+  if (as_character && !droplevels) {
+    warning(
+      paste0(
+        "as_character is TRUE while droplevels is FALSE. ",
+        "Impossible to keep empty levels if ",
+        "labels are not added as factors."
+      )
+    )
+  }
   for (var in vars_to_decode) {
-    labels_list[[var]] <- labels[labels[["ColumnName"]] == var,]
+    labels_list[[var]] <- labels[labels[["ColumnName"]] == var, ]
   }
 
   # Exclude variables which already have only values from their labels (See issue #6)
@@ -128,7 +154,7 @@ decode_data <- function(
     vapply(
       vars_to_decode,
       \(x)
-        all(data[[x]] %in% c(NA, labels_list[[x]]$ValueName)) &&
+      all(data[[x]] %in% c(NA, labels_list[[x]]$ValueName)) &&
         !all(is.na(data[[x]])),
       logical(1)
     )
@@ -141,10 +167,11 @@ decode_data <- function(
     droplevels <- vars_to_decode %in% droplevels
   }
 
+
   if (as_character) {
     if (add_cols) {
       for (var in vars_to_decode) {
-        # Rename colnames and att suffix
+        # Rename colnames and add suffix
         # remove variable ColumnName
         var_labels <- labels_list[[var]]
         var_labels[["ColumnName"]] <- NULL
@@ -163,17 +190,17 @@ decode_data <- function(
 
         } else if (idx_of_var == length(col_order)) {
           # if var is the last one
-          col_order <- c(col_order[1:(length(col_order)-1)],
+          col_order <- c(col_order[1:(length(col_order) - 1)],
                          var, paste0(var, suffix))
         } else {
           # put label var in correct position next to codes
           col_order <- c(
             # All vars up to var
-            col_order[1:idx_of_var-1],
+            col_order[1:idx_of_var - 1],
             # Var and var_suffix
             var, paste0(var, suffix),
             # All vars after var
-            col_order[(idx_of_var+1):length(col_order)]
+            col_order[(idx_of_var + 1):length(col_order)]
           )
         }
         data <- merge(data, labels_list[[var]], all.x = TRUE, sort = FALSE)
@@ -184,7 +211,7 @@ decode_data <- function(
       }
 
     } else {
-      data[,vars_to_decode] <- Map(
+      data[, vars_to_decode] <- Map(
         var_to_char,
         subset(data, select = vars_to_decode),
         labels_list,
@@ -192,7 +219,7 @@ decode_data <- function(
       )
     }
   } else {
-    data[,vars_to_decode] <- Map(
+    data[, vars_to_decode] <- Map(
       var_to_factor,
       subset(data, select = vars_to_decode),
       labels_list,
@@ -202,4 +229,3 @@ decode_data <- function(
   }
   return(data)
 }
-

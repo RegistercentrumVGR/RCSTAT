@@ -28,6 +28,11 @@ check-prod:
     - R -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
     - echo "CHECK PACKAGE"
     - R -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
+    - echo "Build package"
+    - R CMD build . --no-build-vignettes --no-manual
+  artifacts:
+      paths:
+        - "*.tar.gz"
 
 pages:
   image: rocker/r-ver:4.2.0

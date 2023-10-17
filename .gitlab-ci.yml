@@ -1,7 +1,7 @@
 stages:
   - check
   - document
-  - deploy_dev
+  - deploy_prod
 
 variables:
   LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
@@ -60,14 +60,14 @@ pages:
     paths:
       - public
 
-deploy to dev:
-   stage: deploy_dev
+deploy to prod:
+   stage: deploy_prod
    tags:
      - rc-r
    before_script: []
    script: .\PsScripts\deploy.ps1
    environment:
-     name: dev
+     name: prod
    only:
     refs:
       - master

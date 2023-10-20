@@ -29,6 +29,7 @@ Imports:
     rlang (>= 0.4.11),
     stats,
     tibble,
+    tidyr,
     tidyselect
 LinkingTo: 
     Rcpp

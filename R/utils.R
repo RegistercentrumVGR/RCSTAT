@@ -224,13 +224,13 @@ sos_metadata <- function(dts = list(),
 
 
   for (i in seq_along(file_names)) {
-    write.table(x = dts[[i]],
-              file = paste0("./", output_dir, "/", file_names[[i]], ".csv"),
-              sep = separator,
-              eol = "\r\n",
-              fileEncoding = encoding,
-              row.names = F,
-              col.names = T)
+    utils::write.table(x = dts[[i]],
+                file = paste0("./", output_dir, "/", file_names[[i]], ".csv"),
+                sep = separator,
+                eol = "\r\n",
+                fileEncoding = encoding,
+                row.names = F,
+                col.names = T)
   }
 
   metadata <- data.frame(
@@ -246,12 +246,12 @@ sos_metadata <- function(dts = list(),
     tibble::tibble(filename = paste0(file_names[[i]], ".csv"),
                    variable = names(dts[[i]]),
                    position_in_file = seq_along(dts[[i]]),
-                   type = purrr::map_chr(dts[[i]], \(x) tail(class(x), 1)),
-                   length            =
+                   type = purrr::map_chr(dts[[i]], \(x) utils::tail(class(x), 1)),
+                   length =
                      dplyr::if_else(
                        # Ovan väljer vi att exportera logicals som 0/1 även om det är
                        # TRUE/FALSE i dt_out
-                       type == "logical", 1,
+                       type == "logical", as.integer(1),
                        purrr::map_int(
                          dts[[i]],
                          function(x) {

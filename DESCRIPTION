@@ -30,6 +30,7 @@ Imports:
     stats,
     tibble,
     tidyr,
-    tidyselect
+    tidyselect,
+    writexl
 LinkingTo: 
     Rcpp

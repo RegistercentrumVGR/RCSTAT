@@ -6,8 +6,8 @@
 \usage{
 api_statistics(
   register,
-  script,
-  arguments = NULL,
+  fun,
+  arguments = list(),
   api_key = "MpuYxfbtp5I=",
   dev = FALSE,
   verbose = FALSE
@@ -16,7 +16,7 @@ api_statistics(
 \arguments{
 \item{register}{register short name}
 
-\item{script}{script name}
+\item{fun}{script name}
 
 \item{arguments}{Arguments to include as named list}
 

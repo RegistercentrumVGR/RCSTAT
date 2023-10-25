@@ -63,6 +63,11 @@ locf <- function(
 #' @param groupby Variable to group on
 #' @param slice If `TRUE` will select the last row in each group of `groupby`
 #' @param return_tibble whether to return a data.table or a tibble
+#' @param n_months The maximum number of months the last observation can be
+#' carried forward. If this is specified we recommend to also specify only the
+#' variables of interest in `vars` to minimize the computational complexity.
+#' If `n_months` is `NULL` LOCF will be carried out on all observations like
+#' normal
 #' @return data.frame with LOCF imputation
 #' @export locfdt
 #' @examples

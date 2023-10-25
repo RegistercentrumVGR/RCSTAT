@@ -74,7 +74,8 @@ locfdt <- function(
     groupby = "id",
     orderby = "date",
     slice = FALSE,
-    return_tibble = FALSE) {
+    return_tibble = FALSE,
+    n_months = NULL) {
 
   # Sort data
   data.table::setorderv(dt, c(groupby, orderby))
@@ -83,25 +84,36 @@ locfdt <- function(
   # This is TRUE for the first row in each group.
   idchg <- !duplicated(subset(dt, select = groupby))
 
-  if (requireNamespace("parallel", quietly = TRUE)) {
-    # locf all vars with parallel::mclapply
-    dt[
-      ,
-      (vars) := parallel::mclapply(
-        .SD, function(x) x[cummax(as.integer(!is.na(x) | idchg) * .I)]
-      ),
-      .SDcols = vars
-    ]
-  } else {
-    # locf with lapply
-    dt[
-      ,
-      (vars) := lapply(
-        .SD, function(x) x[cummax(as.integer(!is.na(x) | idchg) * .I)]
-      ),
-      .SDcols = vars
-    ]
-  }
+  dt[
+    ,
+    (vars) := lapply(
+      .SD, function(x) {
+        i <- cummax(as.integer(!is.na(x) | idchg) * .I)
+
+        if (!is.null(n_months)) {
+
+          time_diff <- sapply(seq_along(i), function(j) {
+
+            if (idchg[j] == 1)
+              return(T)
+            else
+              # return(dt[j, get(orderby)] - dt[i[j], get(orderby)] >
+              #          lubridate::time_length(months(n_months),
+              #                                 unit = "days"))
+            return(lubridate::`%m-%`(dt[j, get(orderby)],  months(n_months)) >
+                     dt[i[j], get(orderby)])
+          })
+
+          i[time_diff] <- which(time_diff)
+
+        }
+
+        return(x[i])
+      }
+    ),
+    .SDcols = vars
+  ]
+
   # Keep only last observation in each
   # group if slice is TRUE
   if (slice) {

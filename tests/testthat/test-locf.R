@@ -97,4 +97,42 @@ test_that("locf and locfdt works", {
     )
   testthat::expect_identical(dfldt, data.table::setDT(dfres))
 
+  df <- dplyr::bind_rows(data.frame(
+    id = rep(1:3, each = 3),
+    date = rep(lubridate::today() - months(1:3), times = 3),
+    val = c(NA, 1, NA,
+            1, NA, NA,
+            NA, NA, 1)
+  ),
+    data.frame(
+      id = c(3, 3),
+      val = c(NA, NA),
+      date = c(lubridate::ymd("2023-08-24"), lubridate::ymd("2023-08-26"))
+    ))
+
+  df_res <- dplyr::bind_rows(data.frame(
+    id = rep(1:3, each = 3),
+    date = rep(lubridate::today() - months(1:3), times = 3),
+    val = c(1, 1, NA,
+            1, NA, NA,
+            NA, 1, 1)
+  ),
+    data.frame(
+      id = c(3, 3),
+      val = c(1, NA),
+      date = c(lubridate::ymd("2023-08-24"), lubridate::ymd("2023-08-26"))
+    ))
+
+  data.table::setDT(df)
+  data.table::setDT(df_res)
+  data.table::setorderv(df_res, c("id", "date"))
+
+  dfldt <- locfdt(df,
+                  vars = "val",
+                  groupby = "id",
+                  orderby = "date",
+                  n_months = 1)
+
+  testthat::expect_identical(dfldt, df_res)
+
 })

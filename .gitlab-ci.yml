@@ -1,6 +1,7 @@
 stages:
   - check
   - document
+  - deply_demo
   - deploy_prod
 
 variables:
@@ -59,6 +60,19 @@ pages:
   artifacts:
     paths:
       - public
+
+deploy to prod:
+   stage: deploy_demo
+   tags:
+     - rc-rdemo
+   before_script: []
+   script: .\PsScripts\deploy.ps1
+   environment:
+     name: demo
+   only:
+    refs:
+      - master
+   when: manual
 
 deploy to prod:
    stage: deploy_prod

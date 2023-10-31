@@ -26,9 +26,12 @@ Imports:
     jsonlite,
     lubridate,
     Rcpp,
+    readxl,
     rlang (>= 0.4.11),
     stats,
     tibble,
-    tidyselect
+    tidyr,
+    tidyselect,
+    writexl
 LinkingTo: 
     Rcpp

@@ -183,3 +183,97 @@ zip_dir_with_pass <- function(
     flags = paste("--password", pass)
   )
 }
+
+
+
+#' Saves data.frames as .csv files and creates and saves the corresponding
+#' metadata files. Can also zip the outputs with a random password which is
+#' saved in a separate .txt file.
+#'
+#' @param dts A list of data.frames to export
+#' @param file_names A list of the names to use when saving each data.frame in
+#'  `dts`
+#' @param encoding The encoding to use, by default `UTF-8`
+#' @param separator The separator to use when saving the `dts`
+#' @param zip Whether or not to zip the output directory after saving the files
+#' @param output_dir The output directory in which to save the files
+#' @param zip_file_name The name of the created zip file
+#' @export sos_metadata
+#'
+#' @examples
+#' \dontrun{
+#' data_1 <- RCDBT::GetRegisterData(...) %>% filter(...)
+#' data_2 <- RCDBT::GetRegisterData(...) %>% filter(...)
+#' sos_metadata(dts = list(data_1, data_2),
+#'              file_names = list("dnr_xxxx_yyyyy_1", "dnr_xxxx_yyyyy_2"))
+#' }
+sos_metadata <- function(dts = list(),
+                         file_names = list(),
+                         encoding = "UTF-8",
+                         separator = ",",
+                         zip = T,
+                         output_dir = "Output",
+                         zip_file_name = "output") {
+
+  if (length(file_names) != length(dts))
+    stop("file_names and dts is not the same length")
+
+  if (!("list" %in% class(dts)) | !("list" %in% class(file_names)))
+    stop("Both file_names and dts must be a list")
+
+
+
+  for (i in seq_along(file_names)) {
+    utils::write.table(x = dts[[i]],
+                file = paste0("./", output_dir, "/", file_names[[i]], ".csv"),
+                sep = separator,
+                eol = "\r\n",
+                fileEncoding = encoding,
+                row.names = F,
+                col.names = T)
+  }
+
+  metadata <- data.frame(
+    filename = paste0(unlist(file_names), ".csv"),
+    encoding = encoding,
+    separator = separator,
+    end_of_line = "CRLF",
+    nrows = purrr::map_int(dts, nrow),
+    ncols = purrr::map_int(dts, ncol)
+  )
+
+  var_names <- lapply(1:length(file_names), function(i) {
+    tibble::tibble(filename = paste0(file_names[[i]], ".csv"),
+                   variable = names(dts[[i]]),
+                   position_in_file = seq_along(dts[[i]]),
+                   type = purrr::map_chr(dts[[i]], \(x) utils::tail(class(x), 1)),
+                   length =
+                     dplyr::if_else(
+                       # Ovan väljer vi att exportera logicals som 0/1 även om det är
+                       # TRUE/FALSE i dt_out
+                       type == "logical", as.integer(1),
+                       purrr::map_int(
+                         dts[[i]],
+                         function(x) {
+                           str_len <- stringr::str_length(x)
+                           if (all(is.na(str_len))) {
+                             return(1)
+                           } else {
+                             return(max(str_len, na.rm = T))
+                           }
+                         }
+                       )
+                     )
+    )
+  })
+
+  var_names <- dplyr::bind_rows(var_names)
+
+  writexl::write_xlsx(
+    x = list(dataset = metadata, variabler = var_names),
+    path = paste0("./", output_dir, "/metadata.xlsx")
+  )
+
+  if (zip)
+    zip_dir_with_pass(directory = output_dir, file = zip_file_name)
+}

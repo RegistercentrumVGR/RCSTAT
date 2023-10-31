@@ -10,7 +10,8 @@ locfdt(
   groupby = "id",
   orderby = "date",
   slice = FALSE,
-  return_tibble = FALSE
+  return_tibble = FALSE,
+  n_months = NULL
 )
 }
 \arguments{
@@ -25,6 +26,12 @@ locfdt(
 \item{slice}{If `TRUE` will select the last row in each group of `groupby`}
 
 \item{return_tibble}{whether to return a data.table or a tibble}
+
+\item{n_months}{The maximum number of months the last observation can be
+carried forward. If this is specified we recommend to also specify only the
+variables of interest in `vars` to minimize the computational complexity.
+If `n_months` is `NULL` LOCF will be carried out on all observations like
+normal}
 }
 \value{
 data.frame with LOCF imputation

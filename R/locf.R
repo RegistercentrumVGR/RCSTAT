@@ -63,6 +63,11 @@ locf <- function(
 #' @param groupby Variable to group on
 #' @param slice If `TRUE` will select the last row in each group of `groupby`
 #' @param return_tibble whether to return a data.table or a tibble
+#' @param n_months The maximum number of months the last observation can be
+#' carried forward. If this is specified we recommend to also specify only the
+#' variables of interest in `vars` to minimize the computational complexity.
+#' If `n_months` is `NULL` LOCF will be carried out on all observations like
+#' normal
 #' @return data.frame with LOCF imputation
 #' @export locfdt
 #' @examples
@@ -74,7 +79,8 @@ locfdt <- function(
     groupby = "id",
     orderby = "date",
     slice = FALSE,
-    return_tibble = FALSE) {
+    return_tibble = FALSE,
+    n_months = NULL) {
 
   # Sort data
   data.table::setorderv(dt, c(groupby, orderby))
@@ -83,25 +89,36 @@ locfdt <- function(
   # This is TRUE for the first row in each group.
   idchg <- !duplicated(subset(dt, select = groupby))
 
-  if (requireNamespace("parallel", quietly = TRUE)) {
-    # locf all vars with parallel::mclapply
-    dt[
-      ,
-      (vars) := parallel::mclapply(
-        .SD, function(x) x[cummax(as.integer(!is.na(x) | idchg) * .I)]
-      ),
-      .SDcols = vars
-    ]
-  } else {
-    # locf with lapply
-    dt[
-      ,
-      (vars) := lapply(
-        .SD, function(x) x[cummax(as.integer(!is.na(x) | idchg) * .I)]
-      ),
-      .SDcols = vars
-    ]
-  }
+  dt[
+    ,
+    (vars) := lapply(
+      .SD, function(x) {
+        i <- cummax(as.integer(!is.na(x) | idchg) * .I)
+
+        if (!is.null(n_months)) {
+
+          time_diff <- sapply(seq_along(i), function(j) {
+
+            if (idchg[j] == 1)
+              return(T)
+            else
+              # return(dt[j, get(orderby)] - dt[i[j], get(orderby)] >
+              #          lubridate::time_length(months(n_months),
+              #                                 unit = "days"))
+            return(lubridate::`%m-%`(dt[j, get(orderby)],  months(n_months)) >
+                     dt[i[j], get(orderby)])
+          })
+
+          i[time_diff] <- which(time_diff)
+
+        }
+
+        return(x[i])
+      }
+    ),
+    .SDcols = vars
+  ]
+
   # Keep only last observation in each
   # group if slice is TRUE
   if (slice) {

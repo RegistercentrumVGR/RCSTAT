@@ -99,10 +99,10 @@ test_that("locf and locfdt works", {
 
   df <- dplyr::bind_rows(data.frame(
     id = rep(1:3, each = 3),
-    date = rep(lubridate::today() - months(1:3), times = 3),
+    date = rep(lubridate::ymd("2023-08-25") - months(1:3), times = 3),
     val = c(NA, 1, NA,
             1, NA, NA,
-            NA, NA, 1)
+            1, NA, NA)
   ),
     data.frame(
       id = c(3, 3),
@@ -112,10 +112,10 @@ test_that("locf and locfdt works", {
 
   df_res <- dplyr::bind_rows(data.frame(
     id = rep(1:3, each = 3),
-    date = rep(lubridate::today() - months(1:3), times = 3),
+    date = rep(lubridate::ymd("2023-08-25") - months(1:3), times = 3),
     val = c(1, 1, NA,
             1, NA, NA,
-            NA, 1, 1)
+            1, NA, NA)
   ),
     data.frame(
       id = c(3, 3),
@@ -126,7 +126,7 @@ test_that("locf and locfdt works", {
   data.table::setDT(df)
   data.table::setDT(df_res)
   data.table::setorderv(df_res, c("id", "date"))
-
+  data.table::setorderv(df, c("id", "date"))
   dfldt <- locfdt(df,
                   vars = "val",
                   groupby = "id",

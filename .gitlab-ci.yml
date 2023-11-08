@@ -1,7 +1,7 @@
 stages:
   - check
   - document
-  - deply_demo
+  - deploy_demo
   - deploy_prod
 
 variables:

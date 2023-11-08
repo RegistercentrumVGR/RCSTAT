@@ -61,7 +61,7 @@ pages:
     paths:
       - public
 
-deploy to prod:
+deploy to demo:
    stage: deploy_demo
    tags:
      - rc-rdemo

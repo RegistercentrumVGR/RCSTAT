@@ -1,4 +1,5 @@
 stages:
+  - lint
   - check
   - document
   - deploy_demo
@@ -12,6 +13,49 @@ cache:
     paths:
       - $LIBS_USER
 
+lint: 
+  image: rocker/r-ver:4.2.0
+  stage: lint
+  script:
+    - echo "Build pages"
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
+    - echo 'INSTALL SYSTEM DEPENDENCIES'
+    - apt-get update
+    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - Rscript -e 'pak::pkg_install(c("devtools", "lintr"), lib = Sys.getenv("R_LIBS_USER"))'
+    - echo "Lint package"
+    - Rscript -e "devtools::load_all();lintr::lint_package()"
+
+pages:
+  image: rocker/r-ver:4.2.0
+  stage: document
+  only:
+    refs:
+    - master
+  script:
+    - echo "Build pages"
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
+    - echo 'INSTALL SYSTEM DEPENDENCIES'
+    - apt-get update
+    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
+    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - Rscript -e 'pak::pkg_install(c("devtools", "pkgdown", "DT"), lib = Sys.getenv("R_LIBS_USER"))'
+    - Rscript -e 'pak::pkg_install("covr", lib = Sys.getenv("R_LIBS_USER"), dependencies = TRUE)'
+    - echo 'BUILD DOCUMENTATION'
+    - Rscript -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
+    - mv docs public
+    - Rscript -e "covr::gitlab(quiet = FALSE)"
+  coverage: '/Coverage: \d+\.\d+/'
+  artifacts:
+    paths:
+      - public
 
 check-prod:
   image: rocker/r-ver:4.2.0
@@ -35,35 +79,6 @@ check-prod:
       paths:
         - "*.tar.gz"
 
-pages:
-  image: rocker/r-ver:4.2.0
-  stage: document
-  only:
-    refs:
-    - master
-  script:
-    - echo "Build pages"
-    - mkdir -p $LIBS_USER
-    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
-    - echo 'INSTALL SYSTEM DEPENDENCIES'
-    - apt-get update
-    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - Rscript -e 'pak::pkg_install(c("devtools", "pkgdown", "lintr", "DT"), lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::pkg_install("covr", lib = Sys.getenv("R_LIBS_USER"), dependencies = TRUE)'
-    - echo 'BUILD DOCUMENTATION'
-    - Rscript -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
-    # Fuling
-    - mv docs public
-    - Rscript -e "devtools::load_all();lintr::lint_package()"
-    - Rscript -e "covr::gitlab(quiet = FALSE)"
-  coverage: '/Coverage: \d+\.\d+/'
-
-  artifacts:
-    paths:
-      - public
 
 deploy to demo:
    stage: deploy_demo

@@ -3,14 +3,14 @@ test_that("Metadata", {
 
   df1 <- data.frame(
     a = 1:3,
-    b = c(T, T, F),
+    b = c(TRUE, TRUE, FALSE),
     c = rep("abc", 3)
   )
 
 
   df2 <- data.frame(
     a = 1:4,
-    b = c(T, T, F, F),
+    b = c(TRUE, TRUE, FALSE, FALSE),
     c = rep("abc657", 4),
     d = rep("abcdefgh", 4)
   )
@@ -23,10 +23,10 @@ test_that("Metadata", {
                zip_file_name = "zip_file",
                separator = ",",
                encoding = "UTF-8",
-               zip = F)
+               zip = FALSE)
 
-  df1_res <- read.table("./Output/df1.csv", sep = ",", header = T)
-  df2_res <- read.table("./Output/df2.csv", sep = ",", header = T)
+  df1_res <- read.table("./Output/df1.csv", sep = ",", header = TRUE)
+  df2_res <- read.table("./Output/df2.csv", sep = ",", header = TRUE)
 
 
   var_names_res <- readxl::read_xlsx("./Output/metadata.xlsx",
@@ -61,6 +61,6 @@ test_that("Metadata", {
   testthat::expect_equal(var_names_res, var_names)
   testthat::expect_equal(metadata_res, metadata)
 
-  unlink("Output", recursive = T)
+  unlink("Output", recursive = TRUE)
 
 })

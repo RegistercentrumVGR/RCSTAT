@@ -99,14 +99,15 @@ locfdt <- function(
 
           time_diff <- sapply(seq_along(i), function(j) {
 
-            if (idchg[j] == 1)
-              return(T)
-            else
+            if (idchg[j] == 1) {
+              return(TRUE)
+            } else {
               # return(dt[j, get(orderby)] - dt[i[j], get(orderby)] >
               #          lubridate::time_length(months(n_months),
               #                                 unit = "days"))
-            return(lubridate::`%m-%`(dt[j, get(orderby)],  months(n_months)) >
-                     dt[i[j], get(orderby)])
+              return(lubridate::`%m-%`(dt[j, get(orderby)],  months(n_months)) >
+                       dt[i[j], get(orderby)])
+            }
           })
 
           i[time_diff] <- which(time_diff)

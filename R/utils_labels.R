@@ -153,9 +153,10 @@ decode_data <- function(
   already_decoded <-
     vapply(
       vars_to_decode,
-      \(x)
-      all(data[[x]] %in% c(NA, labels_list[[x]]$ValueName)) &&
-        !all(is.na(data[[x]])),
+      \(x) {
+        all(data[[x]] %in% c(NA, labels_list[[x]]$ValueName)) &&
+          !all(is.na(data[[x]]))
+      },
       logical(1)
     )
   vars_to_decode <- vars_to_decode[!already_decoded]

@@ -15,7 +15,7 @@
 api_get <- function(x) {
   root <- "https://stratum.registercentrum.se/api"
   sprintf("%s/%s?apikey=J6b-GSKrkfk=", root, x) |>
-  jsonlite::fromJSON()
+    jsonlite::fromJSON()
 }
 
 
@@ -45,9 +45,6 @@ api_FormID2FormName <- function(FormID) {
 api_FormID2RegisterID <- function(FormID) {
   api_get(sprintf("metadata/forms/%d", FormID))$data$Register$RegisterID
 }
-
-
-
 
 # Register data -----------------------------------------------------------
 
@@ -83,11 +80,12 @@ api_register_forms <- function(RegisterID) {
 api_register_units <- function(RegisterID) {
   api_register(RegisterID)$data$Units |>
     tibble::as_tibble() |>
-    dplyr::select(tidyselect::any_of(
-      c("UnitCode", "UnitName", "HSAID", "IsActive")))
+    dplyr::select(
+      tidyselect::any_of(
+        c("UnitCode", "UnitName", "HSAID", "IsActive")
+      )
+    )
 }
-
-
 
 # Form data ---------------------------------------------------------------
 
@@ -116,7 +114,7 @@ api_form_questions <- function(FormID, all = FALSE, only_mapped = FALSE) {
     dplyr::filter(.data$Domain$DomainID != 1080) |>
     tidyr::unnest(cols = "Domain")
 
-    if (!all) {
+  if (!all) {
     incl <- c("ColumnName", "QuestionID", "MappedTo")
     x <- dplyr::select(x,  tidyselect::any_of(incl), tidyselect::starts_with("Domain"))
 
@@ -142,13 +140,16 @@ api_map <- function(var, FormID) {
   # UnitCodes are found in register-specific tables if DomainID >= 3000
   if (is.na(x$MappedTo)) {
     if (as.numeric(x$DomainID) < 3000L) {
-      stop(paste0(var, " is not mapped (domain: ", x$DomainID, "). ",
-        "See: https://stratum.docs.apiary.io/#reference/metadata/doman"
-      ))
+      stop(
+        paste0(
+          var, " is not mapped (domain: ", x$DomainID, "). ",
+          "See: https://stratum.docs.apiary.io/#reference/metadata/doman"
+        )
+      )
     }
     api_domain(x$DomainID) |>
       dplyr::select(levels := "ValueCode", labels := "ValueName")
-  # Most domains are question-specific
+    # Most domains are question-specific
   } else if (x$MappedTo == "UnitCode") {
     api_register_units(api_FormID2RegisterID(FormID)) |>
       dplyr::select(levels := "UnitCode", labels := "UnitName")

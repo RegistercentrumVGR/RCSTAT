@@ -211,26 +211,28 @@ sos_metadata <- function(dts = list(),
                          file_names = list(),
                          encoding = "UTF-8",
                          separator = ",",
-                         zip = T,
+                         zip = TRUE,
                          output_dir = "Output",
                          zip_file_name = "output") {
 
   if (length(file_names) != length(dts))
     stop("file_names and dts is not the same length")
 
-  if (!("list" %in% class(dts)) | !("list" %in% class(file_names)))
+  if (!("list" %in% class(dts)) || !("list" %in% class(file_names)))
     stop("Both file_names and dts must be a list")
 
 
 
   for (i in seq_along(file_names)) {
-    utils::write.table(x = dts[[i]],
-                file = paste0("./", output_dir, "/", file_names[[i]], ".csv"),
-                sep = separator,
-                eol = "\r\n",
-                fileEncoding = encoding,
-                row.names = F,
-                col.names = T)
+    utils::write.table(
+      x = dts[[i]],
+      file = paste0("./", output_dir, "/", file_names[[i]], ".csv"),
+      sep = separator,
+      eol = "\r\n",
+      fileEncoding = encoding,
+      row.names = FALSE,
+      col.names = TRUE
+    )
   }
 
   metadata <- data.frame(
@@ -242,28 +244,29 @@ sos_metadata <- function(dts = list(),
     ncols = purrr::map_int(dts, ncol)
   )
 
-  var_names <- lapply(1:length(file_names), function(i) {
-    tibble::tibble(filename = paste0(file_names[[i]], ".csv"),
-                   variable = names(dts[[i]]),
-                   position_in_file = seq_along(dts[[i]]),
-                   type = purrr::map_chr(dts[[i]], \(x) utils::tail(class(x), 1)),
-                   length =
-                     dplyr::if_else(
-                       # Ovan väljer vi att exportera logicals som 0/1 även om det är
-                       # TRUE/FALSE i dt_out
-                       type == "logical", as.integer(1),
-                       purrr::map_int(
-                         dts[[i]],
-                         function(x) {
-                           str_len <- stringr::str_length(x)
-                           if (all(is.na(str_len))) {
-                             return(1)
-                           } else {
-                             return(max(str_len, na.rm = T))
-                           }
-                         }
-                       )
-                     )
+  var_names <- lapply(seq_along(file_names), function(i) {
+    tibble::tibble(
+      filename = paste0(file_names[[i]], ".csv"),
+      variable = names(dts[[i]]),
+      position_in_file = seq_along(dts[[i]]),
+      type = purrr::map_chr(dts[[i]], \(x) utils::tail(class(x), 1)),
+      length =
+        dplyr::if_else(
+          # Ovan väljer vi att exportera logicals som 0/1 även om det är
+          # TRUE/FALSE i dt_out
+          .data$type == "logical", as.integer(1),
+          purrr::map_int(
+            dts[[i]],
+            function(x) {
+              str_len <- stringr::str_length(x)
+              if (all(is.na(str_len))) {
+                return(1)
+              } else {
+                return(max(str_len, na.rm = TRUE))
+              }
+            }
+          )
+        )
     )
   })
 

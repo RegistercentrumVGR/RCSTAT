@@ -51,13 +51,13 @@ pages:
     - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
     - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
     - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - Rscript -e 'pak::pkg_install(c("pkgdown", "lintr", "DT"), lib = Sys.getenv("R_LIBS_USER"))'
+    - Rscript -e 'pak::pkg_install(c("devtools", "pkgdown", "lintr", "DT"), lib = Sys.getenv("R_LIBS_USER"))'
     - Rscript -e 'pak::pkg_install("covr", lib = Sys.getenv("R_LIBS_USER"), dependencies = TRUE)'
     - echo 'BUILD DOCUMENTATION'
     - Rscript -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
     # Fuling
     - mv docs public
-    - Rscript -e "lintr::lint_package()"
+    - Rscript -e "devtools::load_all();lintr::lint_package()"
     - Rscript -e "covr::gitlab(quiet = FALSE)"
   coverage: '/Coverage: \d+\.\d+/'
 

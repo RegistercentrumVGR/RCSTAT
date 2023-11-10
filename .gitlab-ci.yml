@@ -47,16 +47,20 @@ pages:
     - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
     - echo 'INSTALL SYSTEM DEPENDENCIES'
     - apt-get update
-    - R -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - R -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
-    - R -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
+    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
     - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - R -e 'pak::pkg_install("pkgdown", lib = Sys.getenv("R_LIBS_USER"))'
-    - R -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
+    - Rscript -e 'pak::pkg_install(c("pkgdown", "lintr", "DT"), lib = Sys.getenv("R_LIBS_USER"))'
+    - Rscript -e 'pak::pkg_install("covr", lib = Sys.getenv("R_LIBS_USER"), dependencies = TRUE)'
     - echo 'BUILD DOCUMENTATION'
-    - R -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
+    - Rscript -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
     # Fuling
     - mv docs public
+    - Rscript -e "lintr::lint_package()"
+    - Rscript -e "covr::gitlab(quiet = FALSE)"
+  coverage: '/Coverage: \d+\.\d+/'
+
   artifacts:
     paths:
       - public

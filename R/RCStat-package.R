@@ -15,3 +15,8 @@
 #' @useDynLib RCStat, .registration = TRUE
 ## usethis namespace: end
 NULL
+
+#' @noRd
+dummy <- function() {
+  readxl::read_excel
+}

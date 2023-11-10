@@ -30,19 +30,19 @@ api_domain <- function(DomainID) {
 
 #' @describeIn api Convert RegisterID to RegisterName
 #' @export
-api_RegisterID2RegisterName <- function(RegisterID) {
+api_registerid_2_registername <- function(RegisterID) {
   api_register_meta(RegisterID)$ShortName
 }
 
 #' @describeIn api Convert FormID to FormName
 #' @export
-api_FormID2FormName <- function(FormID) {
+api_formid_2_formname <- function(FormID) {
   api_get(sprintf("metadata/forms/%d", FormID))$data$FormName
 }
 
 #' @describeIn api Get RegisterID for FormID
 #' @export
-api_FormID2RegisterID <- function(FormID) {
+api_formid_2_registerid <- function(FormID) {
   api_get(sprintf("metadata/forms/%d", FormID))$data$Register$RegisterID
 }
 
@@ -151,7 +151,7 @@ api_map <- function(var, FormID) {
       dplyr::select(levels := "ValueCode", labels := "ValueName")
     # Most domains are question-specific
   } else if (x$MappedTo == "UnitCode") {
-    api_register_units(api_FormID2RegisterID(FormID)) |>
+    api_register_units(api_formid_2_registerid(FormID)) |>
       dplyr::select(levels := "UnitCode", labels := "UnitName")
   } else if (grepl("^[0-9]{4}$", "1273", x$MappedTo)) {
     stop("This variable is just a reference to FormID ", x$MappedTo)

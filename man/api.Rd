@@ -3,9 +3,9 @@
 \name{api_form_count}
 \alias{api_form_count}
 \alias{api_get}
-\alias{api_RegisterID2RegisterName}
-\alias{api_FormID2FormName}
-\alias{api_FormID2RegisterID}
+\alias{api_registerid_2_registername}
+\alias{api_formid_2_formname}
+\alias{api_formid_2_registerid}
 \alias{api_register}
 \alias{api_register_meta}
 \alias{api_register_forms}
@@ -20,11 +20,11 @@ api_form_count(FormID)
 
 api_get(x)
 
-api_RegisterID2RegisterName(RegisterID)
+api_registerid_2_registername(RegisterID)
 
-api_FormID2FormName(FormID)
+api_formid_2_formname(FormID)
 
-api_FormID2RegisterID(FormID)
+api_formid_2_registerid(FormID)
 
 api_register(RegisterID)
 
@@ -61,11 +61,11 @@ Access open data from the Stratum API.
 \itemize{
 \item \code{api_form_count()}: Count number of registrations by form
 
-\item \code{api_RegisterID2RegisterName()}: Convert RegisterID to RegisterName
+\item \code{api_registerid_2_registername()}: Convert RegisterID to RegisterName
 
-\item \code{api_FormID2FormName()}: Convert FormID to FormName
+\item \code{api_formid_2_formname()}: Convert FormID to FormName
 
-\item \code{api_FormID2RegisterID()}: Get RegisterID for FormID
+\item \code{api_formid_2_registerid()}: Get RegisterID for FormID
 
 \item \code{api_register()}: All data for register from API
 

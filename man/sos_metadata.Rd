@@ -11,7 +11,7 @@ sos_metadata(
   file_names = list(),
   encoding = "UTF-8",
   separator = ",",
-  zip = T,
+  zip = TRUE,
   output_dir = "Output",
   zip_file_name = "output"
 )

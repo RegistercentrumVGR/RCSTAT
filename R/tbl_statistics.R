@@ -14,7 +14,7 @@
 #' @export group_proportions
 group_proportions <- function(data, ...) {
 
-  result <- data |>
+  data |>
     dplyr::group_by(...) |>
     dplyr::summarise(
       .groups = "drop_last",
@@ -30,8 +30,6 @@ group_proportions <- function(data, ...) {
       Proportion = "p"
     ) |>
     dplyr::ungroup()
-
-  return(result)
 }
 
 #' Calculate n, means and sd by group
@@ -46,18 +44,20 @@ group_means <- function(data, ..., vars = names(data)) {
   # Remove grouping-vars from vars if present
   vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
-  result <- data |>
+  data |>
     dplyr::group_by(...) |>
     dplyr::summarise(
       .groups = "drop",
       n = dplyr::n(),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
-        .fns = \(x) list(mean = mean(x, na.rm = TRUE), sd = stats::sd(x, na.rm = TRUE))
+        .fns = list(
+          mean = \(x) mean(x, na.rm = TRUE),
+          sd = \(x) stats::sd(x, na.rm = TRUE)
+        ),
+        .names = "{.col}_{.fn}"
       )
     )
-
-  return(result)
 }
 #' Calculates proportion of missing data
 #'
@@ -74,7 +74,7 @@ proportion_missing <- function(data, ..., vars = names(data)) {
   # Remove grouping-vars from vars if present
   vars <- setdiff(vars, names(dplyr::select(data, ...)))
 
-  result <- data |>
+  data |>
     dplyr::group_by(...) |>
     dplyr::summarise(
       .groups = "drop",
@@ -85,10 +85,8 @@ proportion_missing <- function(data, ..., vars = names(data)) {
       ),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
-        .fns = ~ .x / N,
+        .fns = \(x) x / .data[["N"]],
         .names = "Proportion_missing_{.col}"
       )
     )
-
-  return(result)
 }

@@ -11,7 +11,8 @@ locfdt(
   orderby = "date",
   slice = FALSE,
   return_tibble = FALSE,
-  n_months = NULL
+  window_size = NULL,
+  window_type = NULL
 )
 }
 \arguments{
@@ -27,11 +28,13 @@ locfdt(
 
 \item{return_tibble}{whether to return a data.table or a tibble}
 
-\item{n_months}{The maximum number of months the last observation can be
-carried forward. If this is specified we recommend to also specify only the
-variables of interest in `vars` to minimize the computational complexity.
-If `n_months` is `NULL` LOCF will be carried out on all observations like
-normal}
+\item{window_size}{The maximum time the last observation can be
+carried forward. If `n_months` is `NULL` LOCF will be carried out
+on all observations like normal.}
+
+\item{window_type}{`years`, `months` or `days`, deafult is `days`.
+With `months` and `years` the `window_size` is simply multiplied by a
+factor of 31 or 365.25 respectively.}
 }
 \value{
 data.frame with LOCF imputation

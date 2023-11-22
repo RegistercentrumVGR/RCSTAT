@@ -101,44 +101,79 @@ test_that("locf and locfdt works", {
     dplyr::bind_rows(
       data.frame(
         id = rep(1:3, each = 3),
-        date = rep(lubridate::ymd("2023-08-25") - months(1:3), times = 3),
+        date = rep(data.table::as.IDate(paste0("2023-0", 6:8, "-25"))
+                   , times = 3),
         val = c(NA, 1, NA,
                 1, NA, NA,
-                1, NA, NA)
+                NA, 1, NA)
       ),
       data.frame(
         id = c(3, 3),
         val = c(NA, NA),
-        date = c(lubridate::ymd("2023-08-24"), lubridate::ymd("2023-08-26"))
+        date = c(data.table::as.IDate("2023-08-24"),
+                 data.table::as.IDate("2023-09-26"))
       )
-    )
+    ) |>
+    data.table::setorderv(cols = c("id", "date"))
 
-  df_res <-
-    dplyr::bind_rows(
-      data.frame(
-        id = rep(1:3, each = 3),
-        date = rep(lubridate::ymd("2023-08-25") - months(1:3), times = 3),
-        val = c(1, 1, NA,
-                1, NA, NA,
-                1, NA, NA)
-      ),
-      data.frame(
-        id = c(3, 3),
-        val = c(1, NA),
-        date = c(lubridate::ymd("2023-08-24"), lubridate::ymd("2023-08-26"))
-      )
-    )
+  df_res <- data.table::copy(df)
+  df_res[["val"]] <- c(NA, 1, 1,
+                       1, 1, NA,
+                       NA, 1, 1,
+                       1, NA)
 
   data.table::setDT(df)
   data.table::setDT(df_res)
-  data.table::setorderv(df_res, c("id", "date"))
-  data.table::setorderv(df, c("id", "date"))
-  dfldt <- locfdt(df,
+
+  dfldt <- locfdt(data.table::copy(df),
                   vars = "val",
                   groupby = "id",
                   orderby = "date",
-                  n_months = 1)
+                  window_type = "months",
+                  window_size = 1)
 
   testthat::expect_identical(dfldt, df_res)
 
+  dfldt <- locfdt(data.table::copy(df),
+                  vars = "val",
+                  groupby = "id",
+                  orderby = "date",
+                  window_type = "days",
+                  window_size = 31)
+
+  testthat::expect_identical(dfldt, df_res)
+  df <-
+    dplyr::bind_rows(
+      data.frame(
+        id = rep(1:3, each = 3),
+        date = rep(data.table::as.IDate(paste0("202", 1:3, "-01-01"))
+                   , times = 3),
+        val = c(NA, 1, NA,
+                1, NA, NA,
+                NA, 1, NA)
+      ),
+      data.frame(
+        id = c(3, 3),
+        val = c(NA, NA),
+        date = c(data.table::as.IDate("2024-01-01"),
+                 data.table::as.IDate("2025-01-10"))
+      )
+    ) |>
+    data.table::setorderv(cols = c("id", "date"))
+
+  df_res <- data.table::copy(df)
+  df_res[["val"]] <- c(NA, 1, 1,
+                       1, 1, NA,
+                       NA, 1, 1,
+                       1, NA)
+
+  data.table::setDT(df)
+  data.table::setDT(df_res)
+
+  dfldt <- locfdt(data.table::copy(df),
+                  vars = "val",
+                  groupby = "id",
+                  orderby = "date",
+                  window_type = "years",
+                  window_size = 1)
 })

@@ -63,11 +63,13 @@ locf <- function(
 #' @param groupby Variable to group on
 #' @param slice If `TRUE` will select the last row in each group of `groupby`
 #' @param return_tibble whether to return a data.table or a tibble
-#' @param n_months The maximum number of months the last observation can be
-#' carried forward. If this is specified we recommend to also specify only the
-#' variables of interest in `vars` to minimize the computational complexity.
-#' If `n_months` is `NULL` LOCF will be carried out on all observations like
-#' normal
+#' @param window_size The maximum time the last observation can be
+#' carried forward. If `n_months` is `NULL` LOCF will be carried out
+#' on all observations like normal.
+#' @param window_type `years`, `months` or `days`, deafult is `days`.
+#' With `months` and `years` the `window_size` is simply multiplied by a
+#' factor of 31 or 365.25 respectively.
+#'
 #' @return data.frame with LOCF imputation
 #' @export locfdt
 #' @examples
@@ -80,7 +82,23 @@ locfdt <- function(
     orderby = "date",
     slice = FALSE,
     return_tibble = FALSE,
-    n_months = NULL) {
+    window_size = NULL,
+    window_type = NULL) {
+  # Check inputs
+  checkmate::assert_choice(
+    x = window_type,
+    choices = c("months", "years", "days"),
+    null.ok = TRUE
+  )
+  if (!is.null(window_type)) {
+    window_size <- switch(
+      window_type,
+      "months" = 31 * window_size,
+      "years" = ceiling(365.25 * window_size),
+      "days" = window_size
+    )
+  }
+  checkmate::check_int(x = window_size, null.ok = TRUE)
 
   # Sort data
   data.table::setorderv(dt, c(groupby, orderby))
@@ -95,18 +113,16 @@ locfdt <- function(
       .SD, function(x) {
         i <- cummax(as.integer(!is.na(x) | idchg) * .I)
 
-        if (!is.null(n_months)) {
+        if (!is.null(window_size) && !is.null(window_type)) {
 
           time_diff <- sapply(seq_along(i), function(j) {
 
             if (idchg[j] == 1) {
               return(TRUE)
             } else {
-              # return(dt[j, get(orderby)] - dt[i[j], get(orderby)] >
-              #          lubridate::time_length(months(n_months),
-              #                                 unit = "days"))
-              return(lubridate::`%m-%`(dt[j, get(orderby)],  months(n_months)) >
-                       dt[i[j], get(orderby)])
+              return(
+                dt[j, get(orderby)] - window_size > dt[i[j], get(orderby)]
+              )
             }
           })
 

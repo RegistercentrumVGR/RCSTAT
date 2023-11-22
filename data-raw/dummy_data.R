@@ -1,7 +1,10 @@
 #
 #
 library(dplyr)
+set.seed(12345)
+
 n <- 100000
+
 
 dummy_data <-
   data.frame(

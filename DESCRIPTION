@@ -19,6 +19,7 @@ Suggests:
 Config/testthat/edition: 3
 RoxygenNote: 7.2.3
 Imports: 
+    checkmate,
     cli,
     data.table,
     dplyr,

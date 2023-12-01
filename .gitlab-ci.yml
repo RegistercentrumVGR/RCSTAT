@@ -81,7 +81,6 @@ check-prod:
       paths:
         - "*.tar.gz"
 
-
 deploy to demo:
    stage: deploy_demo
    tags:

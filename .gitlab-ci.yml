@@ -1,9 +1,7 @@
 stages:
-  - lint
   - check
-  - document
-  - deploy_demo
-  - deploy_prod
+  - build
+  - deploy
 
 variables:
   LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
@@ -15,9 +13,8 @@ cache:
 
 lint:
   image: rocker/r-ver:4.2.0
-  stage: lint
+  stage: check
   script:
-    - echo "Build pages"
     - mkdir -p $LIBS_USER
     - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
     - echo 'INSTALL SYSTEM DEPENDENCIES'
@@ -33,7 +30,7 @@ lint:
 
 pages:
   image: rocker/r-ver:4.2.0
-  stage: document
+  stage: build
   only:
     refs:
     - master
@@ -59,9 +56,9 @@ pages:
     paths:
       - public
 
-check-prod:
+R Package:
   image: rocker/r-ver:4.2.0
-  stage: check
+  stage: build
   script:
     - mkdir -p $LIBS_USER
     - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
@@ -81,8 +78,8 @@ check-prod:
       paths:
         - "*.tar.gz"
 
-deploy to demo:
-   stage: deploy_demo
+demo:
+   stage: deploy
    tags:
      - rc-rdemo
    before_script: []
@@ -94,8 +91,8 @@ deploy to demo:
       - master
    when: manual
 
-deploy to prod:
-   stage: deploy_prod
+prod:
+   stage: deploy
    tags:
      - rc-r
    before_script: []

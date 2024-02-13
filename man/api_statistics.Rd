@@ -10,7 +10,8 @@ api_statistics(
   arguments = list(),
   api_key = "MpuYxfbtp5I=",
   dev = FALSE,
-  verbose = FALSE
+  verbose = FALSE,
+  return_tibble = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ api_statistics(
 \item{dev}{if newr should be used}
 
 \item{verbose}{print query sent}
+
+\item{return_tibble}{whether or not to coerce data to a tibble using
+tibble::as_tibble. Note that this does not work when the data is a list.}
 }
 \description{
 Get data from statistics API

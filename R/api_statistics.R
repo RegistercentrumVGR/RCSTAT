@@ -33,6 +33,8 @@ get_data_package <- function(register, fun, arguments = list()) {
 #' @param api_key api-key to use
 #' @param dev if newr should be used
 #' @param verbose print query sent
+#' @param return_tibble whether or not to coerce data to a tibble using
+#' tibble::as_tibble. Note that this does not work when the data is a list.
 #'
 #' @export
 api_statistics <- function(
@@ -41,7 +43,8 @@ api_statistics <- function(
     arguments = list(),
     api_key = "MpuYxfbtp5I=",
     dev = FALSE,
-    verbose = FALSE) {
+    verbose = FALSE,
+    return_tibble = TRUE) {
 
   if (length(arguments) > 0) {
 
@@ -92,5 +95,9 @@ api_statistics <- function(
 
   data <- json_list[["data"]]
 
-  tibble::as_tibble(data)
+  if (return_tibble) {
+    data <- tibble::as_tibble(data)
+  }
+
+  return(data)
 }

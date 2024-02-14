@@ -45,8 +45,6 @@ R-tests:
     - Rscript -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
     - echo "Lint package"
     - Rscript -e 'testthat::test_local(reporter = testthat::JunitReporter$new(file = "../../junit_result.xml"))'
-    - Rscript -e "covr::gitlab(quiet = FALSE)"
-  coverage: '/Coverage: \d+\.\d+/'
   artifacts:
     reports:
       junit: junit_result.xml
@@ -73,6 +71,7 @@ pages:
     - echo 'BUILD DOCUMENTATION'
     - Rscript -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
     - mv docs public
+    - Rscript -e "covr::gitlab(quiet = FALSE)"
   coverage: '/Coverage: \d+\.\d+/'
   artifacts:
     paths:

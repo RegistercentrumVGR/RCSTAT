@@ -1,5 +1,5 @@
 stages:
-  - check
+  - test
   - build
   - deploy
 
@@ -13,7 +13,7 @@ cache:
 
 lint:
   image: rocker/r-ver:4.2.0
-  stage: check
+  stage: test
   script:
     - mkdir -p $LIBS_USER
     - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
@@ -27,6 +27,23 @@ lint:
     - Rscript -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
     - echo "Lint package"
     - Rscript -e "devtools::load_all();lintr::lint_package()"
+
+R-tests:
+  image: rocker/r-ver:4.2.0
+  stage: test
+  script:
+    - mkdir -p $LIBS_USER
+    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
+    - echo 'INSTALL SYSTEM DEPENDENCIES'
+    - apt-get update
+    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
+    - Rscript -e 'pak::pkg_install(c("devtools", "testthat"), lib = Sys.getenv("R_LIBS_USER"))'
+    - Rscript -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
+    - echo "Lint package"
+    - Rscript -e 'testthat::test_local(reporter = testthat::JunitReporter$new(file = "junit_result.xml"))'
 
 pages:
   image: rocker/r-ver:4.2.0

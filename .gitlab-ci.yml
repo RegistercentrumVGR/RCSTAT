@@ -6,9 +6,7 @@ stages:
 variables:
   LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
 
-artifacts:
-  reports:
-    junit: junit_result.xml
+
 
 cache:
     paths:
@@ -50,8 +48,8 @@ R-tests:
     - Rscript -e "covr::gitlab(quiet = FALSE)"
   coverage: '/Coverage: \d+\.\d+/'
   artifacts:
-  reports:
-    junit: junit_result.xml
+    reports:
+      junit: junit_result.xml
 
 pages:
   image: rocker/r-ver:4.2.0

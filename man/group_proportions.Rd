@@ -4,12 +4,14 @@
 \alias{group_proportions}
 \title{Proportions by group}
 \usage{
-group_proportions(data, ...)
+group_proportions(data, group_by, obfuscate = TRUE)
 }
 \arguments{
 \item{data}{A data.frame or tibble}
 
-\item{...}{variables to group on}
+\item{group_by}{variables to group on}
+
+\item{obfuscate}{If data should be non-revealing}
 }
 \description{
 Counts number of observations in each group.

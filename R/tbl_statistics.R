@@ -4,7 +4,6 @@
 #' drops last grouping variable and counts total.
 #' Calculates proportion for each grouping
 #'
-#'
 #' @param data A data.frame or tibble
 #' @param group_by variables to group on
 #' @param obfuscate If data should be non-revealing

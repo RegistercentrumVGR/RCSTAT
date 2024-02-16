@@ -21,26 +21,16 @@ obfuscate_data <- function(
     # Round proportions
     data[, proportion_vars] <- lapply(
       data[, proportion_vars], function(x) {
-        roundc(x, digits = 2)
+        round(x, digits = 2)
       }
     )
   }
   # Round frequencies
-  data[, freq_vars] <- lapply(data[, freq_vars], round_to_tens)
+  data[, freq_vars] <- lapply(data[, freq_vars], \(x) round(x, -1L))
 
   data
 }
-#' Round integer to nearest 10
-#'
-#' 5's rounds to nearest even, i.e. 15 rounds to 20
-#' and 25 rounds to 20. See ?round.
-#'
-#' @param n integer, normally a frequency
-#'
-#' @export
-round_to_tens <- function(n) {
-  round(n / 10L, 0L) * 10L
-}
+
 #' Get rounded ci for proportion
 #'
 #' @param p_hat estimate of proportion

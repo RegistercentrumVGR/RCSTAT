@@ -1,9 +1,3 @@
-test_that("round_to_tens runs", {
-  x <- c(0, 5, 10, 15, 20, 24, 25, 26)
-  y <- c(0, 0, 10, 20, 20, 20, 20, 30)
-  expect_equal(round_to_tens(x), y)
-})
-
 test_that("rounded_ci_p works", {
   p_hat <- 0.5
   n <- 20
@@ -25,7 +19,7 @@ test_that("group_proportions censors as expected", {
   )
   expected_res <- tibble::tribble(
     ~a, ~Count, ~Total, ~Proportion,
-    1,  20,     40,     0.63,
+    1,  20,     40,     0.62,
     2,  10,     40,     0.28,
     3,  NA,     NA,     NA
   )

@@ -3,101 +3,17 @@ stages:
   - build
   - deploy
 
-variables:
-  LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
-
-
-
-cache:
-    paths:
-      - $LIBS_USER
-
-lint:
-  image: rocker/r-ver:4.2.0
-  stage: test
-  script:
-    - mkdir -p $LIBS_USER
-    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
-    - echo 'INSTALL SYSTEM DEPENDENCIES'
-    - apt-get update
-    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
-    - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - Rscript -e 'pak::pkg_install(c("devtools", "lintr"), lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
-    - echo "Lint package"
-    - Rscript -e "devtools::load_all();lintr::lint_package()"
-
-R-tests:
-  image: rocker/r-ver:4.2.0
-  stage: test
-  script:
-    - mkdir -p $LIBS_USER
-    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
-    - echo 'INSTALL SYSTEM DEPENDENCIES'
-    - apt-get update
-    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
-    - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - Rscript -e 'pak::pkg_install(c("devtools", "testthat", "covr"), lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
-    - echo "Lint package"
-    - Rscript -e 'testthat::test_local(reporter = testthat::JunitReporter$new(file = "../../junit_result.xml"))'
-  artifacts:
-    reports:
-      junit: junit_result.xml
-
-pages:
-  image: rocker/r-ver:4.2.0
-  stage: build
-  only:
-    refs:
-    - master
-  script:
-    - echo "Build pages"
-    - mkdir -p $LIBS_USER
-    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
-    - echo 'INSTALL SYSTEM DEPENDENCIES'
-    - apt-get update
-    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - Rscript -e 'pak::pkg_install(c("devtools", "pkgdown", "DT"), lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::pkg_install("covr", lib = Sys.getenv("R_LIBS_USER"), dependencies = TRUE)'
-    - Rscript -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
-    - echo 'BUILD DOCUMENTATION'
-    - Rscript -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
-    - mv docs public
-    - Rscript -e "covr::gitlab(quiet = FALSE)"
-  coverage: '/Coverage: \d+\.\d+/'
-  artifacts:
-    paths:
-      - public
-
-R Package:
-  image: rocker/r-ver:4.2.0
-  stage: build
-  script:
-    - mkdir -p $LIBS_USER
-    - echo 'R_LIBS_USER="${LIBS_USER}"' > .Renviron
-    - echo 'INSTALL SYSTEM DEPENDENCIES'
-    - apt-get update
-    - Rscript -e 'install.packages("pak", lib = Sys.getenv("R_LIBS_USER"), repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - Rscript -e 'pak::pkg_install("distro", lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::local_system_requirements(execute = TRUE, sudo = FALSE)'
-    - echo 'INSTALL R PACKAGE DEPENDENCIES'
-    - Rscript -e 'pak::pkg_install(c("Rcpp", "rcmdcheck"), lib = Sys.getenv("R_LIBS_USER"))'
-    - Rscript -e 'pak::local_install_dev_deps(lib = Sys.getenv("R_LIBS_USER"))'
-    - echo "CHECK PACKAGE"
-    - Rscript -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
-    - echo "Build package"
-    - R CMD build . --no-build-vignettes --no-manual
-  artifacts:
-      paths:
-        - "*.tar.gz"
+include:
+  - project: 'registercentrum/pipelines/r-package-ci'
+    file: '/lint-r-package.yml'
+  - project: 'registercentrum/pipelines/r-package-ci'
+    file: '/test-r-package.yml'
+  - project: 'registercentrum/pipelines/r-package-ci'
+    file: '/rcmdcheck-r-package.yml'
+  - project: 'registercentrum/pipelines/r-package-ci'
+    file: '/build-r-package.yml'
+  - project: 'registercentrum/pipelines/r-package-ci'
+    file: '/document-r-package.yml'
 
 demo:
    stage: deploy

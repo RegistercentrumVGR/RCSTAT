@@ -1,6 +1,3 @@
-# Contains functions group_proportions, group_means
-#
-
 #' Proportions by group
 #'
 #' Counts number of observations in each group.
@@ -9,13 +6,17 @@
 #'
 #'
 #' @param data A data.frame or tibble
-#' @param ... variables to group on
+#' @param group_by variables to group on
+#' @param obfuscate If data should be non-revealing
 #'
 #' @export group_proportions
-group_proportions <- function(data, ...) {
+group_proportions <- function(
+    data,
+    group_by,
+    obfuscate = TRUE) {
 
-  data |>
-    dplyr::group_by(...) |>
+  res <- data |>
+    dplyr::group_by(dplyr::pick(tidyselect::all_of(group_by))) |>
     dplyr::summarise(
       .groups = "drop_last",
       n = dplyr::n()
@@ -24,12 +25,20 @@ group_proportions <- function(data, ...) {
       Nt = sum(.data[["n"]], na.rm = TRUE),
       p = .data[["n"]] / .data[["Nt"]]
     ) |>
-    dplyr::rename(
-      Count = "n",
-      Total = "Nt",
-      Proportion = "p"
-    ) |>
     dplyr::ungroup()
+
+  # Make data non-revealing
+  if (obfuscate) {
+    res <- obfuscate_data(
+      data = res,
+      proportion_vars = "p",
+      freq_vars = c("n", "Nt")
+    )
+  }
+  dplyr::rename(
+    res,
+    "Count" = "n", "Total" = "Nt", "Proportion" = "p",
+  )
 }
 
 #' Calculate n, means and sd by group
@@ -38,26 +47,37 @@ group_proportions <- function(data, ...) {
 #' @param ... Variables to group on by
 #' @param vars Variables to calculate means and sd on.
 #' Defaults to all vars in data.
+#' @param obfuscate If data should be non-revealing
 #'
 #' @export group_means
-group_means <- function(data, ..., vars = names(data)) {
-  # Remove grouping-vars from vars if present
-  vars <- setdiff(vars, names(dplyr::select(data, ...)))
+group_means <- function(
+    data,
+    group_by,
+    vars = NULL,
+    obfuscate = TRUE) {
+  if (is.null(vars)) {
+    vars <- setdiff(group_by, names(data))
+  }
 
-  data |>
-    dplyr::group_by(...) |>
+  res <- data |>
+    dplyr::group_by(dplyr::pick(tidyselect::all_of(group_by))) |>
     dplyr::summarise(
       .groups = "drop",
       n = dplyr::n(),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
         .fns = list(
-          mean = \(x) mean(x, na.rm = TRUE),
-          sd = \(x) stats::sd(x, na.rm = TRUE)
+          mean = \(x) if (.data[["n"]] > 14) mean(x, na.rm = TRUE) else NA,
+          sd = \(x) if (.data[["n"]] > 14) stats::sd(x, na.rm = TRUE) else NA
         ),
         .names = "{.col}_{.fn}"
       )
     )
+
+  if (obfuscate) {
+    res <- obfuscate_data(data = res, freq_vars = "n")
+  }
+  res
 }
 #' Calculates proportion of missing data
 #'
@@ -68,20 +88,27 @@ group_means <- function(data, ..., vars = names(data)) {
 #' @param ... grouping to apply before calculation
 #' @param vars vars to calculate proportion of missing
 #' data on. Defaults to all except grouping vars.
+#' @param obfuscate If data should be non-revealing
 #'
 #' @export proportion_missing
-proportion_missing <- function(data, ..., vars = names(data)) {
-  # Remove grouping-vars from vars if present
-  vars <- setdiff(vars, names(dplyr::select(data, ...)))
+proportion_missing <- function(
+    data,
+    group_by,
+    vars = NULL,
+    obfuscate = TRUE) {
 
-  data |>
-    dplyr::group_by(...) |>
+  if (is.null(vars)) {
+    vars <- setdiff(group_by, names(data))
+  }
+
+  res <- data |>
+    dplyr::group_by(dplyr::pick(tidyselect::all_of(group_by))) |>
     dplyr::summarise(
       .groups = "drop",
       N = dplyr::n(),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
-        .fns = \(x) sum(is.na(x), na.rm = TRUE)
+        .fns = \(x) sum(is.na(x))
       ),
       dplyr::across(
         .cols = tidyselect::all_of(vars),
@@ -89,4 +116,14 @@ proportion_missing <- function(data, ..., vars = names(data)) {
         .names = "Proportion_missing_{.col}"
       )
     )
+
+  if (obfuscate) {
+    res <-
+      obfuscate_data(
+        data = res,
+        proportion_vars = paste0("Proportion_missing_", vars),
+        freq_vars = c(vars, "N")
+      )
+  }
+  res
 }

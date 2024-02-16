@@ -4,15 +4,17 @@
 \alias{group_means}
 \title{Calculate n, means and sd by group}
 \usage{
-group_means(data, ..., vars = names(data))
+group_means(data, group_by, vars = NULL, obfuscate = TRUE)
 }
 \arguments{
 \item{data}{A data.frame or tibble}
 
-\item{...}{Variables to group on by}
-
 \item{vars}{Variables to calculate means and sd on.
 Defaults to all vars in data.}
+
+\item{obfuscate}{If data should be non-revealing}
+
+\item{...}{Variables to group on by}
 }
 \description{
 Calculate n, means and sd by group

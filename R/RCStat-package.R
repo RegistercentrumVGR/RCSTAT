@@ -9,7 +9,6 @@
 #' @importFrom data.table .N
 #' @importFrom data.table .NGRP
 #' @importFrom data.table .SD
-#' @importFrom data.table :=
 #' @importFrom data.table data.table
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib RCStat, .registration = TRUE

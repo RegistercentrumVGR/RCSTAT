@@ -9,12 +9,12 @@ proportion_missing(data, group_by, vars = NULL, obfuscate = TRUE)
 \arguments{
 \item{data}{data.frame or tibble}
 
+\item{group_by}{grouping to apply before calculation}
+
 \item{vars}{vars to calculate proportion of missing
 data on. Defaults to all except grouping vars.}
 
 \item{obfuscate}{If data should be non-revealing}
-
-\item{...}{grouping to apply before calculation}
 }
 \description{
 Calculates n missing and proportion missing across

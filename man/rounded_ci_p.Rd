@@ -10,6 +10,8 @@ rounded_ci_p(p_hat, n, alpha = 0.05)
 \item{p_hat}{estimate of proportion}
 
 \item{n}{sample size}
+
+\item{alpha}{alpha level}
 }
 \description{
 Get rounded ci for proportion

@@ -35,10 +35,11 @@ obfuscate_data <- function(
 #'
 #' @param p_hat estimate of proportion
 #' @param n sample size
+#' @param alpha alpha level
 #'
 #' @export
 rounded_ci_p <- function(p_hat, n, alpha = 0.05) {
-  z <- qnorm(1 - alpha / 2)
+  z <- stats::qnorm(1 - alpha / 2)
   width <- round(z * sqrt((p_hat * (1 - p_hat)) / n), digits = 2)
   p_hat <- round(p_hat, digits = 2)
   list(lower = pmax(0, p_hat - width), upper = pmin(1, p_hat + width))

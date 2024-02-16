@@ -43,7 +43,7 @@ group_proportions <- function(
 #' Calculate n, means and sd by group
 #'
 #' @param data A data.frame or tibble
-#' @param ... Variables to group on by
+#' @param group_by Variables to group on by
 #' @param vars Variables to calculate means and sd on.
 #' Defaults to all vars in data.
 #' @param obfuscate If data should be non-revealing
@@ -84,7 +84,7 @@ group_means <- function(
 #' columns and by groups specified.
 #'
 #' @param data data.frame or tibble
-#' @param ... grouping to apply before calculation
+#' @param group_by grouping to apply before calculation
 #' @param vars vars to calculate proportion of missing
 #' data on. Defaults to all except grouping vars.
 #' @param obfuscate If data should be non-revealing

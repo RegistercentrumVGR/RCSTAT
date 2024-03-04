@@ -40,3 +40,13 @@ test_that("group_proportions censors as expected", {
   )
   expect_equal(res, expected_res)
 })
+
+test_that("round_up works", {
+  rounded <- round_up(1:10 + 0.5, digits = 0)
+  expected_rounded <- 2:11
+  expect_equal(rounded, expected_rounded)
+
+  rounded <- round_up(c(125, 5318, 83, 1, 11, 5), digits = -1)
+  expected_rounded <- c(130, 5320, 80, 0, 10, 10)
+  expect_equal(rounded, expected_rounded)
+})

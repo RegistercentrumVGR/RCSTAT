@@ -44,3 +44,26 @@ rounded_ci_p <- function(p_hat, n, alpha = 0.05) {
   p_hat <- round(p_hat, digits = 2)
   list(lower = pmax(0, p_hat - width), upper = pmin(1, p_hat + width))
 }
+
+
+
+#' Round 5's upwards instead of `round`'s behavior which is to round towards
+#' the even digit
+#'
+#' @param x The number you wish to round
+#' @param digits the number of decimal places to be used
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' round(1.5)
+#' round_up(1.5)
+round_up <- function(x, digits = 0) {
+  posneg <- sign(x)
+  z <- abs(x)*10^digits
+  z <- z + 0.5 + sqrt(.Machine$double.eps)
+  z <- trunc(z)
+  z <- z/10^digits
+  return(z*posneg)
+}

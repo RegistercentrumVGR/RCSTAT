@@ -6,6 +6,7 @@
 #' @param x numeric vector
 #' @param digits number of digits to round to
 #' @return rounded vector
+#' @export
 #'
 roundc <- function(x, digits = 0L) {
     .Call(`_RCStat_roundc`, x, digits)

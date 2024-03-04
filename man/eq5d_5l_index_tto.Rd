@@ -25,8 +25,8 @@ eq5d_5l_index_tto(rep(3, 10), rep(4, 10),rep(5, 10), rep(4, 10), rep(3, 10))
 }
 \seealso{
 Other eq5d: 
-\code{\link{eq5d_3l_index_tto}()},
 \code{\link{eq5d_3l_index_tto_old}()},
+\code{\link{eq5d_3l_index_tto}()},
 \code{\link{eq5d_5l_index_vas}()},
 \code{\link{eq5d_index}()}
 }

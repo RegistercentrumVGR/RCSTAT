@@ -16,7 +16,7 @@ The goal of RCStat is to ...
 You can install the development version of RCStat like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+remotes::install_gitlab("registercentrum/statistikenheten/rcstat")
 ```
 
 ## Example

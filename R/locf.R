@@ -115,16 +115,10 @@ locfdt <- function(
 
         if (!is.null(window_size) && !is.null(window_type)) {
 
-          time_diff <- sapply(seq_along(i), function(j) {
+          i_seq <- seq_along(i)
 
-            if (idchg[j] == 1) {
-              return(TRUE)
-            } else {
-              return(
-                dt[j, get(orderby)] - window_size > dt[i[j], get(orderby)]
-              )
-            }
-          })
+          time_diff <- idchg[i_seq] == 1 |
+            dt[i_seq, get(orderby)] - window_size > dt[i[i_seq], get(orderby)]
 
           i[time_diff] <- which(time_diff)
 

@@ -88,7 +88,7 @@ is_male <- function(x) {
 #' @return 1 if male, 2 if female.
 #' @export gender
 gender <- function(x) {
-  if (is_female) {
+  if (is_female(x)) {
     return(2L)
   }else {
     return(1L)

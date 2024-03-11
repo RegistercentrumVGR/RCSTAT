@@ -71,7 +71,6 @@ birthdate <- function(x) {
 #' @export is_female
 is_female <- function(x) {
   second_last_character <- nchar(x) - 1
-
   (as.integer(substr(x, second_last_character, second_last_character)) %% 2L == 0L)
 }
 #' Derives gender from Swedish social security number
@@ -88,11 +87,7 @@ is_male <- function(x) {
 #' @return 1 if male, 2 if female.
 #' @export gender
 gender <- function(x) {
-  if (is_female(x)) {
-    return(2L)
-  }else {
-    return(1L)
-  }
+  data.table::fifelse(is_female(x), 2L, 1L)
 }
 
 #' Gets random password from API

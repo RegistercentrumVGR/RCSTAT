@@ -4,12 +4,14 @@
 \alias{obfuscate_data}
 \title{Make data non-revealing}
 \usage{
-obfuscate_data(data, freq_vars, proportion_vars = NULL)
+obfuscate_data(data, freq_vars, tot_freq_var = NULL, proportion_vars = NULL)
 }
 \arguments{
 \item{data}{Aggregated data with frequencies and proportions}
 
 \item{freq_vars}{variables/columns containing frequencies}
+
+\item{tot_freq_var}{variable/column with total frequency for group}
 
 \item{proportion_vars}{variables/columns containing proportions}
 }

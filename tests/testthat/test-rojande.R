@@ -19,22 +19,22 @@ test_that("group_proportions censors as expected", {
   )
   expected_res <- tibble::tribble(
     ~a, ~Count, ~Total, ~Proportion,
-    1,  20,     40,     0.62,
+    1,  30,     40,     0.63,
     2,  10,     40,     0.28,
     3,  NA,     NA,     NA
   )
   # Test group_means on data.frame and data.table
-  res <- group_proportions(df, group_by = "a")
+  res <- group_proportions(df, group_by = "a", obfuscate = TRUE)
 
   expect_equal(res, expected_res)
 
-  res <- group_proportions(df, group_by = c("a", "b"))
+  res <- group_proportions(df, group_by = c("a", "b"), obfuscate = TRUE)
   expected_res <- tibble::tribble(
     ~a, ~b, ~Count, ~Total, ~Proportion,
-    1,  1,  10,     20,     0.52,
-    1,  2,  10,     20,     0.48,
-    2,  1,   0,     10,     0.45,
-    2,  2,  10,     10,     0.55,
+    1,  1,  10,     30,     0.52,
+    1,  2,  10,     30,     0.48,
+    2,  1,  NA,     NA,     NA,
+    2,  2,  NA,     NA,     NA,
     3,  1,  NA,     NA,     NA,
     3,  2,  NA,     NA,     NA
   )

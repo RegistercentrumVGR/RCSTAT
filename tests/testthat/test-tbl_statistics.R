@@ -41,7 +41,7 @@ test_that("methods give same result on dt and df ", {
   res <- proportion_missing(df, vars = c("c", "x"), group_by = "b")
 
   expected_res <- tibble::tribble(
-    ~b, ~N,       ~c,       ~x,        ~Proportion_missing_c, ~Proportion_missing_x,
+    ~b, ~N,       ~c,       ~x,        ~proportion_missing_c, ~proportion_missing_x,
     1,  NA_real_, NA_real_, NA_real_,  NA_real_,                NA_real_,
     2,  NA_real_, NA_real_, NA_real_,  NA_real_,                NA_real_
   )

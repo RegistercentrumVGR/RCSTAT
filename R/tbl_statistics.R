@@ -31,7 +31,8 @@ group_proportions <- function(
     res <- obfuscate_data(
       data = res,
       proportion_vars = "p",
-      freq_vars = c("n", "Nt")
+      freq_vars = "n",
+      tot_freq_var = "Nt"
     )
   }
   dplyr::rename(
@@ -97,7 +98,7 @@ proportion_missing <- function(
     obfuscate = TRUE) {
 
   if (is.null(vars)) {
-    vars <- setdiff(group_by, names(data))
+    vars <- setdiff(names(data), group_by)
   }
 
   res <- data |>
@@ -112,17 +113,20 @@ proportion_missing <- function(
       dplyr::across(
         .cols = tidyselect::all_of(vars),
         .fns = \(x) x / .data[["N"]],
-        .names = "Proportion_missing_{.col}"
+        .names = "proportion_missing_{.col}"
       )
     )
 
   if (obfuscate) {
-    res <-
-      obfuscate_data(
-        data = res,
-        proportion_vars = paste0("Proportion_missing_", vars),
-        freq_vars = c(vars, "N")
-      )
+    for (v in vars) {
+      res <-
+        obfuscate_data(
+          data = res,
+          proportion_vars = paste0("proportion_missing_", v),
+          freq_vars = v,
+          tot_freq_var = "N"
+        )
+    }
   }
   res
 }

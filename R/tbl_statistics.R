@@ -30,7 +30,7 @@ group_proportions <- function(
   if (obfuscate) {
     res <- obfuscate_data(
       data = res,
-      proportion_vars = "p",
+      statistics_vars = "p",
       freq_vars = "n",
       tot_freq_var = "Nt"
     )
@@ -56,7 +56,7 @@ group_means <- function(
     vars = NULL,
     obfuscate = TRUE) {
   if (is.null(vars)) {
-    vars <- setdiff(group_by, names(data))
+    vars <- setdiff(names(data), group_by)
   }
 
   res <- data |>
@@ -67,15 +67,28 @@ group_means <- function(
       dplyr::across(
         .cols = tidyselect::all_of(vars),
         .fns = list(
-          mean = \(x) if (.data[["n"]] > 14) mean(x, na.rm = TRUE) else NA,
-          sd = \(x) if (.data[["n"]] > 14) stats::sd(x, na.rm = TRUE) else NA
+          non_missing = \(x) sum(!is.na(x))
+        ),
+        .names = "{.col}_{.fn}"
+      ),
+      dplyr::across(
+        .cols = tidyselect::all_of(vars),
+        .fns = list(
+          mean = \(x) mean(x, na.rm = TRUE),
+          sd = \(x) stats::sd(x, na.rm = TRUE)
         ),
         .names = "{.col}_{.fn}"
       )
     )
 
   if (obfuscate) {
-    res <- obfuscate_data(data = res, freq_vars = "n")
+    for (v in vars) {
+      res <- obfuscate_data(
+        data = res,
+        tot_freq_var = c(paste0(v, "_non_missing"), "n"),
+        statistics_vars = c(paste0(v, "_sd"), paste0(v, "_mean"))
+      )
+    }
   }
   res
 }
@@ -122,7 +135,7 @@ proportion_missing <- function(
       res <-
         obfuscate_data(
           data = res,
-          proportion_vars = paste0("proportion_missing_", v),
+          statistics_vars = paste0("proportion_missing_", v),
           freq_vars = v,
           tot_freq_var = "N"
         )

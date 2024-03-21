@@ -187,12 +187,12 @@ zip_dir_with_pass <- function(
 #'
 #' @param dts A list of data.frames to export
 #' @param file_names A list of the names to use when saving each data.frame in
-#'  `dts`
+#'  `dts` without file extension
 #' @param encoding The encoding to use, by default `UTF-8`
 #' @param separator The separator to use when saving the `dts`
 #' @param zip Whether or not to zip the output directory after saving the files
 #' @param output_dir The output directory in which to save the files
-#' @param zip_file_name The name of the created zip file
+#' @param zip_file_name The name of the created zip file without file extension
 #' @export sos_metadata
 #'
 #' @examples
@@ -272,6 +272,12 @@ sos_metadata <- function(dts = list(),
     path = paste0("./", output_dir, "/metadata.xlsx")
   )
 
-  if (zip)
+  if (zip) {
+
     zip_dir_with_pass(directory = output_dir, file = zip_file_name)
+
+    if (!file.exists(paste0("./", zip_file_name, ".zip")))
+      message("Zip failed, try (re-)installing RTools")
+
+  }
 }

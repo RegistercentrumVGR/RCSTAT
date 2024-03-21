@@ -20,7 +20,7 @@ sos_metadata(
 \item{dts}{A list of data.frames to export}
 
 \item{file_names}{A list of the names to use when saving each data.frame in
-`dts`}
+`dts` without file extension}
 
 \item{encoding}{The encoding to use, by default `UTF-8`}
 
@@ -30,7 +30,7 @@ sos_metadata(
 
 \item{output_dir}{The output directory in which to save the files}
 
-\item{zip_file_name}{The name of the created zip file}
+\item{zip_file_name}{The name of the created zip file without file extension}
 }
 \description{
 Saves data.frames as .csv files and creates and saves the corresponding

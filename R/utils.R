@@ -185,9 +185,9 @@ zip_dir_with_pass <- function(
 #' metadata files. Can also zip the outputs with a random password which is
 #' saved in a separate .txt file.
 #'
-#' @param dts A list of data.frames to export
+#' @param dfs A list of data.frames to export
 #' @param file_names A list of the names to use when saving each data.frame in
-#'  `dts` without file extension
+#'  `dfs` without file extension
 #' @param encoding The encoding to use, by default `UTF-8`
 #' @param separator The separator to use when saving the `dts`
 #' @param zip Whether or not to zip the output directory after saving the files
@@ -199,34 +199,41 @@ zip_dir_with_pass <- function(
 #' \dontrun{
 #' data_1 <- RCDBT::GetRegisterData(...) %>% filter(...)
 #' data_2 <- RCDBT::GetRegisterData(...) %>% filter(...)
-#' sos_metadata(dts = list(data_1, data_2),
+#' sos_metadata(dfs = list(data_1, data_2),
 #'              file_names = list("dnr_xxxx_yyyyy_1", "dnr_xxxx_yyyyy_2"))
 #' }
-sos_metadata <- function(dts = list(),
+sos_metadata <- function(dfs = list(),
                          file_names = list(),
-                         encoding = "UTF-8",
                          separator = ",",
                          zip = TRUE,
                          output_dir = "Output",
                          zip_file_name = "output") {
 
-  if (length(file_names) != length(dts))
-    stop("file_names and dts is not the same length")
+  encoding <- "UTF-8"
 
-  if (!("list" %in% class(dts)) || !("list" %in% class(file_names)))
-    stop("Both file_names and dts must be a list")
+  if (length(file_names) != length(dfs))
+    stop("file_names and dfs is not the same length")
+
+  if (!("list" %in% class(dfs)) || !("list" %in% class(file_names)))
+    stop("Both file_names and dfs must be a list")
 
 
 
   for (i in seq_along(file_names)) {
-    utils::write.table(
-      x = dts[[i]],
+
+    df <- dfs[[i]] |>
+      dplyr::mutate(dplyr::across(
+        tidyselect::where(is.character),
+        ~ enc2utf8(.x)
+      ))
+
+    data.table::fwrite(
+      x = df,
       file = paste0("./", output_dir, "/", file_names[[i]], ".csv"),
-      sep = separator,
       eol = "\r\n",
-      fileEncoding = encoding,
-      row.names = FALSE,
-      col.names = TRUE
+      row.names = F,
+      col.names = T,
+      sep = separator
     )
   }
 
@@ -235,23 +242,23 @@ sos_metadata <- function(dts = list(),
     encoding = encoding,
     separator = separator,
     end_of_line = "CRLF",
-    nrows = purrr::map_int(dts, nrow),
-    ncols = purrr::map_int(dts, ncol)
+    nrows = purrr::map_int(dfs, nrow),
+    ncols = purrr::map_int(dfs, ncol)
   )
 
   var_names <- lapply(seq_along(file_names), function(i) {
     tibble::tibble(
       filename = paste0(file_names[[i]], ".csv"),
-      variable = names(dts[[i]]),
-      position_in_file = seq_along(dts[[i]]),
-      type = purrr::map_chr(dts[[i]], \(x) utils::tail(class(x), 1)),
+      variable = names(dfs[[i]]),
+      position_in_file = seq_along(dfs[[i]]),
+      type = purrr::map_chr(dfs[[i]], \(x) utils::tail(class(x), 1)),
       length =
         dplyr::if_else(
           # Ovan väljer vi att exportera logicals som 0/1 även om det är
           # TRUE/FALSE i dt_out
           .data$type == "logical", as.integer(1),
           purrr::map_int(
-            dts[[i]],
+            dfs[[i]],
             function(x) {
               str_len <- stringr::str_length(x)
               if (all(is.na(str_len))) {

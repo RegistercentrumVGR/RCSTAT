@@ -188,7 +188,6 @@ zip_dir_with_pass <- function(
 #' @param dfs A list of data.frames to export
 #' @param file_names A list of the names to use when saving each data.frame in
 #'  `dfs` without file extension
-#' @param encoding The encoding to use, by default `UTF-8`
 #' @param separator The separator to use when saving the `dts`
 #' @param zip Whether or not to zip the output directory after saving the files
 #' @param output_dir The output directory in which to save the files

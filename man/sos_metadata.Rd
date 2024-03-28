@@ -7,9 +7,8 @@ metadata files. Can also zip the outputs with a random password which is
 saved in a separate .txt file.}
 \usage{
 sos_metadata(
-  dts = list(),
+  dfs = list(),
   file_names = list(),
-  encoding = "UTF-8",
   separator = ",",
   zip = TRUE,
   output_dir = "Output",
@@ -17,12 +16,10 @@ sos_metadata(
 )
 }
 \arguments{
-\item{dts}{A list of data.frames to export}
+\item{dfs}{A list of data.frames to export}
 
 \item{file_names}{A list of the names to use when saving each data.frame in
-`dts` without file extension}
-
-\item{encoding}{The encoding to use, by default `UTF-8`}
+`dfs` without file extension}
 
 \item{separator}{The separator to use when saving the `dts`}
 
@@ -41,7 +38,7 @@ saved in a separate .txt file.
 \dontrun{
 data_1 <- RCDBT::GetRegisterData(...) \%>\% filter(...)
 data_2 <- RCDBT::GetRegisterData(...) \%>\% filter(...)
-sos_metadata(dts = list(data_1, data_2),
+sos_metadata(dfs = list(data_1, data_2),
              file_names = list("dnr_xxxx_yyyyy_1", "dnr_xxxx_yyyyy_2"))
 }
 }

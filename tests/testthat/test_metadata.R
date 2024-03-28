@@ -17,12 +17,11 @@ test_that("Metadata", {
 
   dir.create("Output")
 
-  sos_metadata(dts = list(df1, df2),
+  sos_metadata(dfs = list(df1, df2),
                file_names = list("df1", "df2"),
                output_dir = "Output",
                zip_file_name = "zip_file",
                separator = ",",
-               encoding = "UTF-8",
                zip = FALSE)
 
   df1_res <- read.table("./Output/df1.csv", sep = ",", header = TRUE)

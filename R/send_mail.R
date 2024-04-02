@@ -72,12 +72,11 @@ rc_mail <- function(to, from, subject, body, password){
 #'   file = "data/test.csv")
 #'
 #' sh_mail(
-#' to = c("alexander.thoren@vgregion.se",
+#'   to = c("alexander.thoren@vgregion.se",
 #'  "oskar.e.johansson@vgregion.se"),
-#'  subject = "test",
-#'  password = ...,
-#'   file = "test.xlsx"
-#'   )
+#'   subject = "test",
+#'   password = ...,
+#'   file = "test.xlsx")
 #' }
 #' @export
 

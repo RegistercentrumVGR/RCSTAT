@@ -61,7 +61,7 @@ rc_mail <- function(to, from, subject, body, password){
 #' @param subject Subject of message
 #' @param file file to include. Currently supports
 #' one file of type csv, xlsx, pdf, zip, doc or docx.
-#' @param password The password to the statistik\@registercentrum.se email
+#' @param password The password to the statistik@registercentrum.se email
 #' @param run_bash Whether or not to run and then delete the created bash script
 #'
 #' @examples

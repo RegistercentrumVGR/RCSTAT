@@ -13,7 +13,7 @@ sh_mail(to, subject, password, file = NULL, run_bash = T)
 
 \item{subject}{Subject of message}
 
-\item{password}{The password to the statistik\@registercentrum.se email}
+\item{password}{The password to the statistik@registercentrum.se email}
 
 \item{file}{file to include. Currently supports
 one file of type csv, xlsx, pdf, zip, doc or docx.}

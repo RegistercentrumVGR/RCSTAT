@@ -66,10 +66,18 @@ rc_mail <- function(to, from, subject, body, password){
 #'
 #' @examples
 #' \dontrun{
-#' make_mail_sh(
+#' sh_mail(
 #'   to = "rikard.isaksson@vgregion.se",
 #'   subject = "Hej test",
 #'   file = "data/test.csv")
+#'
+#' sh_mail(
+#' to = c("alexander.thoren@vgregion.se",
+#'  "oskar.e.johansson@vgregion.se"),
+#'  subject = "test",
+#'  password = ...,
+#'   file = "test.xlsx"
+#'   )
 #' }
 #' @export
 
@@ -103,11 +111,11 @@ sh_mail <- function(to, subject, password, file = NULL, run_bash = T){
     paste0(
       "curl smtp://smtp.office365.com:587 --ssl ",
       "--mail-from statistik@registercentrum.se ",
-      "--mail-rcpt ", to, " ",
-      "--user statistik@registercentrum.se:",
+      paste("--mail-rcpt", to, collapse = " "),
+      " --user statistik@registercentrum.se:",
       password,
       " -H 'From: statistik@registercentrum.se' ",
-      "-H 'To: ", to, "' ",
+      "-H 'To: ", paste(to, collapse = ","), "' ",
       "-H 'Subject: ", subject, "' ",
       "-F '=(;type=multipart/mixed' ",
       "-F 'file=@", file,

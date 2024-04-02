@@ -27,9 +27,17 @@ office 365 mail.
 }
 \examples{
 \dontrun{
-make_mail_sh(
+sh_mail(
   to = "rikard.isaksson@vgregion.se",
   subject = "Hej test",
   file = "data/test.csv")
+
+sh_mail(
+to = c("alexander.thoren@vgregion.se",
+ "oskar.e.johansson@vgregion.se"),
+ subject = "test",
+ password = ...,
+  file = "test.xlsx"
+  )
 }
 }

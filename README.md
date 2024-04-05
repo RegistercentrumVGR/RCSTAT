@@ -12,7 +12,7 @@
 The goal of RCStat is to ...
 
 ## Installation
-testing testing 123
+testing testing 1234
 You can install the development version of RCStat like so:
 
 ``` r

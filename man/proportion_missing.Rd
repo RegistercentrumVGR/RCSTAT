@@ -4,7 +4,7 @@
 \alias{proportion_missing}
 \title{Calculates proportion of missing data}
 \usage{
-proportion_missing(data, group_by, vars = NULL, obfuscate = TRUE)
+proportion_missing(data, group_by, vars = NULL, obfuscate = TRUE, ...)
 }
 \arguments{
 \item{data}{data.frame or tibble}
@@ -15,6 +15,8 @@ proportion_missing(data, group_by, vars = NULL, obfuscate = TRUE)
 data on. Defaults to all except grouping vars.}
 
 \item{obfuscate}{If data should be non-revealing}
+
+\item{...}{Arguments passed to obfuscate}
 }
 \description{
 Calculates n missing and proportion missing across

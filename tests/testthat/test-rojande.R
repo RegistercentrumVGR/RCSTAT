@@ -21,7 +21,7 @@ test_that("group_proportions censors as expected", {
     ~a, ~Count, ~Total, ~Proportion,
     1,  30,     40,     0.63,
     2,  10,     40,     0.28,
-    3,  NA,     NA,     NA
+    3,  0,      40,     0
   )
   # Test group_means on data.frame and data.table
   res <- group_proportions(df, group_by = "a", obfuscate = TRUE)
@@ -33,10 +33,78 @@ test_that("group_proportions censors as expected", {
     ~a, ~b, ~Count, ~Total, ~Proportion,
     1,  1,  10,     30,     0.52,
     1,  2,  10,     30,     0.48,
-    2,  1,  NA,     NA,     NA,
-    2,  2,  NA,     NA,     NA,
-    3,  1,  NA,     NA,     NA,
-    3,  2,  NA,     NA,     NA
+    2,  1,  10,     10,     0,
+    2,  2,  10,     10,     0,
+    3,  1,  0,      0,      0,
+    3,  2,  0,      0,      0
   )
   expect_equal(res, expected_res)
+})
+
+test_that("reason col works", {
+
+  res <- data.frame(
+    group = c(rep("a", 3), rep("b", 2), rep("c", 2)),
+    n = c(1, 5, 10, 1, 11, 1, 10),
+    total = c(rep(16, 3), rep(10, 2), rep(50, 2))
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    dplyr::group_by(group) |>
+    obfuscate_data(add_reason_col = T) |>
+    dplyr::ungroup()
+
+  expected_res <- tibble::tribble(
+    ~group, ~n, ~total, ~prop, ~obfuscated_reason,
+    "a",    0,  20,     0,     "n < 5",
+    "a",    10, 20,     0,     "n < 5",
+    "a",    10, 20,     0,     "n < 5",
+    "b",    0,  10,     0,     "N < 15",
+    "b",    10, 10,     0,     "N < 15",
+    "c",    0,  50,     0,     NA,
+    "c",    10, 50,     0.2,   NA
+  )
+
+  expect_equal(res, expected_res)
+
+  res <- data.frame(
+    group = c(rep("a", 3), rep("b", 2), rep("c", 2)),
+    n = c(1, 5, 10, 1, 11, 1, 10),
+    total = c(rep(16, 3), rep(10, 2), rep(50, 2))
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    dplyr::group_by(group) |>
+    obfuscate_data(add_reason_col = T, liberal_obfuscation = F) |>
+    dplyr::ungroup()
+
+  expected_res <- tibble::tribble(
+    ~group, ~n, ~total, ~prop, ~obfuscated_reason,
+    "a",    0,  20,     0,     "n < 5",
+    "a",    10, 20,     0,     "n < 5",
+    "a",    10, 20,     0,     "n < 5",
+    "b",    0,  10,     0,     "N < 15",
+    "b",    10, 10,     0,     "N < 15",
+    "c",    0,  50,     0,     "n < 5",
+    "c",    10, 50,     0,   "n < 5"
+  )
+
+  expect_equal(res, expected_res)
+
+  res <- data.frame(
+    n = c(1, 11, 1, 11),
+    total = c(15, 15, 12, 12)
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    obfuscate_data(add_reason_col = T, liberal_obfuscation = F) |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~n, ~total, ~prop, ~obfuscated_reason,
+    0,  20,     0,     "n < 5",
+    10, 20,     0.73,  NA,
+    0,  10,     0,     "N < 15",
+    10, 10,     0,     "N < 15",
+  )
+
+  expect_equal(res, expected_res)
+
 })

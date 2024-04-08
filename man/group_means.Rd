@@ -4,7 +4,7 @@
 \alias{group_means}
 \title{Calculate n, means and sd by group}
 \usage{
-group_means(data, group_by, vars = NULL, obfuscate = TRUE)
+group_means(data, group_by, vars = NULL, obfuscate = TRUE, ...)
 }
 \arguments{
 \item{data}{A data.frame or tibble}
@@ -15,6 +15,8 @@ group_means(data, group_by, vars = NULL, obfuscate = TRUE)
 Defaults to all vars in data.}
 
 \item{obfuscate}{If data should be non-revealing}
+
+\item{...}{Arguments passed to obfuscate}
 }
 \description{
 Calculate n, means and sd by group

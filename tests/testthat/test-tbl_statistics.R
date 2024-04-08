@@ -13,7 +13,8 @@ test_that("methods give same result on dt and df ", {
   df_big <- dplyr::bind_rows(df, df, df, df, df, df)
 
   # Test group_means on data.frame and data.table
-  res <- group_means(df_big, vars = c("x", "y"), group_by = c("a", "b"))
+  res <- group_means(df_big, vars = c("x", "y"), group_by = c("a", "b"),
+                     round_statistics_vars = T)
 
   expected_res <- tibble::tribble(
     ~a, ~b, ~n, ~x_non_missing, ~y_non_missing, ~x_mean, ~x_sd, ~y_mean, ~y_sd,
@@ -42,9 +43,9 @@ test_that("methods give same result on dt and df ", {
   res <- proportion_missing(df, vars = c("c", "x"), group_by = "b")
 
   expected_res <- tibble::tribble(
-    ~b, ~N,       ~c,       ~x,        ~proportion_missing_c, ~proportion_missing_x,
-    1,  NA_real_, NA_real_, NA_real_,  NA_real_,                NA_real_,
-    2,  NA_real_, NA_real_, NA_real_,  NA_real_,                NA_real_
+    ~b, ~N, ~c,  ~x,  ~proportion_missing_c, ~proportion_missing_x,
+    1,  10,  0,   0,  NA_real_,              NA_real_,
+    2,  20,  0,   0,  0,                     0.15
   )
 
   expect_equal(res, expected_res)

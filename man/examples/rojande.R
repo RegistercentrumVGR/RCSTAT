@@ -16,9 +16,9 @@ data_aggregated <- tibble::tribble(
 # Groups with less than 15 in total are cleared
 obfuscate_data(
   data_aggregated,
-  freq_vars = "Count",
-  tot_freq_var = "Total",
-  statistics_vars = "Proportion"
+  count_var = "Count",
+  total_var = "Total",
+  prop_var = "Proportion"
 )
 
 
@@ -37,9 +37,10 @@ data_aggregated <- tibble::tribble(
 # Round frequencies, total and non_missing
 obfuscate_data(
   data = data_aggregated,
-  tot_freq_var = "x_non_missing",
-  freq_var = "n",
-  statistics_vars = c("x_sd", "x_mean")
+  total_var = "x_non_missing",
+  count_var = "n",
+  statistics_vars = c("x_sd", "x_mean"),
+  round_statistics_vars = TRUE
 )
 
 # Example with multiple variables in result
@@ -55,8 +56,10 @@ res <- data_aggregated
 for (v in c("x", "y")) {
   res <- obfuscate_data(
     data = res,
-    tot_freq_var = c(paste0(v, "_non_missing"), "n"),
-    statistics_vars = c(paste0(v, "_sd"), paste0(v, "_mean"))
+    total_var = paste0(v, "_non_missing"),
+    statistics_vars = c(paste0(v, "_sd"), paste0(v, "_mean")),
+    round_statistics_vars = TRUE
   )
 }
+
 res

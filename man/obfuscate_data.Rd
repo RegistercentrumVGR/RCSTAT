@@ -6,19 +6,49 @@
 \usage{
 obfuscate_data(
   data,
-  freq_vars = NULL,
-  tot_freq_var = NULL,
-  statistics_vars = NULL
+  total_var = "total",
+  count_var = "n",
+  prop_var = "prop",
+  group_var = NULL,
+  statistics_vars = NULL,
+  other_count_vars = NULL,
+  round_statistics_vars = F,
+  round_statistics_digits = 2,
+  add_reason_col = F,
+  liberal_obfuscation = T
 )
 }
 \arguments{
-\item{data}{Aggregated data with frequencies and proportions}
+\item{data}{The data.frame to obfuscate}
 
-\item{freq_vars}{variables/columns containing frequencies}
+\item{total_var}{The column containing the denominator}
 
-\item{tot_freq_var}{variable/column with total frequency for group}
+\item{count_var}{The column containing the numerator}
 
-\item{statistics_vars}{variables/columns containing proportions}
+\item{prop_var}{The column containing the proportion as determined by
+total_var and count_var}
+
+\item{group_var}{The variables to group by before obfuscating. If data is
+already grouped the grouping will be overwritten}
+
+\item{statistics_vars}{Other statistics to be obfuscated such as mean,
+standard deviation, etc. These are hidden if total_var is < 15}
+
+\item{other_count_vars}{Other count vars to obfuscate. These have not been
+used to calculate proportions. These are simply rounded to nearest 10}
+
+\item{round_statistics_vars}{Whether or not to round statistics_vars}
+
+\item{round_statistics_digits}{The number of digits statistics_vars are
+rounded to. Passed to RCStat::roundc}
+
+\item{add_reason_col}{Whether or not to add a column called obfuscated_reason
+indicating why a row was obfuscated with either "n < 5" or "N < 15"}
+
+\item{liberal_obfuscation}{Whether or not to use liberal obfuscation. If
+this is true we round proportions to 5% when the numerator < 5 and
+the denominator is >= 45. We also do nothing when the numerator is < 5 and
+the denominator is >= 245.}
 }
 \description{
 Make data non-revealing
@@ -42,9 +72,9 @@ data_aggregated <- tibble::tribble(
 # Groups with less than 15 in total are cleared
 obfuscate_data(
   data_aggregated,
-  freq_vars = "Count",
-  tot_freq_var = "Total",
-  statistics_vars = "Proportion"
+  count_var = "Count",
+  total_var = "Total",
+  prop_var = "Proportion"
 )
 
 
@@ -63,9 +93,10 @@ data_aggregated <- tibble::tribble(
 # Round frequencies, total and non_missing
 obfuscate_data(
   data = data_aggregated,
-  tot_freq_var = "x_non_missing",
-  freq_var = "n",
-  statistics_vars = c("x_sd", "x_mean")
+  total_var = "x_non_missing",
+  count_var = "n",
+  statistics_vars = c("x_sd", "x_mean"),
+  round_statistics_vars = TRUE
 )
 
 # Example with multiple variables in result
@@ -81,9 +112,11 @@ res <- data_aggregated
 for (v in c("x", "y")) {
   res <- obfuscate_data(
     data = res,
-    tot_freq_var = c(paste0(v, "_non_missing"), "n"),
-    statistics_vars = c(paste0(v, "_sd"), paste0(v, "_mean"))
+    total_var = paste0(v, "_non_missing"),
+    statistics_vars = c(paste0(v, "_sd"), paste0(v, "_mean")),
+    round_statistics_vars = TRUE
   )
 }
+
 res
 }

@@ -7,6 +7,7 @@ using namespace Rcpp;
 //' @param digits number of digits to round to
 //' @return rounded vector
 //'
+//' @export
 // [[Rcpp::export]]
 NumericVector roundc(const NumericVector x, const int digits = 0)
 {

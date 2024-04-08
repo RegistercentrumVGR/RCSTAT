@@ -30,9 +30,9 @@ group_proportions <- function(
   if (obfuscate) {
     res <- obfuscate_data(
       data = res,
-      statistics_vars = "p",
-      freq_vars = "n",
-      tot_freq_var = "Nt"
+      prop_var = "p",
+      count_var = "n",
+      total_var = "Nt"
     )
   }
   dplyr::rename(
@@ -48,13 +48,14 @@ group_proportions <- function(
 #' @param vars Variables to calculate means and sd on.
 #' Defaults to all vars in data.
 #' @param obfuscate If data should be non-revealing
-#'
+#' @param ... Arguments passed to obfuscate
 #' @export group_means
 group_means <- function(
     data,
     group_by,
     vars = NULL,
-    obfuscate = TRUE) {
+    obfuscate = TRUE,
+    ...) {
   if (is.null(vars)) {
     vars <- setdiff(names(data), group_by)
   }
@@ -82,13 +83,13 @@ group_means <- function(
     )
 
   if (obfuscate) {
-    for (v in vars) {
-      res <- obfuscate_data(
-        data = res,
-        tot_freq_var = c(paste0(v, "_non_missing"), "n"),
-        statistics_vars = c(paste0(v, "_sd"), paste0(v, "_mean"))
-      )
-    }
+    res <- obfuscate_data(
+      data = res,
+      total_var = "n",
+      other_count_vars = paste0(vars, "_non_missing"),
+      statistics_vars = c(paste0(vars, "_sd"), paste0(vars, "_mean")),
+      ...
+    )
   }
   res
 }
@@ -102,13 +103,14 @@ group_means <- function(
 #' @param vars vars to calculate proportion of missing
 #' data on. Defaults to all except grouping vars.
 #' @param obfuscate If data should be non-revealing
-#'
+#' @param ... Arguments passed to obfuscate
 #' @export proportion_missing
 proportion_missing <- function(
     data,
     group_by,
     vars = NULL,
-    obfuscate = TRUE) {
+    obfuscate = TRUE,
+    ...) {
 
   if (is.null(vars)) {
     vars <- setdiff(names(data), group_by)
@@ -131,15 +133,13 @@ proportion_missing <- function(
     )
 
   if (obfuscate) {
-    for (v in vars) {
-      res <-
-        obfuscate_data(
-          data = res,
-          statistics_vars = paste0("proportion_missing_", v),
-          freq_vars = v,
-          tot_freq_var = "N"
-        )
-    }
+    res <- obfuscate_data(
+      data = res,
+      statistics_vars = paste0("proportion_missing_", vars),
+      total_var = "N",
+      other_count_vars = c("x", "c"),
+      ...
+    )
   }
   res
 }

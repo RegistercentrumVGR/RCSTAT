@@ -1,53 +1,248 @@
+#' Round number to nearest y
+#'
+#' @param x The number to round
+#' @param y The number to round to
+#'
+#' @export
+#'
+#' @examples
+#' round_to_y(x = 0.12, y = 0.05)
+round_to_y <- function(x, y = 0.05) {
+
+  return(roundc(x / y) * y)
+
+}
+
 #' Make data non-revealing
 #'
-#' @param data Aggregated data with frequencies and proportions
-#' @param freq_vars variables/columns containing frequencies
-#' @param tot_freq_var variable/column with total frequency for group
-#' @param statistics_vars variables/columns containing proportions
+#' @param data The data.frame to obfuscate
+#' @param total_var The column containing the denominator
+#' @param count_var The column containing the numerator
+#' @param prop_var The column containing the proportion as determined by
+#' total_var and count_var
+#' @param group_var The variables to group by before obfuscating. If data is
+#' already grouped the grouping will be overwritten
+#' @param statistics_vars Other statistics to be obfuscated such as mean,
+#' standard deviation, etc. These are hidden if total_var is < 15
+#' @param other_count_vars Other count vars to obfuscate. These have not been
+#' used to calculate proportions. These are simply rounded to nearest 10
+#' @param round_statistics_vars Whether or not to round statistics_vars
+#' @param round_statistics_digits The number of digits statistics_vars are
+#' rounded to. Passed to RCStat::roundc
+#' @param add_reason_col Whether or not to add a column called obfuscated_reason
+#' indicating why a row was obfuscated with either "n < 5" or "N < 15"
+#' @param liberal_obfuscation Whether or not to use liberal obfuscation. If
+#' this is true we round proportions to 5% when the numerator < 5 and
+#' the denominator is >= 45. We also do nothing when the numerator is < 5 and
+#' the denominator is >= 245.
+#'
+#' @export
 #'
 #' @example man/examples/rojande.R
 #'
-#' @export
-obfuscate_data <- function(
-    data,
-    freq_vars = NULL,
-    tot_freq_var = NULL,
-    statistics_vars = NULL) {
+obfuscate_data <- function(data,
+                           total_var = "total",
+                           count_var = "n",
+                           prop_var = "prop",
+                           group_var = NULL,
+                           statistics_vars = NULL,
+                           other_count_vars = NULL,
+                           round_statistics_vars = F,
+                           round_statistics_digits = 2,
+                           add_reason_col = F,
+                           liberal_obfuscation = T) {
 
+  if (!is.null(group_var)) {
+    data <- data |>
+      dplyr::group_by(
+        dplyr::across(
+          tidyselect::all_of(group_var)
+        )
+      )
+  }
 
-  # Clear rows with less than 5 for proportions
-  # and where the denominator (tot_freq_var)
-  # is less than 15
-  if (!is.null(statistics_vars)) {
-    for (i in seq_len(nrow(data))) {
-      if (any(data[i, freq_vars] < 5) || any(data[i, tot_freq_var] < 15)) {
-        data[i, c(freq_vars, tot_freq_var, statistics_vars)] <- NA
+  if(length(dplyr::group_vars(data)) > 0) {
+
+    if (add_reason_col) {
+
+      if (liberal_obfuscation) {
+
+        data <- data |>
+          dplyr::mutate(
+            obfuscated_reason = dplyr::case_when(
+              .data[[total_var]] < 15 ~ "N < 15",
+              .data[[total_var]] < 45 ~ dplyr::if_else(
+                rep(any(.data[[count_var]] < 5), dplyr::n()),
+                rep("n < 5", dplyr::n()),
+                NA
+              )
+            )
+          )
+
+      } else {
+
+        data <- data |>
+          dplyr::mutate(
+            obfuscated_reason = dplyr::case_when(
+              .data[[total_var]] < 15 ~ "N < 15",
+              .default = dplyr::if_else(
+                rep(any(.data[[count_var]] < 5), dplyr::n()),
+                rep("n < 5", dplyr::n()),
+                NA
+              )
+            )
+          )
+
       }
+
     }
-    # Round proportions
-    data[, statistics_vars] <- lapply(
-      data[, statistics_vars], function(x) {
-        roundc(x, digits = 2)
+
+    if (liberal_obfuscation) {
+
+      data <- data |>
+        dplyr::mutate(
+          dplyr::across(
+            tidyselect::any_of(prop_var),
+            ~ dplyr::case_when(
+              .data[[total_var]] < 15 ~ 0,
+              .data[[total_var]] < 45 ~ dplyr::if_else(
+                rep(any(.data[[count_var]] < 5), dplyr::n()),
+                rep(0, dplyr::n()),
+                roundc(.x, digits = 2)
+              ),
+              .data[[total_var]] < 245 ~ dplyr::if_else(
+                .data[[count_var]] < 5,
+                round_to_y(.x, y = 0.05),
+                roundc(.x, digits = 2)
+              ),
+              .data[[total_var]] >= 245 ~ roundc(.x, digits = 2)
+            )
+          )
+        )
+
+    } else {
+
+      data <- data |>
+        dplyr::mutate(
+          dplyr::across(
+            tidyselect::any_of(prop_var),
+            ~ dplyr::case_when(
+              .data[[total_var]] < 15 ~ 0,
+              .default = dplyr::if_else(
+                rep(any(.data[[count_var]] < 5), dplyr::n()),
+                rep(0, dplyr::n()),
+                roundc(.x, digits = 2)
+              )
+            )
+          )
+        )
+
+    }
+
+  } else {
+
+    if (add_reason_col) {
+
+      if (liberal_obfuscation) {
+
+        data <- data |>
+          dplyr::mutate(
+            obfuscated_reason = dplyr::case_when(
+              .data[[total_var]] < 15 ~ "N < 15",
+              .data[[total_var]] < 45 ~ dplyr::if_else(
+                .data[[count_var]] < 5,
+                "n < 5",
+                NA),
+            )
+          )
+
+      } else {
+
+        data <- data |>
+          dplyr::mutate(
+            obfuscated_reason = dplyr::case_when(
+              .data[[total_var]] < 15 ~ "N < 15",
+              .data[[count_var]] < 5 ~ "n < 5"
+            )
+          )
+
       }
-    )
+
+    }
+
+    if (liberal_obfuscation) {
+
+      data <- data |>
+        dplyr::mutate(
+          dplyr::across(
+            tidyselect::any_of(prop_var),
+            ~ dplyr::case_when(
+              .data[[total_var]] < 15 ~ 0,
+              .data[[total_var]] < 45 ~ dplyr::if_else(
+                .data[[count_var]] < 5,
+                0,
+                roundc(.x, digits = 2)
+              ),
+              .data[[total_var]] < 245 ~ dplyr::if_else(
+                .data[[count_var]] < 5,
+                round_to_y(.x, y = 0.05),
+                roundc(.x, digits = 2)
+              ),
+              .data[[total_var]] >= 245 ~ roundc(.x, digits = 2)
+            )
+          )
+        )
+
+    } else {
+
+      data <- data |>
+        dplyr::mutate(
+          dplyr::across(
+            tidyselect::any_of(prop_var),
+            ~ dplyr::case_when(
+              .data[[total_var]] < 15 ~ 0,
+              .data[[count_var]] < 5 ~ 0,
+              .default = roundc(.x, digits = 2)
+            )
+          )
+        )
+
+    }
+
   }
 
-  if (!is.null(tot_freq_var)) {
-    # Round total frequencies
-    data[, tot_freq_var] <- lapply(
-      data[, tot_freq_var],
-      \(x) data.table::fifelse(x < 5, NA_integer_, roundc(x, -1L))
+  data <- data  |>
+    dplyr::mutate(
+      dplyr::across(
+        tidyselect::any_of(c(count_var, total_var, other_count_vars)),
+        ~ roundc(.x, -1)
+      )
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        tidyselect::any_of(statistics_vars),
+        ~ dplyr::if_else(
+          .data[[total_var]] < 15,
+          NA,
+          .x
+        )
+      )
     )
-  }
-  if (!is.null(freq_vars)) {
-    # Round frequencies
-    data[, freq_vars] <- lapply(
-      data[, freq_vars],
-      \(x) data.table::fifelse(x < 5, NA_integer_, roundc(x, -1L))
-    )
+
+  if (round_statistics_vars) {
+
+    data <- data |>
+      dplyr::mutate(
+        dplyr::across(
+          tidyselect::any_of(statistics_vars),
+          ~ roundc(.x, digits = round_statistics_digits)
+        )
+      )
+
   }
 
-  data
+  return(data)
+
 }
 
 #' Get rounded ci for proportion

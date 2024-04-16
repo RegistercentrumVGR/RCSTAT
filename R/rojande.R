@@ -61,11 +61,11 @@ obfuscate_data <- function(data,
       )
   }
 
-  if(length(dplyr::group_vars(data)) > 0) {
+  if (add_reason_col) {
 
-    if (add_reason_col) {
+    if (liberal_obfuscation) {
 
-      if (liberal_obfuscation) {
+      if (length(dplyr::group_vars(data)) > 0) {
 
         data <- data |>
           dplyr::mutate(
@@ -75,11 +75,34 @@ obfuscate_data <- function(data,
                 rep(any(.data[[count_var]] < 5), dplyr::n()),
                 rep("n < 5", dplyr::n()),
                 NA
-              )
+              ),
+              dplyr::between(.data[[total_var]], 45, 244) &
+                (.data[[count_var]] < 5 | .data[[total_var]] -
+                   .data[[count_var]] < 5) ~ "rounded to nearest 5%"
             )
           )
 
       } else {
+
+        data <- data |>
+          dplyr::mutate(
+            obfuscated_reason = dplyr::case_when(
+              .data[[total_var]] < 15 ~ "N < 15",
+              .data[[total_var]] < 45 ~
+                dplyr::case_when(
+                  .data[[count_var]] < 5 ~ "n < 5",
+                  .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5",
+                  .default = NA),
+              dplyr::between(.data[[total_var]], 45, 244) &
+                (.data[[count_var]] < 5 | .data[[total_var]] -
+                   .data[[count_var]] < 5) ~ "rounded to nearest 5%"
+            )
+          )
+      }
+
+    } else {
+
+      if (length(dplyr::group_vars(data)) > 0) {
 
         data <- data |>
           dplyr::mutate(
@@ -93,9 +116,26 @@ obfuscate_data <- function(data,
             )
           )
 
+      } else {
+
+        data <- data |>
+          dplyr::mutate(
+            obfuscated_reason = dplyr::case_when(
+              .data[[total_var]] < 15 ~ "N < 15",
+              .data[[count_var]] < 5 ~ "n < 5",
+              .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5"
+            )
+          )
+
       }
 
     }
+
+  }
+
+
+
+  if(length(dplyr::group_vars(data)) > 0) {
 
     if (liberal_obfuscation) {
 
@@ -141,35 +181,6 @@ obfuscate_data <- function(data,
 
   } else {
 
-    if (add_reason_col) {
-
-      if (liberal_obfuscation) {
-
-        data <- data |>
-          dplyr::mutate(
-            obfuscated_reason = dplyr::case_when(
-              .data[[total_var]] < 15 ~ "N < 15",
-              .data[[total_var]] < 45 ~ dplyr::if_else(
-                .data[[count_var]] < 5,
-                "n < 5",
-                NA),
-            )
-          )
-
-      } else {
-
-        data <- data |>
-          dplyr::mutate(
-            obfuscated_reason = dplyr::case_when(
-              .data[[total_var]] < 15 ~ "N < 15",
-              .data[[count_var]] < 5 ~ "n < 5"
-            )
-          )
-
-      }
-
-    }
-
     if (liberal_obfuscation) {
 
       data <- data |>
@@ -179,12 +190,12 @@ obfuscate_data <- function(data,
             ~ dplyr::case_when(
               .data[[total_var]] < 15 ~ 0,
               .data[[total_var]] < 45 ~ dplyr::if_else(
-                .data[[count_var]] < 5,
+                .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 0,
                 roundc(.x, digits = 2)
               ),
               .data[[total_var]] < 245 ~ dplyr::if_else(
-                .data[[count_var]] < 5,
+                .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 round_to_y(.x, y = 0.05),
                 roundc(.x, digits = 2)
               ),
@@ -202,6 +213,7 @@ obfuscate_data <- function(data,
             ~ dplyr::case_when(
               .data[[total_var]] < 15 ~ 0,
               .data[[count_var]] < 5 ~ 0,
+              .data[[total_var]] - .data[[count_var]] < 5 ~ 0,
               .default = roundc(.x, digits = 2)
             )
           )

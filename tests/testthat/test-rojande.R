@@ -45,7 +45,7 @@ test_that("reason col works", {
 
   res <- data.frame(
     group = c(rep("a", 3), rep("b", 2), rep("c", 2)),
-    n = c(1, 5, 10, 1, 11, 1, 10),
+    n = c(1, 5, 10, 1, 9, 1, 10),
     total = c(rep(16, 3), rep(10, 2), rep(50, 2))
   ) |>
     dplyr::mutate(prop = n / total) |>
@@ -60,7 +60,7 @@ test_that("reason col works", {
     "a",    10, 20,     0,     "n < 5",
     "b",    0,  10,     0,     "N < 15",
     "b",    10, 10,     0,     "N < 15",
-    "c",    0,  50,     0,     NA,
+    "c",    0,  50,     0,     "rounded to nearest 5%",
     "c",    10, 50,     0.2,   NA
   )
 
@@ -84,7 +84,7 @@ test_that("reason col works", {
     "b",    0,  10,     0,     "N < 15",
     "b",    10, 10,     0,     "N < 15",
     "c",    0,  50,     0,     "n < 5",
-    "c",    10, 50,     0,   "n < 5"
+    "c",    10, 50,     0,     "n < 5"
   )
 
   expect_equal(res, expected_res)
@@ -100,9 +100,50 @@ test_that("reason col works", {
   expected_res <- tibble::tribble(
     ~n, ~total, ~prop, ~obfuscated_reason,
     0,  20,     0,     "n < 5",
-    10, 20,     0.73,  NA,
+    10, 20,     0,     "N - n < 5",
     0,  10,     0,     "N < 15",
     10, 10,     0,     "N < 15",
+  )
+
+  expect_equal(res, expected_res)
+
+  res <- data.frame(
+    n = c(2, 43, 249, 1),
+    total = c(46, 46, 250, 250)
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    obfuscate_data(add_reason_col = T) |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~n, ~total, ~prop, ~obfuscated_reason,
+    0,   50,     0.05,     "rounded to nearest 5%",
+    40,  50,     0.95,     "rounded to nearest 5%",
+    250, 250,    1,        NA,
+    0,   250,    0,        NA
+  )
+
+  expect_equal(res, expected_res)
+
+  res <- data.frame(
+    group = rep(c("a", "b"), each = 3),
+    n = c(23, 23, 4, 20, 20, 4),
+    total = c(rep(50, 3), rep(44, 3))
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    dplyr::group_by(group) |>
+    obfuscate_data(add_reason_col = T) |>
+    dplyr::ungroup() |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~group, ~n, ~total, ~prop, ~obfuscated_reason,
+    "a",    20,  50,     0.46,     NA,
+    "a",    20,  50,     0.46,     NA,
+    "a",    0,   50,     0.1,      "rounded to nearest 5%",
+    "b",    20,  40,     0,        "n < 5",
+    "b",    20,  40,     0,        "n < 5",
+    "b",    0,   40,     0,        "n < 5"
   )
 
   expect_equal(res, expected_res)

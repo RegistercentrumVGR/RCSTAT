@@ -149,3 +149,37 @@ test_that("reason col works", {
   expect_equal(res, expected_res)
 
 })
+
+test_that("zero_or_na works", {
+
+  res <- data.frame(
+    n = 4,
+    total = 20
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    obfuscate_data(zero_or_na = 0) |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~n, ~total, ~prop,
+    0,  20,     0
+  )
+
+  expect_equal(res, expected_res)
+
+  res <- data.frame(
+    n = 4,
+    total = 20
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    obfuscate_data(zero_or_na = NA) |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~n, ~total, ~prop,
+    0,  20,     NA_real_
+  )
+
+  expect_equal(res, expected_res)
+
+})

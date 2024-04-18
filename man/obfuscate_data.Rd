@@ -15,7 +15,8 @@ obfuscate_data(
   round_statistics_vars = F,
   round_statistics_digits = 2,
   add_reason_col = F,
-  liberal_obfuscation = T
+  liberal_obfuscation = T,
+  zero_or_na = 0
 )
 }
 \arguments{
@@ -49,6 +50,10 @@ indicating why a row was obfuscated with either "n < 5" or "N < 15"}
 this is true we round proportions to 5% when the numerator < 5 and
 the denominator is >= 45. We also do nothing when the numerator is < 5 and
 the denominator is >= 245.}
+
+\item{zero_or_na}{What to replace prop_var with when it is censored.
+Either 0 or NA. When working with bars it is useful to censor with 0 to not
+affect order of bars but when producing a line plot 0 does not make sense.}
 }
 \description{
 Make data non-revealing

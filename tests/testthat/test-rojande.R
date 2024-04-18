@@ -150,14 +150,14 @@ test_that("reason col works", {
 
 })
 
-test_that("zero_or_na works", {
+test_that("censored_value works", {
 
   res <- data.frame(
     n = 4,
     total = 20
   ) |>
     dplyr::mutate(prop = n / total) |>
-    obfuscate_data(zero_or_na = 0) |>
+    obfuscate_data(censored_value = 0) |>
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
@@ -172,7 +172,7 @@ test_that("zero_or_na works", {
     total = 20
   ) |>
     dplyr::mutate(prop = n / total) |>
-    obfuscate_data(zero_or_na = NA) |>
+    obfuscate_data(censored_value = NA) |>
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(

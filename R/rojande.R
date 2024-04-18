@@ -35,8 +35,8 @@ round_to_y <- function(x, y = 0.05) {
 #' this is true we round proportions to 5% when the numerator < 5 and
 #' the denominator is >= 45. We also do nothing when the numerator is < 5 and
 #' the denominator is >= 245.
-#' @param zero_or_na What to replace prop_var with when it is censored.
-#' Either 0 or NA. When working with bars it is useful to censor with 0 to not
+#' @param censored_value What to replace prop_var with when it is censored.
+#' When working with bars it is useful to censor with 0 to not
 #' affect order of bars but when producing a line plot 0 does not make sense.
 #'
 #' @export
@@ -54,9 +54,7 @@ obfuscate_data <- function(data,
                            round_statistics_digits = 2,
                            add_reason_col = F,
                            liberal_obfuscation = T,
-                           zero_or_na = 0) {
-
-  checkmate::assert_choice(zero_or_na, c(0, NA))
+                           censored_value = 0) {
 
   if (!is.null(group_var)) {
     data <- data |>
@@ -153,7 +151,7 @@ obfuscate_data <- function(data,
               .data[[total_var]] < 15 ~ 0,
               .data[[total_var]] < 45 ~ dplyr::if_else(
                 rep(any(.data[[count_var]] < 5), dplyr::n()),
-                rep(zero_or_na, dplyr::n()),
+                rep(censored_value, dplyr::n()),
                 roundc(.x, digits = 2)
               ),
               .data[[total_var]] < 245 ~ dplyr::if_else(
@@ -176,7 +174,7 @@ obfuscate_data <- function(data,
               .data[[total_var]] < 15 ~ 0,
               .default = dplyr::if_else(
                 rep(any(.data[[count_var]] < 5), dplyr::n()),
-                rep(zero_or_na, dplyr::n()),
+                rep(censored_value, dplyr::n()),
                 roundc(.x, digits = 2)
               )
             )
@@ -197,7 +195,7 @@ obfuscate_data <- function(data,
               .data[[total_var]] < 15 ~ 0,
               .data[[total_var]] < 45 ~ dplyr::if_else(
                 .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
-                zero_or_na,
+                censored_value,
                 roundc(.x, digits = 2)
               ),
               .data[[total_var]] < 245 ~ dplyr::if_else(
@@ -217,9 +215,9 @@ obfuscate_data <- function(data,
           dplyr::across(
             tidyselect::any_of(prop_var),
             ~ dplyr::case_when(
-              .data[[total_var]] < 15 ~ zero_or_na,
-              .data[[count_var]] < 5 ~ zero_or_na,
-              .data[[total_var]] - .data[[count_var]] < 5 ~ zero_or_na,
+              .data[[total_var]] < 15 ~ censored_value,
+              .data[[count_var]] < 5 ~ censored_value,
+              .data[[total_var]] - .data[[count_var]] < 5 ~ censored_value,
               .default = roundc(.x, digits = 2)
             )
           )

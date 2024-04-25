@@ -14,7 +14,7 @@ test_that("methods give same result on dt and df ", {
 
   # Test group_means on data.frame and data.table
   res <- group_means(df_big, vars = c("x", "y"), group_by = c("a", "b"),
-                     round_statistics_vars = T)
+                     round_statistics_vars = TRUE)
 
   expected_res <- tibble::tribble(
     ~a, ~b, ~n, ~x_non_missing, ~y_non_missing, ~x_mean, ~x_sd, ~y_mean, ~y_sd,

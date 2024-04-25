@@ -183,3 +183,33 @@ test_that("censored_value works", {
   expect_equal(res, expected_res)
 
 })
+
+test_that("round_statistics_digits list works", {
+  data_aggregated <- tibble::tribble(
+    ~unit, ~group,  ~x_mean, ~x_sd,   ~total,
+    1,     "a",    1.0503,   0.26956, 51,
+    1,     "b",    0.6725,   0.17612, 45,
+    2,     "a",    0.5021,   0.46552, 32,
+    2,     "b",    1.1357,   0.54783, 78
+  )
+
+  res <- obfuscate_data(
+    data = data_aggregated,
+    statistics_vars = c("x_mean", "x_sd"),
+    round_statistics_digits = list(x_mean = 2, x_sd = 1),
+    round_statistics_vars = TRUE,
+    total_var = "total"
+  )
+
+  expected_res <- tibble::tribble(
+    ~unit, ~group,  ~x_mean, ~x_sd,   ~total,
+    1,     "a",    1.05,     0.3,     50,
+    1,     "b",    0.67,     0.2,     50,
+    2,     "a",    0.5,      0.5,     30,
+    2,     "b",    1.14,     0.5,     80
+  )
+
+  expect_equal(res, expected_res)
+
+
+})

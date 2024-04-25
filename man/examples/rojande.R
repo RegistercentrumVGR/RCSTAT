@@ -63,3 +63,21 @@ for (v in c("x", "y")) {
 }
 
 res
+
+
+data_aggregated <- tibble::tribble(
+  ~unit,  ~x_mean, ~x_sd,
+  1,      1.0503,   0.26956,
+  1,      0.6725,   0.17612,
+  2,      0.5021,   0.46552,
+  2,      1.1307,   0.55783
+)
+
+res <- obfuscate_data(
+  data = data_aggregated,
+  statistics_vars = c("x_mean", "x_sd"),
+  round_statistics_digits = list(x_mean = 2, x_sd = 1),
+  round_statistics_vars = TRUE
+)
+
+res

@@ -41,7 +41,10 @@ used to calculate proportions. These are simply rounded to nearest 10}
 \item{round_statistics_vars}{Whether or not to round statistics_vars}
 
 \item{round_statistics_digits}{The number of digits statistics_vars are
-rounded to. Passed to RCStat::roundc}
+rounded to. Passed to RCStat::roundc. Should be an integer or a list.
+If it is a list it should a named list where each name is a column in
+statistics_vars. The corresponding value in the list is the number of digits
+to round to.}
 
 \item{add_reason_col}{Whether or not to add a column called obfuscated_reason
 indicating why a row was obfuscated with either "n < 5" or "N < 15"}
@@ -122,6 +125,24 @@ for (v in c("x", "y")) {
     round_statistics_vars = TRUE
   )
 }
+
+res
+
+
+data_aggregated <- tibble::tribble(
+  ~unit,  ~x_mean, ~x_sd,
+  1,      1.0503,   0.26956,
+  1,      0.6725,   0.17612,
+  2,      0.5021,   0.46552,
+  2,      1.1307,   0.55783
+)
+
+res <- obfuscate_data(
+  data = data_aggregated,
+  statistics_vars = c("x_mean", "x_sd"),
+  round_statistics_digits = list(x_mean = 2, x_sd = 1),
+  round_statistics_vars = TRUE
+)
 
 res
 }

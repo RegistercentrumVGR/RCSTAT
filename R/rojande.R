@@ -28,7 +28,10 @@ round_to_y <- function(x, y = 0.05) {
 #' used to calculate proportions. These are simply rounded to nearest 10
 #' @param round_statistics_vars Whether or not to round statistics_vars
 #' @param round_statistics_digits The number of digits statistics_vars are
-#' rounded to. Passed to RCStat::roundc
+#' rounded to. Passed to RCStat::roundc. Should be an integer or a list.
+#' If it is a list it should a named list where each name is a column in
+#' statistics_vars. The corresponding value in the list is the number of digits
+#' to round to.
 #' @param add_reason_col Whether or not to add a column called obfuscated_reason
 #' indicating why a row was obfuscated with either "n < 5" or "N < 15"
 #' @param liberal_obfuscation Whether or not to use liberal obfuscation. If
@@ -252,7 +255,7 @@ obfuscate_data <- function(data,
         )
       )
 
-  } else if (any(statistics_vars) %in% colnames(data)) {
+  } else if (any(statistics_vars %in% colnames(data))) {
 
     warning(
       "total_var was not found among the columns, unable to censor statistics_vars"
@@ -262,13 +265,29 @@ obfuscate_data <- function(data,
 
   if (round_statistics_vars) {
 
-    data <- data |>
-      dplyr::mutate(
-        dplyr::across(
-          tidyselect::any_of(statistics_vars),
-          ~ roundc(.x, digits = round_statistics_digits)
+    if (is.numeric(round_statistics_digits)) {
+
+      data <- data |>
+        dplyr::mutate(
+          dplyr::across(
+            tidyselect::any_of(statistics_vars),
+            ~ roundc(.x, digits = round_statistics_digits)
+          )
         )
-      )
+
+    } else {
+
+      for (stat_var in statistics_vars) {
+        data <- data |>
+          dplyr::mutate(
+            !!stat_var := roundc(
+              .data[[stat_var]],
+              digits = round_statistics_digits[[stat_var]]
+            )
+          )
+      }
+
+    }
 
   }
 

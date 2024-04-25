@@ -252,6 +252,12 @@ obfuscate_data <- function(data,
         )
       )
 
+  } else if(any(statistics_vars) %in% colnames(data)) {
+
+    warning(
+      "total_var was not found among the columns, unable to censor statistics_vars"
+    )
+
   }
 
   if (round_statistics_vars) {

@@ -139,7 +139,7 @@ obfuscate_data <- function(data,
 
 
 
-  if(length(dplyr::group_vars(data)) > 0) {
+  if (length(dplyr::group_vars(data)) > 0) {
 
     if (liberal_obfuscation) {
 
@@ -238,7 +238,7 @@ obfuscate_data <- function(data,
   # To allow using this function even without total_var, only used in rare
   # occasions
 
-  if(total_var %in% colnames(data)) {
+  if (total_var %in% colnames(data)) {
 
     data <- data |>
       dplyr::mutate(
@@ -252,7 +252,7 @@ obfuscate_data <- function(data,
         )
       )
 
-  } else if(any(statistics_vars) %in% colnames(data)) {
+  } else if (any(statistics_vars) %in% colnames(data)) {
 
     warning(
       "total_var was not found among the columns, unable to censor statistics_vars"

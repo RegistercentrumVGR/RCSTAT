@@ -233,17 +233,26 @@ obfuscate_data <- function(data,
         tidyselect::any_of(c(count_var, total_var, other_count_vars)),
         ~ roundc(.x, -1)
       )
-    ) |>
-    dplyr::mutate(
-      dplyr::across(
-        tidyselect::any_of(statistics_vars),
-        ~ dplyr::if_else(
-          .data[[total_var]] < 15,
-          NA,
-          .x
+    )
+
+  # To allow using this function even without total_var, only used in rare
+  # occasions
+
+  if(total_var %in% colnames(data)) {
+
+    data <- data |>
+      dplyr::mutate(
+        dplyr::across(
+          tidyselect::any_of(statistics_vars),
+          ~ dplyr::if_else(
+            .data[[total_var]] < 15,
+            NA,
+            .x
+          )
         )
       )
-    )
+
+  }
 
   if (round_statistics_vars) {
 

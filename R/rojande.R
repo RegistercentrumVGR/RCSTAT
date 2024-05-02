@@ -41,6 +41,8 @@ round_to_y <- function(x, y = 0.05) {
 #' @param censored_value What to replace prop_var with when it is censored.
 #' When working with bars it is useful to censor with 0 to not
 #' affect order of bars but when producing a line plot 0 does not make sense.
+#' @param inform Whether or not to print information about the current group
+#' vars when `group_var` is `NULL`
 #'
 #' @export
 #'
@@ -57,7 +59,8 @@ obfuscate_data <- function(data,
                            round_statistics_digits = 2,
                            add_reason_col = F,
                            liberal_obfuscation = T,
-                           censored_value = 0) {
+                           censored_value = 0,
+                           inform = T) {
 
   if (!is.null(group_var)) {
     data <- data |>
@@ -66,6 +69,16 @@ obfuscate_data <- function(data,
           tidyselect::all_of(group_var)
         )
       )
+  } else if (inform && length(dplyr::group_vars(data)) > 0) {
+
+    msg <- paste0(
+      "obfuscate_data: data is grouped by ",
+      paste0("'", dplyr::group_vars(data), "'", collapse = ", "),
+      ", is this intentional?"
+    )
+
+    rlang::inform(msg)
+
   }
 
   if (add_reason_col) {

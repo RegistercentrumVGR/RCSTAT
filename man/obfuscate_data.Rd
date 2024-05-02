@@ -16,7 +16,8 @@ obfuscate_data(
   round_statistics_digits = 2,
   add_reason_col = F,
   liberal_obfuscation = T,
-  censored_value = 0
+  censored_value = 0,
+  inform = T
 )
 }
 \arguments{
@@ -57,6 +58,9 @@ the denominator is >= 245.}
 \item{censored_value}{What to replace prop_var with when it is censored.
 When working with bars it is useful to censor with 0 to not
 affect order of bars but when producing a line plot 0 does not make sense.}
+
+\item{inform}{Whether or not to print information about the current group
+vars when `group_var` is `NULL`}
 }
 \description{
 Make data non-revealing

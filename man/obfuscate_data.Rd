@@ -48,7 +48,9 @@ statistics_vars. The corresponding value in the list is the number of digits
 to round to.}
 
 \item{add_reason_col}{Whether or not to add a column called obfuscated_reason
-indicating why a row was obfuscated with either "n < 5" or "N < 15"}
+indicating why a row was obfuscated with either "n < 5" or "N < 15" if
+all of `count_var`, `total_var`, and `prop_var` are supplied. If only
+`total_var` is found the only obfuscated_reason can be "N < 5"}
 
 \item{liberal_obfuscation}{Whether or not to use liberal obfuscation. If
 this is true we round proportions to 5% when the numerator < 5 and

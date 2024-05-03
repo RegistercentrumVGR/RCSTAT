@@ -33,7 +33,9 @@ round_to_y <- function(x, y = 0.05) {
 #' statistics_vars. The corresponding value in the list is the number of digits
 #' to round to.
 #' @param add_reason_col Whether or not to add a column called obfuscated_reason
-#' indicating why a row was obfuscated with either "n < 5" or "N < 15"
+#' indicating why a row was obfuscated with either "n < 5" or "N < 15" if
+#' all of `count_var`, `total_var`, and `prop_var` are supplied. If only
+#' `total_var` is found the only obfuscated_reason can be "N < 5"
 #' @param liberal_obfuscation Whether or not to use liberal obfuscation. If
 #' this is true we round proportions to 5% when the numerator < 5 and
 #' the denominator is >= 45. We also do nothing when the numerator is < 5 and
@@ -83,76 +85,13 @@ obfuscate_data <- function(data,
 
   if (add_reason_col) {
 
-    if (liberal_obfuscation) {
-
-      if (length(dplyr::group_vars(data)) > 0) {
-
-        data <- data |>
-          dplyr::mutate(
-            obfuscated_reason = dplyr::case_when(
-              .data[[total_var]] < 15 ~ "N < 15",
-              .data[[total_var]] < 45 ~ dplyr::if_else(
-                rep(any(.data[[count_var]] < 5), dplyr::n()),
-                rep("n < 5", dplyr::n()),
-                NA
-              ),
-              dplyr::between(.data[[total_var]], 45, 244) &
-                (.data[[count_var]] < 5 | .data[[total_var]] -
-                   .data[[count_var]] < 5) ~ "rounded to nearest 5%"
-            )
-          )
-
-      } else {
-
-        data <- data |>
-          dplyr::mutate(
-            obfuscated_reason = dplyr::case_when(
-              .data[[total_var]] < 15 ~ "N < 15",
-              .data[[total_var]] < 45 ~
-                dplyr::case_when(
-                  .data[[count_var]] < 5 ~ "n < 5",
-                  .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5",
-                  .default = NA),
-              dplyr::between(.data[[total_var]], 45, 244) &
-                (.data[[count_var]] < 5 | .data[[total_var]] -
-                   .data[[count_var]] < 5) ~ "rounded to nearest 5%"
-            )
-          )
-      }
-
-    } else {
-
-      if (length(dplyr::group_vars(data)) > 0) {
-
-        data <- data |>
-          dplyr::mutate(
-            obfuscated_reason = dplyr::case_when(
-              .data[[total_var]] < 15 ~ "N < 15",
-              .default = dplyr::if_else(
-                rep(any(.data[[count_var]] < 5), dplyr::n()),
-                rep("n < 5", dplyr::n()),
-                NA
-              )
-            )
-          )
-
-      } else {
-
-        data <- data |>
-          dplyr::mutate(
-            obfuscated_reason = dplyr::case_when(
-              .data[[total_var]] < 15 ~ "N < 15",
-              .data[[count_var]] < 5 ~ "n < 5",
-              .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5"
-            )
-          )
-
-      }
-
-    }
+    data <- reason_col(data = data,
+                           liberal_obfuscation = liberal_obfuscation,
+                           count_var = count_var,
+                           total_var = total_var,
+                           prop_var = prop_var)
 
   }
-
 
 
   if (length(dplyr::group_vars(data)) > 0) {
@@ -301,6 +240,112 @@ obfuscate_data <- function(data,
       }
 
     }
+
+  }
+
+  return(data)
+
+}
+
+
+#' Internal function to add obfuscated reason column
+#'
+#' @param data Data to be obfuscated
+#' @param liberal_obfuscation Whether or not to use liberal obfuscation
+#' @param count_var The column containing the numerator
+#' @param total_var The column containing the denominator
+#' @param prop_var The column containing the proportion as determined by
+#' `count_var` and `total_var`
+
+reason_col <- function(
+    data,
+    liberal_obfuscation = T,
+    count_var = "n",
+    total_var = "total",
+    prop_var = "prop") {
+
+  n_group_vars <- length(dplyr::group_vars(data))
+
+  all_vars <- all(c(count_var, total_var, prop_var) %in% colnames(data))
+
+  if (all_vars && liberal_obfuscation && n_group_vars > 0) {
+
+    data <- data |>
+      dplyr::mutate(
+        obfuscated_reason = dplyr::case_when(
+          .data[[total_var]] < 15 ~ "N < 15",
+          .data[[total_var]] < 45 ~ dplyr::if_else(
+            rep(any(.data[[count_var]] < 5), dplyr::n()),
+            rep("n < 5", dplyr::n()),
+            NA
+          ),
+          dplyr::between(.data[[total_var]], 45, 244) &
+            (.data[[count_var]] < 5 | .data[[total_var]] -
+               .data[[count_var]] < 5) ~ "rounded to nearest 5%"
+        )
+      )
+
+  }
+
+  if (all_vars && liberal_obfuscation && n_group_vars == 0) {
+
+    data <- data |>
+      dplyr::mutate(
+        obfuscated_reason = dplyr::case_when(
+          .data[[total_var]] < 15 ~ "N < 15",
+          .data[[total_var]] < 45 ~
+            dplyr::case_when(
+              .data[[count_var]] < 5 ~ "n < 5",
+              .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5",
+              .default = NA),
+          dplyr::between(.data[[total_var]], 45, 244) &
+            (.data[[count_var]] < 5 | .data[[total_var]] -
+               .data[[count_var]] < 5) ~ "rounded to nearest 5%"
+        )
+      )
+
+  }
+
+  if (all_vars && !liberal_obfuscation && n_group_vars > 0) {
+
+    data <- data |>
+      dplyr::mutate(
+        obfuscated_reason = dplyr::case_when(
+          .data[[total_var]] < 15 ~ "N < 15",
+          .default = dplyr::if_else(
+            rep(any(.data[[count_var]] < 5), dplyr::n()),
+            rep("n < 5", dplyr::n()),
+            NA
+          )
+        )
+      )
+
+  }
+
+  if (all_vars && !liberal_obfuscation && n_group_vars == 0) {
+
+    data <- data |>
+      dplyr::mutate(
+        obfuscated_reason = dplyr::case_when(
+          .data[[total_var]] < 15 ~ "N < 15",
+          .data[[count_var]] < 5 ~ "n < 5",
+          .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5"
+        )
+      )
+
+
+  }
+
+  if (!all_vars && total_var %in% colnames(data)) {
+
+    data <- data |>
+      dplyr::mutate(
+        obfuscated_reason = dplyr::if_else(
+          .data[[total_var]] < 5,
+          "N < 5",
+          NA
+        )
+      )
 
   }
 

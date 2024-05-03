@@ -148,6 +148,22 @@ test_that("reason col works", {
 
   expect_equal(res, expected_res)
 
+  res <- data.frame(
+    n = c(1, 5, 10)
+  ) |>
+    obfuscate_data(add_reason_col = T,
+                   total_var = "n") |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~n, ~obfuscated_reason,
+    0,  "N < 5",
+    10, NA,
+    10, NA
+  )
+
+  expect_equal(res, expected_res)
+
 })
 
 test_that("censored_value works", {

@@ -229,3 +229,29 @@ test_that("round_statistics_digits list works", {
 
 
 })
+
+test_that("obfuscate_data works", {
+
+  res <- tibble::tribble(
+    ~unit, ~n,  ~total, ~prop,
+    "a",   4,   200,    4/200,
+    "a",   196, 200,    196/200,
+    "b",   4,   44,     4/44,
+    "b",   40,  44,     40/44
+  ) |>
+    obfuscate_data(liberal_obfuscation = T,
+                   group_var = "unit",
+                   add_reason_col = T) |>
+    dplyr::ungroup()
+
+  expected_res <- tibble::tribble(
+    ~unit, ~n,  ~total, ~prop, ~obfuscated_reason,
+    "a",   0,   200,    0,     "rounded to nearest 5%",
+    "a",   200, 200,    1,     "rounded to nearest 5%",
+    "b",   0,   40,     0,     "n < 5",
+    "b",   40,  40,     0,     "n < 5"
+  )
+
+  expect_equal(res, expected_res)
+
+})

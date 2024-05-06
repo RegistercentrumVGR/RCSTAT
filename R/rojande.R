@@ -110,7 +110,7 @@ obfuscate_data <- function(data,
                 roundc(.x, digits = 2)
               ),
               .data[[total_var]] < 245 ~ dplyr::if_else(
-                .data[[count_var]] < 5,
+                .data[[count_var]] < 5| .data[[total_var]] - .data[[count_var]] < 5,
                 round_to_y(.x, y = 0.05),
                 roundc(.x, digits = 2)
               ),

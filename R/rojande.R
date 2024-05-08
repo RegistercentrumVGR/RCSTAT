@@ -86,10 +86,11 @@ obfuscate_data <- function(data,
   if (add_reason_col) {
 
     data <- reason_col(data = data,
-                           liberal_obfuscation = liberal_obfuscation,
-                           count_var = count_var,
-                           total_var = total_var,
-                           prop_var = prop_var)
+                       liberal_obfuscation = liberal_obfuscation,
+                       count_var = count_var,
+                       total_var = total_var,
+                       prop_var = prop_var,
+                       statistics_vars = statistics_vars)
 
   }
 
@@ -256,13 +257,15 @@ obfuscate_data <- function(data,
 #' @param total_var The column containing the denominator
 #' @param prop_var The column containing the proportion as determined by
 #' `count_var` and `total_var`
+#' @param statistics_vars Columns containing statistics such as mean, sd, etc.
 
 reason_col <- function(
     data,
     liberal_obfuscation = T,
     count_var = "n",
     total_var = "total",
-    prop_var = "prop") {
+    prop_var = "prop",
+    statistics_vars = NULL) {
 
   n_group_vars <- length(dplyr::group_vars(data))
 
@@ -343,6 +346,20 @@ reason_col <- function(
         obfuscated_reason = dplyr::if_else(
           .data[[total_var]] < 5,
           "N < 5",
+          NA
+        )
+      )
+
+  }
+
+  if (any(statistics_vars %in% colnames(data)) &&
+    total_var %in% colnames(data)) {
+
+    data <- data |>
+      dplyr::mutate(
+        obfuscated_reason = dplyr::if_else(
+          .data[[total_var]] < 15,
+          "N < 15",
           NA
         )
       )

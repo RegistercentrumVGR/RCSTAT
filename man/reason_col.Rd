@@ -9,7 +9,8 @@ reason_col(
   liberal_obfuscation = T,
   count_var = "n",
   total_var = "total",
-  prop_var = "prop"
+  prop_var = "prop",
+  statistics_vars = NULL
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ reason_col(
 
 \item{prop_var}{The column containing the proportion as determined by
 `count_var` and `total_var`}
+
+\item{statistics_vars}{Columns containing statistics such as mean, sd, etc.}
 }
 \description{
 Internal function to add obfuscated reason column

@@ -181,6 +181,23 @@ test_that("reason col works", {
 
   expect_equal(res, expected_res)
 
+  res <- data.frame(
+    n = 4, total = 16, prop = 4/16, mean = 0.125
+  ) |>
+    obfuscate_data(
+      add_reason_col = T,
+      statistics_vars = "mean",
+      round_statistics_vars = T,
+      censored_value = NA
+    )
+
+  expected_res <- data.frame(
+    n = 0, total = 20, prop = as.double(NA), mean = 0.13,
+    obfuscated_reason = "n < 5"
+  )
+
+  expect_equal(res, expected_res)
+
 })
 
 test_that("censored_value works", {

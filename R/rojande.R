@@ -148,7 +148,7 @@ obfuscate_data <- function(data,
           dplyr::across(
             tidyselect::any_of(prop_var),
             ~ dplyr::case_when(
-              .data[[total_var]] < 15 ~ 0,
+              .data[[total_var]] < 15 ~ censored_value,
               .data[[total_var]] < 45 ~ dplyr::if_else(
                 .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 censored_value,
@@ -352,7 +352,7 @@ reason_col <- function(
 
   }
 
-  if (any(statistics_vars %in% colnames(data)) &&
+  if (!all_vars && any(statistics_vars %in% colnames(data)) &&
     total_var %in% colnames(data)) {
 
     data <- data |>

@@ -17,7 +17,8 @@ obfuscate_data(
   add_reason_col = F,
   liberal_obfuscation = T,
   censored_value = 0,
-  inform = T
+  inform = T,
+  prop_scale = 1
 )
 }
 \arguments{
@@ -63,6 +64,9 @@ affect order of bars but when producing a line plot 0 does not make sense.}
 
 \item{inform}{Whether or not to print information about the current group
 vars when `group_var` is `NULL`}
+
+\item{prop_scale}{Argument indicating what scale the prop_var is. Either 1
+or 100}
 }
 \description{
 Make data non-revealing

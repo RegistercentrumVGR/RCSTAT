@@ -289,3 +289,53 @@ test_that("obfuscate_data works", {
   expect_equal(res, expected_res)
 
 })
+
+
+test_that("prop_scale works", {
+
+  res <- tibble::tribble(
+    ~n, ~total, ~prop,
+    6,  23,     100 * (6 / 23),
+    17, 23,     100 * (17 / 23)
+  ) |>
+    obfuscate_data(
+      prop_scale = 100
+    )
+
+  expected_res <- tibble::tribble(
+    ~n, ~total, ~prop,
+    10, 20,     26,
+    20, 20,     74
+  )
+
+  expect_equal(res, expected_res)
+
+  res <- tibble::tribble(
+    ~n, ~total, ~prop,
+    6,  23,     6 / 23,
+    17, 23,     17 / 23
+  ) |>
+    obfuscate_data(
+      prop_scale = 1
+    )
+
+  expected_res <- tibble::tribble(
+    ~n, ~total, ~prop,
+    10, 20,     0.26,
+    20, 20,     0.74
+  )
+
+  expect_equal(res, expected_res)
+
+  expect_error(
+    tibble::tribble(
+      ~n, ~total, ~prop,
+      6,  23,     6 / 23,
+      17, 23,     17 / 23
+    ) |>
+      obfuscate_data(
+        prop_scale = -1
+      )
+  )
+
+})

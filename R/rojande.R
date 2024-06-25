@@ -45,24 +45,31 @@ round_to_y <- function(x, y = 0.05) {
 #' affect order of bars but when producing a line plot 0 does not make sense.
 #' @param inform Whether or not to print information about the current group
 #' vars when `group_var` is `NULL`
+#' @param prop_scale Argument indicating what scale the prop_var is. Either 1
+#' or 100
 #'
 #' @export
 #'
 #' @example man/examples/rojande.R
 #'
-obfuscate_data <- function(data,
-                           total_var = "total",
-                           count_var = "n",
-                           prop_var = "prop",
-                           group_var = NULL,
-                           statistics_vars = NULL,
-                           other_count_vars = NULL,
-                           round_statistics_vars = F,
-                           round_statistics_digits = 2,
-                           add_reason_col = F,
-                           liberal_obfuscation = T,
-                           censored_value = 0,
-                           inform = T) {
+obfuscate_data <- function(
+    data,
+    total_var = "total",
+    count_var = "n",
+    prop_var = "prop",
+    group_var = NULL,
+    statistics_vars = NULL,
+    other_count_vars = NULL,
+    round_statistics_vars = F,
+    round_statistics_digits = 2,
+    add_reason_col = F,
+    liberal_obfuscation = T,
+    censored_value = 0,
+    inform = T,
+    prop_scale = 1
+) {
+
+  checkmate::assert_choice(prop_scale, c(1, 100))
 
   if (!is.null(group_var)) {
     data <- data |>
@@ -80,6 +87,18 @@ obfuscate_data <- function(data,
     )
 
     rlang::inform(msg)
+
+  }
+
+  if (prop_scale == 100) {
+
+    data <- data |>
+      dplyr::mutate(
+        dplyr::across(
+          tidyselect::any_of(prop_var),
+          ~ .x / 100
+        )
+      )
 
   }
 
@@ -244,6 +263,18 @@ obfuscate_data <- function(data,
 
   }
 
+  if (prop_scale == 100) {
+
+    data <- data |>
+      dplyr::mutate(
+        dplyr::across(
+          tidyselect::any_of(prop_var),
+          ~ .x * 100
+        )
+      )
+
+  }
+
   return(data)
 
 }
@@ -353,7 +384,7 @@ reason_col <- function(
   }
 
   if (!all_vars && any(statistics_vars %in% colnames(data)) &&
-    total_var %in% colnames(data)) {
+      total_var %in% colnames(data)) {
 
     data <- data |>
       dplyr::mutate(

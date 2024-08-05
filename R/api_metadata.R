@@ -14,7 +14,7 @@
 #' @rdname api
 api_get <- function(x) {
   root <- "https://stratum.registercentrum.se/api"
-  sprintf("%s/%s?apikey=bK3H9bwaG4o%%3D", root, x) |>
+  sprintf("%s/%s?apikey=J6b-GSKrkfk=", root, x) |>
     jsonlite::fromJSON()
 }
 

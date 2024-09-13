@@ -7,11 +7,12 @@
 \usage{
 decode_data(
   data,
-  labels,
+  labels = NULL,
   droplevels = TRUE,
   add_cols = FALSE,
   suffix = "_label",
-  as_character = FALSE
+  as_character = FALSE,
+  form_id = NULL
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ then the specified variables will have its levels dropped.}
 
 \item{as_character}{If `TRUE` variables
 will be set to characters. If `FALSE` variables will be factors.}
+
+\item{form_id}{Optional FormID to get labels for.}
 }
 \value{
 data.frame with character values instead

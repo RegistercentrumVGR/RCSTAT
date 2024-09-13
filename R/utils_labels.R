@@ -45,7 +45,7 @@ var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
         ),
         "x" = paste(
           cli::col_blue(sprintf("%d (%.0f%%)", n_obs, n_obs / length(x) * 100)),
-          "cells(s) set to", cli::style_underline("NA")
+          "cell(s) set to", cli::style_underline("NA")
         )
       )
     )
@@ -100,6 +100,7 @@ var_to_char <- function(x, labels, name = NULL) {
 #' @param suffix suffix to add to added columns
 #' @param as_character If `TRUE` variables
 #' will be set to characters. If `FALSE` variables will be factors.
+#' @param form_id Optional FormID to get labels for.
 #'
 #' @return data.frame with character values instead
 #'         of numerical values.
@@ -111,11 +112,32 @@ var_to_char <- function(x, labels, name = NULL) {
 #'
 decode_data <- function(
     data,
-    labels,
+    labels = NULL,
     droplevels = TRUE,
     add_cols = FALSE,
     suffix = "_label",
-    as_character = FALSE) {
+    as_character = FALSE,
+    form_id = NULL) {
+
+  checkmate::assert(
+    checkmate::check_null(form_id),
+    checkmate::check_integerish(form_id)
+  )
+
+  checkmate::assert(
+    checkmate::check_null(labels),
+    checkmate::check_data_frame(labels)
+  )
+
+  if (is.null(labels) && is.null(form_id)) {
+
+    stop("Both labels and form_id can not be null")
+
+  } else if (is.null(labels) && !is.null(form_id)) {
+
+    labels <- RCDBT::GetValueLabels(FormID = form_id)
+
+  }
 
   var_names <- colnames(data)
   label_names <- unique(labels[["ColumnName"]])
@@ -146,6 +168,11 @@ decode_data <- function(
   }
   for (var in vars_to_decode) {
     labels_list[[var]] <- labels[labels[["ColumnName"]] == var, ]
+
+    if (is.logical(data[[var]])) {
+      labels_list[[var]][["ValueCode"]] <- labels_list[[var]][["ValueCode"]] |>
+        as.numeric() |> as.logical()
+    }
   }
 
   # Exclude variables which already have only values from their labels (See issue #6)

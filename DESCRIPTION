@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.0.11
+Version: 1.0.13
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 
@@ -15,7 +15,8 @@ Suggests:
     roxygen2,
     testthat (>= 3.0.0),
     rcmdcheck,
-    usethis
+    usethis,
+    RCDBT
 Config/testthat/edition: 3
 RoxygenNote: 7.3.1
 Imports: 

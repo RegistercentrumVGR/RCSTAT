@@ -51,6 +51,126 @@ test_that("decode_data works on data.frames", {
   expect_equal(dfac, dfr)
 })
 
+test_that("decode_data works with form_id", {
+
+  skip_on_ci()
+
+  df <- RCDBT::GetDatalayer(2398) |>
+    dplyr::distinct(I_Unit)
+
+  labels <- RCDBT::GetValueLabels(2398)
+
+  df_decoded <- df |>
+    decode_data(labels = labels, as_character = T)
+
+  expected <- data.frame(
+    I_Unit = c(
+      "Barndiabetes SUS Lund",
+      "DSBUS Göteborg Barnklinik",
+      "Linköping Barnklinik",
+      "Borås Barnklinik",
+      "Helsingborg Barnklinik",
+      "Ängelholm Barnklinik",
+      "Nyköping Barnklinik",
+      "Kalmar Barnklinik",
+      "Kristianstad Barnklinik",
+      "Kungsbacka Barnklinik",
+      "Trollhättan Barnklinik",
+      "Visby Barnklinik",
+      "Växjö Barnklinik",
+      "Halmstad Barnklinik",
+      "Örebro Barnklinik",
+      "Östersund Barnklinik",
+      "Lidköping Barnklinik",
+      "Skövde Barnklinik",
+      "Karlstad Barnklinik",
+      "ALB Solna Barnklinik",
+      "Uddevalla Barnklinik",
+      "Norrköping Barnklinik",
+      "Eskilstuna Barnklinik",
+      "Falun Barnklinik",
+      "Karlskrona Barnklinik",
+      "Hudiksvall Barnklinik",
+      "Ystad Barnklinik",
+      "Jönköping Barnklinik",
+      "Västerås Barnklinik",
+      "Uppsala Barnklinik",
+      "Västervik Barnklinik",
+      "Sachsska Barnklinik",
+      "Barndiabetes SUS Malmö",
+      "Sundsvall Barnklinik",
+      "ALB Huddinge Barnklinik",
+      "Gävle Barnklinik",
+      "Umeå Barnklinik",
+      "Skellefteå Barnklinik",
+      "Gällivare Barnklinik",
+      "Örnsköldsvik Barnklinik",
+      "Sollefteå Barnklinik",
+      "Luleå Barnklinik",
+      "Simrishamn Barnklinik"
+    )
+  )
+
+  expect_equal(df_decoded, expected)
+
+  df_decoded <- df |>
+    decode_data(form_id = 2398, as_character = T)
+
+  expect_equal(df_decoded, expected)
+
+  df_decoded <- df |>
+    decode_data(labels = labels, form_id = 2398, as_character = T)
+
+  expect_equal(df_decoded, expected)
+
+  expect_error(
+    decode_data(df, labels = NULL, form_id = NULL),
+    regexp = "Both labels and form_id can not be null"
+  )
+
+})
+
+test_that("decode_data handles character value codes", {
+
+  labels <- data.frame(
+    ColumnName = "x",
+    ValueCode = 1:3 |> as.character(),
+    ValueName = c("a", "b", "c")
+  ) |>
+    dplyr::bind_rows(
+      data.frame(
+        ColumnName = "y",
+        ValueCode = c("x", "y", "z"),
+        ValueName = c("abc", "def", "ghi")
+      )
+    ) |>
+    dplyr::bind_rows(
+      data.frame(
+        ColumnName = "z",
+        ValueCode = 0:1 |> as.character(),
+        ValueName = c("false", "true")
+      )
+    )
+
+  df <- data.frame(
+    x = rep(1:3, 4)[1:10],
+    y = rep(c("x", "y", "z"), 4)[1:10],
+    z = rep(c(T, F), 5)
+  )
+
+  df_decoded <- df |>
+    decode_data(labels = labels, as_character = T)
+
+  expected <- data.frame(
+    x = rep(c("a", "b", "c"), 4)[1:10],
+    y = rep(c("abc", "def", "ghi"), 4)[1:10],
+    z = rep(c("true", "false"), 5)
+  )
+
+  expect_equal(df_decoded, expected)
+
+})
+
 test_that("set_factors works on data.tables", {
 
   # Test set_factors on dummy data

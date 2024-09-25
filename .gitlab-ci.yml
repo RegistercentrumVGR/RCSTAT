@@ -5,15 +5,7 @@ stages:
 
 include:
   - project: 'registercentrum/pipelines/r-package-ci'
-    file: '/lint-r-package.yml'
-  - project: 'registercentrum/pipelines/r-package-ci'
-    file: '/test-r-package.yml'
-  - project: 'registercentrum/pipelines/r-package-ci'
-    file: '/rcmdcheck-r-package.yml'
-  - project: 'registercentrum/pipelines/r-package-ci'
-    file: '/build-r-package.yml'
-  - project: 'registercentrum/pipelines/r-package-ci'
-    file: '/document-r-package.yml'
+    file: '/full-pipeline.yml'
 
 demo:
    stage: deploy

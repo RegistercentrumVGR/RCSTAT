@@ -62,8 +62,10 @@ test_that("eq5d_5l_index_tto", {
     0.5031
   )
   expect_equal(
-    eq5d_5l_index_tto(rep(3, 10), rep(4, 10), rep(5, 10),
-                      rep(4, 10), rep(3, 10)),
+    eq5d_5l_index_tto(
+      rep(3, 10), rep(4, 10), rep(5, 10),
+      rep(4, 10), rep(3, 10)
+    ),
     rep(0.5031, 10)
   )
   expect_error(

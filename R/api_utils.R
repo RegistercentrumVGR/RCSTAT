@@ -1,7 +1,6 @@
 #' Get current user info
 #' @export
 get_user_info <- function() {
-
   scope_register <- .GlobalEnv[["Scope.Register"]]
   scope_role <- .GlobalEnv[["Scope.Role"]]
   scope_user <- .GlobalEnv[["Scope.User"]]

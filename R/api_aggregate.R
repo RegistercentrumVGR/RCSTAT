@@ -1,4 +1,3 @@
-
 #' @export
 #' @describeIn api Count number of registrations by form
 api_form_count <- function(FormID) {

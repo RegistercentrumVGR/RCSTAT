@@ -1,5 +1,4 @@
 test_that("Age can be calculated ", {
-
   testthat::expect_equal(
     age(as.Date("2000-02-01"), as.Date("2001-01-01"), unit = "whole_years"),
     0L
@@ -8,7 +7,6 @@ test_that("Age can be calculated ", {
     age(as.Date("2000-02-01"), as.Date("2001-02-01"), unit = "whole_years"),
     1L
   )
-
 })
 
 test_that("Age can be calculated from pnr ", {
@@ -40,11 +38,9 @@ test_that("Age can be calculated from pnr ", {
     age(birthdate(dummy_pnr), dates_plus_10_years, unit = "whole_years"),
     ages_10
   )
-
 })
 
 test_that("Gender can be calculated from pnr ", {
-
   dummy_pnr <- c(
     "19110908-4531",
     "19001219-8750",

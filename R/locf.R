@@ -73,7 +73,9 @@ locf <- function(
 #' @return data.frame with LOCF imputation
 #' @export locfdt
 #' @examples
-#' \dontrun{df <- locfdt(df, vars)}
+#' \dontrun{
+#' df <- locfdt(df, vars)
+#' }
 #'
 locfdt <- function(
     dt,
@@ -91,8 +93,7 @@ locfdt <- function(
     null.ok = TRUE
   )
   if (!is.null(window_type)) {
-    window_size <- switch(
-      window_type,
+    window_size <- switch(window_type,
       "months" = 31 * window_size,
       "years" = ceiling(365.25 * window_size),
       "days" = window_size
@@ -114,14 +115,12 @@ locfdt <- function(
         i <- cummax(as.integer(!is.na(x) | idchg) * .I)
 
         if (!is.null(window_size) && !is.null(window_type)) {
-
           i_seq <- seq_along(i)
 
           time_diff <- idchg[i_seq] == 1 |
             dt[i_seq, get(orderby)] - window_size > dt[i[i_seq], get(orderby)]
 
           i[time_diff] <- which(time_diff)
-
         }
 
         return(x[i])

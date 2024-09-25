@@ -4,10 +4,12 @@ any_na <- function(...) apply(cbind(...), 1, anyNA)
 # Check that only valid numbers are used as EQ5D-levels
 valid <- function(..., ok) {
   check <- function(x) {
-    if (!is.numeric(x))
+    if (!is.numeric(x)) {
       stop("EQ5D-values must be numeric!")
-    if (any(!x %in% c(NA, ok)))
+    }
+    if (any(!x %in% c(NA, ok))) {
       stop("EQ5D-values must be: ", paste(ok, collapse = ", "))
+    }
   }
   lapply(data.frame(...), check)
 }
@@ -37,7 +39,7 @@ valid <- function(..., ok) {
 #' eq5d_index(1, 1, 1, 1, 1, levels = 3, type = "TTO")
 #' eq5d_index(c("1,1,1,1,1"), levels = 3, type = "TTO", old = TRUE)
 #' eq5d_index(1, 1, 1, 1, 1, levels = 5, type = "TTO")
-#' eq5d_index(3,4,5,4,3, levels = 5, type = "VAS")
+#' eq5d_index(3, 4, 5, 4, 3, levels = 5, type = "VAS")
 eq5d_index <- function(..., levels, type, old = FALSE, split = ",") {
   stopifnot(levels %in% c(3, 5), type %in% c("VAS", "TTO"))
   if (type == "TTO") {
@@ -57,8 +59,11 @@ eq5d_index <- function(..., levels, type, old = FALSE, split = ",") {
       eq5d_5l_index_tto(...)
     }
   } else if (type == "VAS") {
-    if (levels == 5) eq5d_5l_index_vas(...)
-    else stop("VAS is only available for `levels = 5`!")
+    if (levels == 5) {
+      eq5d_5l_index_vas(...)
+    } else {
+      stop("VAS is only available for `levels = 5`!")
+    }
   }
 }
 
@@ -78,7 +83,7 @@ eq5d_index <- function(..., levels, type, old = FALSE, split = ",") {
 #' eq5d_3l_index_tto(2, 1, 3, 1, 1) # 0.724
 #'
 #' # Works with vectors as well
-#' eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1,3), rep(1, 3))
+#' eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3))
 eq5d_3l_index_tto <- function(mobility, selfcare, usual, pain, anxiety) {
   valid(mobility, selfcare, usual, pain, anxiety, ok = 1:3)
   ifelse(
@@ -86,9 +91,9 @@ eq5d_3l_index_tto <- function(mobility, selfcare, usual, pain, anxiety) {
     0.9694 -
       c(0, 0.0666, 0.1247)[mobility] -
       c(0, 0.0276, 0.0276)[selfcare] -
-      c(0, 0.1012, 0.1355)[usual]    -
-      c(0, 0.0345, 0.0904)[pain]     -
-      c(0, 0.0552, 0.2077)[anxiety]  -
+      c(0, 0.1012, 0.1355)[usual] -
+      c(0, 0.0345, 0.0904)[pain] -
+      c(0, 0.0552, 0.2077)[anxiety] -
       ifelse(pmax(mobility, selfcare, usual, pain, anxiety) == 3, 0.0433, 0)
   )
 }
@@ -130,8 +135,8 @@ eq5d_3l_index_tto_old <- function(x, split = ",") {
 #'   [Burström, model 5 TTO](https://link.springer.com/article/10.1007/s40273-020-00905-7/tables/9)
 #' @family eq5d
 #' @examples
-#' eq5d_5l_index_tto(3,4,5,4,3) # 0.503
-#' eq5d_5l_index_tto(rep(3, 10), rep(4, 10),rep(5, 10), rep(4, 10), rep(3, 10))
+#' eq5d_5l_index_tto(3, 4, 5, 4, 3) # 0.503
+#' eq5d_5l_index_tto(rep(3, 10), rep(4, 10), rep(5, 10), rep(4, 10), rep(3, 10))
 eq5d_5l_index_tto <- function(mobility, selfcare, usual, pain, anxiety) {
   valid(mobility, selfcare, usual, pain, anxiety, ok = 1:5)
   ifelse(
@@ -139,9 +144,9 @@ eq5d_5l_index_tto <- function(mobility, selfcare, usual, pain, anxiety) {
     0.9755 -
       c(0, 0.0287, 0.0346, 0.0523, 0.0523)[mobility] -
       c(0, 0.0254, 0.0817, 0.0824, 0.0824)[selfcare] -
-      c(0, 0.0549, 0.1143, 0.1639, 0.1639)[usual]    -
-      c(0, 0.0108, 0.0428, 0.1024, 0.1974)[pain]     -
-      c(0, 0.0325, 0.0868, 0.2002, 0.2339)[anxiety]  -
+      c(0, 0.0549, 0.1143, 0.1639, 0.1639)[usual] -
+      c(0, 0.0108, 0.0428, 0.1024, 0.1974)[pain] -
+      c(0, 0.0325, 0.0868, 0.2002, 0.2339)[anxiety] -
       ifelse(pmax(mobility, selfcare, usual, pain, anxiety) == 5, 0.0023, 0)
   )
 }
@@ -158,18 +163,18 @@ eq5d_5l_index_tto <- function(mobility, selfcare, usual, pain, anxiety) {
 #'   [Burström, model 5 VAS](https://link.springer.com/article/10.1007/s40273-020-00905-7/tables/9)
 #'
 #' @examples
-#' eq5d_5l_index_vas(3,4,5,4,3) # 30.5
-#' eq5d_5l_index_vas(rep(3, 10), rep(4, 10),rep(5, 10), rep(4, 10), rep(3, 10))
+#' eq5d_5l_index_vas(3, 4, 5, 4, 3) # 30.5
+#' eq5d_5l_index_vas(rep(3, 10), rep(4, 10), rep(5, 10), rep(4, 10), rep(3, 10))
 eq5d_5l_index_vas <- function(mobility, selfcare, usual, pain, anxiety) {
   maxp <- pmax(mobility, selfcare, usual, pain, anxiety)
   ifelse(
     any_na(mobility, selfcare, usual, pain, anxiety), NA,
     88.85 -
-      c(0, 3.37,  5.53,  9.05,  9.05)[mobility] -
-      c(0, 2.25,  2.82,  6.07,  7.83)[selfcare] -
-      c(0, 5.23, 10.12, 14.07, 17.05)[usual]    -
-      c(0, 1.63,  4.43, 10.14, 17.05)[pain]     -
-      c(0, 4.97, 10.75, 16.52, 27.30)[anxiety]  -
+      c(0, 3.37, 5.53, 9.05, 9.05)[mobility] -
+      c(0, 2.25, 2.82, 6.07, 7.83)[selfcare] -
+      c(0, 5.23, 10.12, 14.07, 17.05)[usual] -
+      c(0, 1.63, 4.43, 10.14, 17.05)[pain] -
+      c(0, 4.97, 10.75, 16.52, 27.30)[anxiety] -
       ifelse(maxp >= 2, 2.75, 0) -
       ifelse(maxp >= 3, 4.19, 0) -
       ifelse(maxp >= 4, 1.85, 0)

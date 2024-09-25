@@ -16,12 +16,12 @@
 #'   to = "rikard.isaksson@vgregion.se",
 #'   from = "Rikard Isaksson",
 #'   subject = "Hej test",
-#'   body = "Test!")
-#'
+#'   body = "Test!"
+#' )
 #' }
 #' @export
 
-rc_mail <- function(to, from, subject, body, password){
+rc_mail <- function(to, from, subject, body, password) {
   requireNamespace("curl")
   requireNamespace("httr")
 
@@ -30,7 +30,8 @@ rc_mail <- function(to, from, subject, body, password){
       ssl_verifypeer = 0L,
       ssl_verifyhost = 0L,
       ssl_version = 7
-    ))
+    )
+  )
 
   message <- paste0(
     "From: statistik@registercentrum.se",
@@ -39,7 +40,8 @@ rc_mail <- function(to, from, subject, body, password){
     body,
     "\r\n\r\nHälsningar\r\n",
     from,
-    "\r\nStatistiker\r\nRegistercentrum Västra Götaland")
+    "\r\nStatistiker\r\nRegistercentrum Västra Götaland"
+  )
 
   curl::send_mail(
     mail_from = "statistik@registercentrum.se",
@@ -69,41 +71,44 @@ rc_mail <- function(to, from, subject, body, password){
 #' sh_mail(
 #'   to = "rikard.isaksson@vgregion.se",
 #'   subject = "Hej test",
-#'   file = "data/test.csv")
+#'   file = "data/test.csv"
+#' )
 #'
 #' sh_mail(
-#'   to = c("alexander.thoren@vgregion.se",
-#'  "oskar.e.johansson@vgregion.se"),
+#'   to = c(
+#'     "alexander.thoren@vgregion.se",
+#'     "oskar.e.johansson@vgregion.se"
+#'   ),
 #'   subject = "test",
 #'   password = ...,
-#'   file = "test.xlsx")
+#'   file = "test.xlsx"
+#' )
 #' }
 #' @export
 
-sh_mail <- function(to, subject, password, file = NULL, run_bash = T){
+sh_mail <- function(to, subject, password, file = NULL, run_bash = TRUE) {
   requireNamespace("curl")
   requireNamespace("httr")
 
 
   # https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 
-  if(!is.null(file)){
-    if(grepl(".csv$", file)){
+  if (!is.null(file)) {
+    if (grepl(".csv$", file)) {
       mimetype <- "text/csv"
-    } else if(grepl(".xlsx$", file)){
+    } else if (grepl(".xlsx$", file)) {
       mimetype <- "application/vnd.ms-excel"
-    } else if(grepl(".pdf$", file)){
+    } else if (grepl(".pdf$", file)) {
       mimetype <- "application/pdf"
-    } else if(grepl(".doc$", file)) {
+    } else if (grepl(".doc$", file)) {
       mimetype <- "application/msword"
-    } else if(grepl(".docx$", file)) {
+    } else if (grepl(".docx$", file)) {
       mimetype <- "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    } else if(grepl(".zip$", file)) {
+    } else if (grepl(".zip$", file)) {
       mimetype <- "application/zip"
     } else {
       stop("Filetype not supported")
     }
-
   }
 
   curl_command <-
@@ -122,7 +127,7 @@ sh_mail <- function(to, subject, password, file = NULL, run_bash = T){
       "-F '=)'"
     )
 
-  con = file("send.sh")
+  con <- file("send.sh")
 
   writeLines(paste0("#!/bin/bash \n\n", curl_command), con)
   close(con)
@@ -132,4 +137,3 @@ sh_mail <- function(to, subject, password, file = NULL, run_bash = T){
     system("rm send.sh")
   }
 }
-

@@ -1,5 +1,3 @@
-
-
 #' Add row with total
 #'
 #' Brutally sums up all numeric columns and appends
@@ -12,7 +10,6 @@
 #'
 #' @export add_total
 add_total <- function(data) {
-
   cols <- unlist(lapply(data, is.numeric))
   totals <- lapply(data[cols], sum, na.rm = TRUE)
   totals[names(cols[!cols])] <- NA
@@ -55,11 +52,11 @@ age <- function(from_date, to_date, unit = "whole_years") {
 #' @export birthdate
 birthdate <- function(x) {
   as.Date(paste(
-    #year
+    # year
     substr(x, 1L, 4L),
-    #month
+    # month
     substr(x, 5L, 6L),
-    #day
+    # day
     substr(x, 7L, 8L),
     sep = "-"
   ))
@@ -111,14 +108,18 @@ gender <- function(x) {
 #' @param password_length integer, number of characters in password
 #'
 #' @export
-#' @examples \dontrun{rand_pass <- random_password(c("R", "N"), 10)}
+#' @examples \dontrun{
+#' rand_pass <- random_password(c("R", "N"), 10)
+#' }
 random_password <- function(
     char_types = c("R", "N", "!"),
     password_length = 15) {
-
   # Generera slumpmässig struktur för lösenord
-  schema_pass <- paste0(sample(char_types, size = password_length,
-                               replace = TRUE), collapse = "")
+  schema_pass <- paste0(sample(
+    char_types,
+    size = password_length,
+    replace = TRUE
+  ), collapse = "")
 
   # Skapa API-anrop
   query <-
@@ -153,14 +154,15 @@ random_password <- function(
 #' @param overwrite Overwrite zip-file if it exists
 #'
 #' @export
-#' @examples \dontrun{zip_dir_with_pass()}
+#' @examples \dontrun{
+#' zip_dir_with_pass()
+#' }
 zip_dir_with_pass <- function(
     directory = "output",
     pass = random_password(),
     # TODO: get DNR from Environment variable instead?
     file = "output",
     overwrite = TRUE) {
-
   sink("password.txt")
   # TODO: add additional info to password.txt
   cat(pass)
@@ -198,8 +200,10 @@ zip_dir_with_pass <- function(
 #' \dontrun{
 #' data_1 <- RCDBT::GetRegisterData(...) %>% filter(...)
 #' data_2 <- RCDBT::GetRegisterData(...) %>% filter(...)
-#' sos_metadata(dfs = list(data_1, data_2),
-#'              file_names = list("dnr_xxxx_yyyyy_1", "dnr_xxxx_yyyyy_2"))
+#' sos_metadata(
+#'   dfs = list(data_1, data_2),
+#'   file_names = list("dnr_xxxx_yyyyy_1", "dnr_xxxx_yyyyy_2")
+#' )
 #' }
 sos_metadata <- function(dfs = list(),
                          file_names = list(),
@@ -207,19 +211,19 @@ sos_metadata <- function(dfs = list(),
                          zip = TRUE,
                          output_dir = "Output",
                          zip_file_name = "output") {
-
   encoding <- "UTF-8"
 
-  if (length(file_names) != length(dfs))
+  if (length(file_names) != length(dfs)) {
     stop("file_names and dfs is not the same length")
+  }
 
-  if (!("list" %in% class(dfs)) || !("list" %in% class(file_names)))
+  if (!("list" %in% class(dfs)) || !("list" %in% class(file_names))) {
     stop("Both file_names and dfs must be a list")
+  }
 
 
 
   for (i in seq_along(file_names)) {
-
     df <- dfs[[i]] |>
       dplyr::mutate(dplyr::across(
         tidyselect::where(is.character),
@@ -230,8 +234,8 @@ sos_metadata <- function(dfs = list(),
       x = df,
       file = paste0("./", output_dir, "/", file_names[[i]], ".csv"),
       eol = "\r\n",
-      row.names = F,
-      col.names = T,
+      row.names = FALSE,
+      col.names = TRUE,
       sep = separator
     )
   }
@@ -279,11 +283,10 @@ sos_metadata <- function(dfs = list(),
   )
 
   if (zip) {
-
     zip_dir_with_pass(directory = output_dir, file = zip_file_name)
 
-    if (!file.exists(paste0("./", zip_file_name, ".zip")))
+    if (!file.exists(paste0("./", zip_file_name, ".zip"))) {
       message("Zip failed, try (re-)installing RTools")
-
+    }
   }
 }

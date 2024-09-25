@@ -8,9 +8,7 @@
 #' @examples
 #' round_to_y(x = 0.12, y = 0.05)
 round_to_y <- function(x, y = 0.05) {
-
   return(roundc(x / y) * y)
-
 }
 
 #' Make data non-revealing
@@ -60,15 +58,13 @@ obfuscate_data <- function(
     group_var = NULL,
     statistics_vars = NULL,
     other_count_vars = NULL,
-    round_statistics_vars = F,
+    round_statistics_vars = FALSE,
     round_statistics_digits = 2,
-    add_reason_col = F,
-    liberal_obfuscation = T,
+    add_reason_col = FALSE,
+    liberal_obfuscation = TRUE,
     censored_value = 0,
-    inform = T,
-    prop_scale = 1
-) {
-
+    inform = TRUE,
+    prop_scale = 1) {
   checkmate::assert_choice(prop_scale, c(1, 100))
 
   if (!is.null(group_var)) {
@@ -79,7 +75,6 @@ obfuscate_data <- function(
         )
       )
   } else if (inform && length(dplyr::group_vars(data)) > 0) {
-
     msg <- paste0(
       "obfuscate_data: data is grouped by ",
       paste0("'", dplyr::group_vars(data), "'", collapse = ", "),
@@ -87,11 +82,9 @@ obfuscate_data <- function(
     )
 
     rlang::inform(msg)
-
   }
 
   if (prop_scale == 100) {
-
     data <- data |>
       dplyr::mutate(
         dplyr::across(
@@ -99,25 +92,22 @@ obfuscate_data <- function(
           ~ .x / 100
         )
       )
-
   }
 
   if (add_reason_col) {
-
-    data <- reason_col(data = data,
-                       liberal_obfuscation = liberal_obfuscation,
-                       count_var = count_var,
-                       total_var = total_var,
-                       prop_var = prop_var,
-                       statistics_vars = statistics_vars)
-
+    data <- reason_col(
+      data = data,
+      liberal_obfuscation = liberal_obfuscation,
+      count_var = count_var,
+      total_var = total_var,
+      prop_var = prop_var,
+      statistics_vars = statistics_vars
+    )
   }
 
 
   if (length(dplyr::group_vars(data)) > 0) {
-
     if (liberal_obfuscation) {
-
       data <- data |>
         dplyr::mutate(
           dplyr::across(
@@ -130,7 +120,7 @@ obfuscate_data <- function(
                 roundc(.x, digits = 2)
               ),
               .data[[total_var]] < 245 ~ dplyr::if_else(
-                .data[[count_var]] < 5| .data[[total_var]] - .data[[count_var]] < 5,
+                .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 round_to_y(.x, y = 0.05),
                 roundc(.x, digits = 2)
               ),
@@ -138,9 +128,7 @@ obfuscate_data <- function(
             )
           )
         )
-
     } else {
-
       data <- data |>
         dplyr::mutate(
           dplyr::across(
@@ -155,13 +143,9 @@ obfuscate_data <- function(
             )
           )
         )
-
     }
-
   } else {
-
     if (liberal_obfuscation) {
-
       data <- data |>
         dplyr::mutate(
           dplyr::across(
@@ -182,9 +166,7 @@ obfuscate_data <- function(
             )
           )
         )
-
     } else {
-
       data <- data |>
         dplyr::mutate(
           dplyr::across(
@@ -197,12 +179,10 @@ obfuscate_data <- function(
             )
           )
         )
-
     }
-
   }
 
-  data <- data  |>
+  data <- data |>
     dplyr::mutate(
       dplyr::across(
         tidyselect::any_of(c(count_var, total_var, other_count_vars)),
@@ -214,7 +194,6 @@ obfuscate_data <- function(
   # occasions
 
   if (total_var %in% colnames(data)) {
-
     data <- data |>
       dplyr::mutate(
         dplyr::across(
@@ -226,19 +205,14 @@ obfuscate_data <- function(
           )
         )
       )
-
   } else if (any(statistics_vars %in% colnames(data))) {
-
     warning(
       "total_var was not found among the columns, unable to censor statistics_vars"
     )
-
   }
 
   if (round_statistics_vars) {
-
     if (is.numeric(round_statistics_digits)) {
-
       data <- data |>
         dplyr::mutate(
           dplyr::across(
@@ -246,9 +220,7 @@ obfuscate_data <- function(
             ~ roundc(.x, digits = round_statistics_digits)
           )
         )
-
     } else {
-
       for (stat_var in statistics_vars) {
         data <- data |>
           dplyr::mutate(
@@ -258,13 +230,10 @@ obfuscate_data <- function(
             )
           )
       }
-
     }
-
   }
 
   if (prop_scale == 100) {
-
     data <- data |>
       dplyr::mutate(
         dplyr::across(
@@ -272,11 +241,9 @@ obfuscate_data <- function(
           ~ .x * 100
         )
       )
-
   }
 
   return(data)
-
 }
 
 
@@ -292,18 +259,16 @@ obfuscate_data <- function(
 
 reason_col <- function(
     data,
-    liberal_obfuscation = T,
+    liberal_obfuscation = TRUE,
     count_var = "n",
     total_var = "total",
     prop_var = "prop",
     statistics_vars = NULL) {
-
   n_group_vars <- length(dplyr::group_vars(data))
 
   all_vars <- all(c(count_var, total_var, prop_var) %in% colnames(data))
 
   if (all_vars && liberal_obfuscation && n_group_vars > 0) {
-
     data <- data |>
       dplyr::mutate(
         obfuscated_reason = dplyr::case_when(
@@ -318,11 +283,9 @@ reason_col <- function(
                .data[[count_var]] < 5) ~ "rounded to nearest 5%"
         )
       )
-
   }
 
   if (all_vars && liberal_obfuscation && n_group_vars == 0) {
-
     data <- data |>
       dplyr::mutate(
         obfuscated_reason = dplyr::case_when(
@@ -331,17 +294,16 @@ reason_col <- function(
             dplyr::case_when(
               .data[[count_var]] < 5 ~ "n < 5",
               .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5",
-              .default = NA),
+              .default = NA
+            ),
           dplyr::between(.data[[total_var]], 45, 244) &
             (.data[[count_var]] < 5 | .data[[total_var]] -
                .data[[count_var]] < 5) ~ "rounded to nearest 5%"
         )
       )
-
   }
 
   if (all_vars && !liberal_obfuscation && n_group_vars > 0) {
-
     data <- data |>
       dplyr::mutate(
         obfuscated_reason = dplyr::case_when(
@@ -353,11 +315,9 @@ reason_col <- function(
           )
         )
       )
-
   }
 
   if (all_vars && !liberal_obfuscation && n_group_vars == 0) {
-
     data <- data |>
       dplyr::mutate(
         obfuscated_reason = dplyr::case_when(
@@ -366,12 +326,9 @@ reason_col <- function(
           .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5"
         )
       )
-
-
   }
 
   if (!all_vars && total_var %in% colnames(data)) {
-
     data <- data |>
       dplyr::mutate(
         obfuscated_reason = dplyr::if_else(
@@ -380,12 +337,11 @@ reason_col <- function(
           NA
         )
       )
-
   }
 
-  if (!all_vars && any(statistics_vars %in% colnames(data)) &&
-      total_var %in% colnames(data)) {
-
+  if (!all_vars &&
+        any(statistics_vars %in% colnames(data)) &&
+        total_var %in% colnames(data)) {
     data <- data |>
       dplyr::mutate(
         obfuscated_reason = dplyr::if_else(
@@ -394,11 +350,9 @@ reason_col <- function(
           NA
         )
       )
-
   }
 
   return(data)
-
 }
 
 #' Get rounded ci for proportion

@@ -1,5 +1,4 @@
 test_that("decode_data works on data.frames", {
-
   # Test set_factors on dummy data
   df <- data.frame(x = 1:10, y = 1:10)
   vl <- dplyr::bind_rows(
@@ -52,7 +51,6 @@ test_that("decode_data works on data.frames", {
 })
 
 test_that("decode_data works with form_id", {
-
   skip_on_ci()
 
   df <- RCDBT::GetDatalayer(2398) |>
@@ -61,7 +59,7 @@ test_that("decode_data works with form_id", {
   labels <- RCDBT::GetValueLabels(2398)
 
   df_decoded <- df |>
-    decode_data(labels = labels, as_character = T)
+    decode_data(labels = labels, as_character = TRUE)
 
   expected <- data.frame(
     I_Unit = c(
@@ -114,12 +112,12 @@ test_that("decode_data works with form_id", {
   expect_equal(df_decoded, expected)
 
   df_decoded <- df |>
-    decode_data(form_id = 2398, as_character = T)
+    decode_data(form_id = 2398, as_character = TRUE)
 
   expect_equal(df_decoded, expected)
 
   df_decoded <- df |>
-    decode_data(labels = labels, form_id = 2398, as_character = T)
+    decode_data(labels = labels, form_id = 2398, as_character = TRUE)
 
   expect_equal(df_decoded, expected)
 
@@ -127,11 +125,9 @@ test_that("decode_data works with form_id", {
     decode_data(df, labels = NULL, form_id = NULL),
     regexp = "Both labels and form_id can not be null"
   )
-
 })
 
 test_that("decode_data handles character value codes", {
-
   labels <- data.frame(
     ColumnName = "x",
     ValueCode = 1:3 |> as.character(),
@@ -155,11 +151,11 @@ test_that("decode_data handles character value codes", {
   df <- data.frame(
     x = rep(1:3, 4)[1:10],
     y = rep(c("x", "y", "z"), 4)[1:10],
-    z = rep(c(T, F), 5)
+    z = rep(c(TRUE, FALSE), 5)
   )
 
   df_decoded <- df |>
-    decode_data(labels = labels, as_character = T)
+    decode_data(labels = labels, as_character = TRUE)
 
   expected <- data.frame(
     x = rep(c("a", "b", "c"), 4)[1:10],
@@ -168,11 +164,9 @@ test_that("decode_data handles character value codes", {
   )
 
   expect_equal(df_decoded, expected)
-
 })
 
 test_that("set_factors works on data.tables", {
-
   # Test set_factors on dummy data
   df <- data.table::data.table(x = 1:10, y = 1:10)
   vl <- rbind(
@@ -224,5 +218,4 @@ test_that("set_factors works on data.tables", {
     y_label = letters[1:10]
   )
   expect_equal(dtac, dtr)
-
 })

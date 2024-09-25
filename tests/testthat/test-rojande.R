@@ -7,11 +7,9 @@ test_that("rounded_ci_p works", {
   p_hat <- c(0.5, 0.5)
   n <- c(20, 30)
   expected_res <- list(lower = c(0.28, 0.32), upper = c(0.72, 0.67))
-
 })
 
 test_that("group_proportions censors as expected", {
-
   # Make some data for tests
   df <- tibble::tibble(
     a = c(rep(1, 25), rep(2, 11), rep(3, 4)),
@@ -42,7 +40,6 @@ test_that("group_proportions censors as expected", {
 })
 
 test_that("reason col works", {
-
   res <- data.frame(
     group = c(rep("a", 3), rep("b", 2), rep("c", 2)),
     n = c(1, 5, 10, 1, 9, 1, 10),
@@ -50,7 +47,7 @@ test_that("reason col works", {
   ) |>
     dplyr::mutate(prop = n / total) |>
     dplyr::group_by(group) |>
-    obfuscate_data(add_reason_col = T) |>
+    obfuscate_data(add_reason_col = TRUE) |>
     dplyr::ungroup()
 
   expected_res <- tibble::tribble(
@@ -73,7 +70,7 @@ test_that("reason col works", {
   ) |>
     dplyr::mutate(prop = n / total) |>
     dplyr::group_by(group) |>
-    obfuscate_data(add_reason_col = T, liberal_obfuscation = F) |>
+    obfuscate_data(add_reason_col = TRUE, liberal_obfuscation = FALSE) |>
     dplyr::ungroup()
 
   expected_res <- tibble::tribble(
@@ -94,7 +91,7 @@ test_that("reason col works", {
     total = c(15, 15, 12, 12)
   ) |>
     dplyr::mutate(prop = n / total) |>
-    obfuscate_data(add_reason_col = T, liberal_obfuscation = F) |>
+    obfuscate_data(add_reason_col = TRUE, liberal_obfuscation = FALSE) |>
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
@@ -112,15 +109,15 @@ test_that("reason col works", {
     total = c(46, 46, 250, 250)
   ) |>
     dplyr::mutate(prop = n / total) |>
-    obfuscate_data(add_reason_col = T) |>
+    obfuscate_data(add_reason_col = TRUE) |>
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
     ~n, ~total, ~prop, ~obfuscated_reason,
-    0,   50,     0.05,     "rounded to nearest 5%",
-    40,  50,     0.95,     "rounded to nearest 5%",
-    250, 250,    1,        NA,
-    0,   250,    0,        NA
+    0, 50, 0.05, "rounded to nearest 5%",
+    40, 50, 0.95, "rounded to nearest 5%",
+    250, 250, 1, NA,
+    0, 250, 0, NA
   )
 
   expect_equal(res, expected_res)
@@ -132,18 +129,18 @@ test_that("reason col works", {
   ) |>
     dplyr::mutate(prop = n / total) |>
     dplyr::group_by(group) |>
-    obfuscate_data(add_reason_col = T) |>
+    obfuscate_data(add_reason_col = TRUE) |>
     dplyr::ungroup() |>
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
     ~group, ~n, ~total, ~prop, ~obfuscated_reason,
-    "a",    20,  50,     0.46,     NA,
-    "a",    20,  50,     0.46,     NA,
-    "a",    0,   50,     0.1,      "rounded to nearest 5%",
-    "b",    20,  40,     0,        "n < 5",
-    "b",    20,  40,     0,        "n < 5",
-    "b",    0,   40,     0,        "n < 5"
+    "a", 20, 50, 0.46, NA,
+    "a", 20, 50, 0.46, NA,
+    "a", 0, 50, 0.1, "rounded to nearest 5%",
+    "b", 20, 40, 0, "n < 5",
+    "b", 20, 40, 0, "n < 5",
+    "b", 0, 40, 0, "n < 5"
   )
 
   expect_equal(res, expected_res)
@@ -151,8 +148,10 @@ test_that("reason col works", {
   res <- data.frame(
     n = c(1, 5, 10)
   ) |>
-    obfuscate_data(add_reason_col = T,
-                   total_var = "n") |>
+    obfuscate_data(
+      add_reason_col = TRUE,
+      total_var = "n"
+    ) |>
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
@@ -168,26 +167,28 @@ test_that("reason col works", {
     n = c(5, 20),
     x_mean = c(1.7, 2.1)
   ) |>
-    obfuscate_data(add_reason_col = T,
-                   total_var = "n",
-                   statistics_vars = "x_mean") |>
+    obfuscate_data(
+      add_reason_col = TRUE,
+      total_var = "n",
+      statistics_vars = "x_mean"
+    ) |>
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
     ~n, ~x_mean, ~obfuscated_reason,
-    10,  NA,      "N < 15",
-    20, 2.1,     NA
+    10, NA, "N < 15",
+    20, 2.1, NA
   )
 
   expect_equal(res, expected_res)
 
   res <- data.frame(
-    n = 4, total = 16, prop = 4/16, mean = 0.125
+    n = 4, total = 16, prop = 4 / 16, mean = 0.125
   ) |>
     obfuscate_data(
-      add_reason_col = T,
+      add_reason_col = TRUE,
       statistics_vars = "mean",
-      round_statistics_vars = T,
+      round_statistics_vars = TRUE,
       censored_value = NA
     )
 
@@ -197,11 +198,9 @@ test_that("reason col works", {
   )
 
   expect_equal(res, expected_res)
-
 })
 
 test_that("censored_value works", {
-
   res <- data.frame(
     n = 4,
     total = 20
@@ -231,16 +230,15 @@ test_that("censored_value works", {
   )
 
   expect_equal(res, expected_res)
-
 })
 
 test_that("round_statistics_digits list works", {
   data_aggregated <- tibble::tribble(
-    ~unit, ~group,  ~x_mean, ~x_sd,   ~total,
-    1,     "a",    1.0503,   0.26956, 51,
-    1,     "b",    0.6725,   0.17612, 45,
-    2,     "a",    0.5021,   0.46552, 32,
-    2,     "b",    1.1357,   0.54783, 78
+    ~unit, ~group, ~x_mean, ~x_sd, ~total,
+    1, "a", 1.0503, 0.26956, 51,
+    1, "b", 0.6725, 0.17612, 45,
+    2, "a", 0.5021, 0.46552, 32,
+    2, "b", 1.1357, 0.54783, 78
   )
 
   res <- obfuscate_data(
@@ -252,30 +250,29 @@ test_that("round_statistics_digits list works", {
   )
 
   expected_res <- tibble::tribble(
-    ~unit, ~group,  ~x_mean, ~x_sd,   ~total,
-    1,     "a",    1.05,     0.3,     50,
-    1,     "b",    0.67,     0.2,     50,
-    2,     "a",    0.5,      0.5,     30,
-    2,     "b",    1.14,     0.5,     80
+    ~unit, ~group, ~x_mean, ~x_sd, ~total,
+    1, "a", 1.05, 0.3, 50,
+    1, "b", 0.67, 0.2, 50,
+    2, "a", 0.5, 0.5, 30,
+    2, "b", 1.14, 0.5, 80
   )
 
   expect_equal(res, expected_res)
-
-
 })
 
 test_that("obfuscate_data works", {
-
   res <- tibble::tribble(
     ~unit, ~n,  ~total, ~prop,
-    "a",   4,   200,    4/200,
-    "a",   196, 200,    196/200,
-    "b",   4,   44,     4/44,
-    "b",   40,  44,     40/44
+    "a",   4,   200,    4 / 200,
+    "a",   196, 200,    196 / 200,
+    "b",   4,   44,     4 / 44,
+    "b",   40,  44,     40 / 44
   ) |>
-    obfuscate_data(liberal_obfuscation = T,
-                   group_var = "unit",
-                   add_reason_col = T) |>
+    obfuscate_data(
+      liberal_obfuscation = TRUE,
+      group_var = "unit",
+      add_reason_col = TRUE
+    ) |>
     dplyr::ungroup()
 
   expected_res <- tibble::tribble(
@@ -287,12 +284,10 @@ test_that("obfuscate_data works", {
   )
 
   expect_equal(res, expected_res)
-
 })
 
 
 test_that("prop_scale works", {
-
   res <- tibble::tribble(
     ~n, ~total, ~prop,
     6,  23,     100 * (6 / 23),
@@ -337,5 +332,4 @@ test_that("prop_scale works", {
         prop_scale = -1
       )
   )
-
 })

@@ -40,10 +40,3 @@ prod:
     refs:
       - master
    when: manual
-
-default:
-  before_script:
-    - R -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-    - R -e 'pak::pkg_install("distro")'
-    - R -e 'pak::pkg_install("remotes")'
-    - R -e 'remotes::install_gitlab("registercentrum/statistikenheten/RCDBT", lib = .libPaths()[1])'

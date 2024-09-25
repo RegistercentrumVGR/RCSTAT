@@ -1,4 +1,3 @@
-
 #' Get data from function call in `{register}`
 #'
 #' Data from either a installed `{register}` package for testing locally
@@ -11,11 +10,15 @@
 #'
 #' @return tibble
 get_data <- function(register, fun, arguments = list()) {
-  message("Calling function: ", register, "::",
-          fun, " using: ", getOption("get_data_fun")) # for debug
+  message(
+    "Calling function: ", register, "::",
+    fun, " using: ", getOption("get_data_fun")
+  ) # for debug
   if (length(arguments) > 0) arguments[sapply(arguments, is.null)] <- NULL
-  do.call(getOption("get_data_fun"),
-          list(register = register, fun = fun, arguments = arguments))
+  do.call(
+    getOption("get_data_fun"),
+    list(register = register, fun = fun, arguments = arguments)
+  )
 }
 
 
@@ -45,9 +48,7 @@ api_statistics <- function(
     dev = FALSE,
     verbose = FALSE,
     return_tibble = TRUE) {
-
   if (length(arguments) > 0) {
-
     arguments_str <- paste0(
       # Add all arguments
       paste0(

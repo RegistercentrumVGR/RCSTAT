@@ -40,3 +40,4 @@ Imports:
     curl
 LinkingTo: 
     Rcpp
+Remotes: gitlab::registercentrum/statistikenheten/RCDBT

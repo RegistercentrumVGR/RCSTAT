@@ -1,5 +1,4 @@
 test_that("Rolling average works", {
-
   x <- 10:20
   n <- 4
 
@@ -21,5 +20,4 @@ test_that("Rolling average works", {
   testthat::expect_equal(rolling_mean(x, n = n, align = "left"), res_left)
   testthat::expect_equal(rolling_mean(x, n = n, align = "right"), res_right)
   testthat::expect_equal(rolling_mean(x, n = n, align = "center"), res_center)
-
 })

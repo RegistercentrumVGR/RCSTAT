@@ -20,7 +20,6 @@
 #' var_to_factor(x, labels, name = "cars")
 #' @export
 var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
-
   unique_levels <- as.character(unique(x))
   unique_levels <- unique_levels[!is.na(unique_levels)]
 
@@ -33,7 +32,6 @@ var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
   x_no_label <- unique_levels[!unique_levels %in% labels[["ValueCode"]]]
 
   if (!is.null(x_no_label) && length(x_no_label) > 0 && !all(is.na(x_no_label))) {
-
     n_obs <- sum(x %in% x_no_label)
 
     rlang::warn(
@@ -118,7 +116,6 @@ decode_data <- function(
     suffix = "_label",
     as_character = FALSE,
     form_id = NULL) {
-
   checkmate::assert(
     checkmate::check_null(form_id),
     checkmate::check_integerish(form_id)
@@ -130,13 +127,9 @@ decode_data <- function(
   )
 
   if (is.null(labels) && is.null(form_id)) {
-
     stop("Both labels and form_id can not be null")
-
   } else if (is.null(labels) && !is.null(form_id)) {
-
     labels <- RCDBT::GetValueLabels(FormID = form_id)
-
   }
 
   var_names <- colnames(data)
@@ -155,7 +148,6 @@ decode_data <- function(
         "added columns will be character."
       )
     )
-
   }
   if (as_character && !droplevels) {
     warning(
@@ -171,7 +163,8 @@ decode_data <- function(
 
     if (is.logical(data[[var]])) {
       labels_list[[var]][["ValueCode"]] <- labels_list[[var]][["ValueCode"]] |>
-        as.numeric() |> as.logical()
+        as.numeric() |>
+        as.logical()
     }
   }
 
@@ -213,13 +206,16 @@ decode_data <- function(
         # Handle off-by-one indexing
         if (idx_of_var == 1) {
           # If var is the first
-          col_order <- c(var, paste0(var, suffix),
-                         col_order[2:length(col_order)])
-
+          col_order <- c(
+            var, paste0(var, suffix),
+            col_order[2:length(col_order)]
+          )
         } else if (idx_of_var == length(col_order)) {
           # if var is the last one
-          col_order <- c(col_order[1:(length(col_order) - 1)],
-                         var, paste0(var, suffix))
+          col_order <- c(
+            col_order[1:(length(col_order) - 1)],
+            var, paste0(var, suffix)
+          )
         } else {
           # put label var in correct position next to codes
           col_order <- c(
@@ -235,9 +231,7 @@ decode_data <- function(
 
         # Re-arrange columns to original order
         data.table::setcolorder(data, col_order)
-
       }
-
     } else {
       data[, vars_to_decode] <- Map(
         var_to_char,

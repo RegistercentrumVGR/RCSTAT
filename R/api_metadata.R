@@ -67,10 +67,12 @@ api_register_forms <- function(RegisterID) {
   x <-
     tibble::as_tibble(api_register(RegisterID)$data$Forms)
 
-  if (utils::hasName(x, "Parent"))
-    x <-  tidyr::unnest(x, "Parent", names_sep = "_")
-  if (utils::hasName(x, "Parent_Parent"))
+  if (utils::hasName(x, "Parent")) {
+    x <- tidyr::unnest(x, "Parent", names_sep = "_")
+  }
+  if (utils::hasName(x, "Parent_Parent")) {
     x <- tidyr::unnest(x, "Parent_Parent", names_sep = "_")
+  }
 
   dplyr::select(x, tidyselect::matches("FormID|FormName|FormTitle"))
 }
@@ -116,7 +118,7 @@ api_form_questions <- function(FormID, all = FALSE, only_mapped = FALSE) {
 
   if (!all) {
     incl <- c("ColumnName", "QuestionID", "MappedTo")
-    x <- dplyr::select(x,  tidyselect::any_of(incl), tidyselect::starts_with("Domain"))
+    x <- dplyr::select(x, tidyselect::any_of(incl), tidyselect::starts_with("Domain"))
 
     if (only_mapped) {
       x <-
@@ -133,8 +135,9 @@ api_form_questions <- function(FormID, all = FALSE, only_mapped = FALSE) {
 #' @describeIn api get map table attribute for variable in form
 api_map <- function(var, FormID) {
   x <- api_form_questions(FormID)
-  if (!var %in% x$ColumnName)
+  if (!var %in% x$ColumnName) {
     stop(sprintf("Column %s not found in form %s", var, FormID))
+  }
   x <- dplyr::filter(x, .data$ColumnName == var)
 
   # UnitCodes are found in register-specific tables if DomainID >= 3000

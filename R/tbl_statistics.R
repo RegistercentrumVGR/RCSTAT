@@ -13,7 +13,6 @@ group_proportions <- function(
     data,
     group_by,
     obfuscate = TRUE) {
-
   res <- data |>
     dplyr::group_by(dplyr::pick(tidyselect::all_of(group_by))) |>
     dplyr::summarise(
@@ -111,7 +110,6 @@ proportion_missing <- function(
     vars = NULL,
     obfuscate = TRUE,
     ...) {
-
   if (is.null(vars)) {
     vars <- setdiff(names(data), group_by)
   }

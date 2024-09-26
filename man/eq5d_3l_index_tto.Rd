@@ -22,7 +22,7 @@ eq5d_3l_index_tto(1, 2, 2, 3, 3) # 0.499
 eq5d_3l_index_tto(2, 1, 3, 1, 1) # 0.724
 
 # Works with vectors as well
-eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1,3), rep(1, 3))
+eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3))
 }
 \references{
 [Burström et al. 2014, TTO Model 4, Table 3](https://dx.doi.org/10.1007%2Fs11136-013-0496-4)

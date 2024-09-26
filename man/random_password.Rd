@@ -27,5 +27,7 @@ https://www.passwordrandom.com/pronounceable-password-generator
 Gets random password from API
 }
 \examples{
-\dontrun{rand_pass <- random_password(c("R", "N"), 10)}
+\dontrun{
+rand_pass <- random_password(c("R", "N"), 10)
+}
 }

@@ -38,9 +38,9 @@ rc_mail <- function(to, from, subject, body, password) {
     "\r\nTo: ", to,
     "\r\nSubject: ", subject, "\r\n\r\n",
     body,
-    "\r\n\r\nHälsningar\r\n",
+    "\r\n\r\nH\u00e4lsningar\r\n",
     from,
-    "\r\nStatistiker\r\nRegistercentrum Västra Götaland"
+    "\r\nStatistiker\r\nRegistercentrum V\u00e4stra G\u00f6taland"
   )
 
   curl::send_mail(

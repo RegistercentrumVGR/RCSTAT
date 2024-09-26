@@ -25,5 +25,7 @@ zips chosen directory with password protection. Zip-file and
 txt-file with the password are placed in working directory
 }
 \examples{
-\dontrun{zip_dir_with_pass()}
+\dontrun{
+zip_dir_with_pass()
+}
 }

@@ -6,7 +6,7 @@
 \usage{
 reason_col(
   data,
-  liberal_obfuscation = T,
+  liberal_obfuscation = TRUE,
   count_var = "n",
   total_var = "total",
   prop_var = "prop",

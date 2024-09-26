@@ -48,6 +48,8 @@ data.table. Faster than `RCStat::locf` for large
 datasets, especially when imputing on multiple variables
 }
 \examples{
-\dontrun{df <- locfdt(df, vars)}
+\dontrun{
+df <- locfdt(df, vars)
+}
 
 }

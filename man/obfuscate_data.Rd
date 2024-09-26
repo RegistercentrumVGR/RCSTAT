@@ -12,12 +12,12 @@ obfuscate_data(
   group_var = NULL,
   statistics_vars = NULL,
   other_count_vars = NULL,
-  round_statistics_vars = F,
+  round_statistics_vars = FALSE,
   round_statistics_digits = 2,
-  add_reason_col = F,
-  liberal_obfuscation = T,
+  add_reason_col = FALSE,
+  liberal_obfuscation = TRUE,
   censored_value = 0,
-  inform = T,
+  inform = TRUE,
   prop_scale = 1
 )
 }

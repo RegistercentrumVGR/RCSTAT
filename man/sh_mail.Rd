@@ -6,7 +6,7 @@
 e-mail with attachment from Registercentrum
 office 365 mail.}
 \usage{
-sh_mail(to, subject, password, file = NULL, run_bash = T)
+sh_mail(to, subject, password, file = NULL, run_bash = TRUE)
 }
 \arguments{
 \item{to}{e-mail to send to}
@@ -30,13 +30,17 @@ office 365 mail.
 sh_mail(
   to = "rikard.isaksson@vgregion.se",
   subject = "Hej test",
-  file = "data/test.csv")
+  file = "data/test.csv"
+)
 
 sh_mail(
-  to = c("alexander.thoren@vgregion.se",
- "oskar.e.johansson@vgregion.se"),
+  to = c(
+    "alexander.thoren@vgregion.se",
+    "oskar.e.johansson@vgregion.se"
+  ),
   subject = "test",
   password = ...,
-  file = "test.xlsx")
+  file = "test.xlsx"
+)
 }
 }

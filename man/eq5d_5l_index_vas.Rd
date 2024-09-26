@@ -17,8 +17,8 @@ numeric vector with EQ5D-indices
 Calculate Swedish EQ5D-index based on VAS from EQ5D-5-level data
 }
 \examples{
-eq5d_5l_index_vas(3,4,5,4,3) # 30.5
-eq5d_5l_index_vas(rep(3, 10), rep(4, 10),rep(5, 10), rep(4, 10), rep(3, 10))
+eq5d_5l_index_vas(3, 4, 5, 4, 3) # 30.5
+eq5d_5l_index_vas(rep(3, 10), rep(4, 10), rep(5, 10), rep(4, 10), rep(3, 10))
 }
 \references{
 [Burström, model 5 VAS](https://link.springer.com/article/10.1007/s40273-020-00905-7/tables/9)

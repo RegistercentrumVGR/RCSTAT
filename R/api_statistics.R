@@ -1,6 +1,6 @@
-#' Get data from function call in `{register}`
+#' Get data from function call in `register`
 #'
-#' Data from either a installed `{register}` package for testing locally
+#' Data from either a installed `register` package for testing locally
 #' or from the API when in active use
 #' (controlled by global option `get_data_fun`)
 #'

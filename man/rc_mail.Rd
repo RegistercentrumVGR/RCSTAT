@@ -31,7 +31,7 @@ rc_mail(
   to = "rikard.isaksson@vgregion.se",
   from = "Rikard Isaksson",
   subject = "Hej test",
-  body = "Test!")
-
+  body = "Test!"
+)
 }
 }

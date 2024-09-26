@@ -38,7 +38,9 @@ saved in a separate .txt file.
 \dontrun{
 data_1 <- RCDBT::GetRegisterData(...) \%>\% filter(...)
 data_2 <- RCDBT::GetRegisterData(...) \%>\% filter(...)
-sos_metadata(dfs = list(data_1, data_2),
-             file_names = list("dnr_xxxx_yyyyy_1", "dnr_xxxx_yyyyy_2"))
+sos_metadata(
+  dfs = list(data_1, data_2),
+  file_names = list("dnr_xxxx_yyyyy_1", "dnr_xxxx_yyyyy_2")
+)
 }
 }

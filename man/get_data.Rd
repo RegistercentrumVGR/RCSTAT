@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_statistics.R
 \name{get_data}
 \alias{get_data}
-\title{Get data from function call in `{register}`}
+\title{Get data from function call in `register`}
 \usage{
 get_data(register, fun, arguments = list())
 }
@@ -17,7 +17,7 @@ get_data(register, fun, arguments = list())
 tibble
 }
 \description{
-Data from either a installed `{register}` package for testing locally
+Data from either a installed `register` package for testing locally
 or from the API when in active use
 (controlled by global option `get_data_fun`)
 }

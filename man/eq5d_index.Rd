@@ -39,7 +39,7 @@ sets are, however, not (yet) available there.
 eq5d_index(1, 1, 1, 1, 1, levels = 3, type = "TTO")
 eq5d_index(c("1,1,1,1,1"), levels = 3, type = "TTO", old = TRUE)
 eq5d_index(1, 1, 1, 1, 1, levels = 5, type = "TTO")
-eq5d_index(3,4,5,4,3, levels = 5, type = "VAS")
+eq5d_index(3, 4, 5, 4, 3, levels = 5, type = "VAS")
 }
 \seealso{
 https://github.com/fragla/eq5d

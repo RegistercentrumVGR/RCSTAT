@@ -6,6 +6,7 @@
 \alias{api_registerid_2_registername}
 \alias{api_formid_2_formname}
 \alias{api_formid_2_registerid}
+\alias{api_registers}
 \alias{api_register}
 \alias{api_register_meta}
 \alias{api_register_forms}
@@ -25,6 +26,8 @@ api_registerid_2_registername(RegisterID)
 api_formid_2_formname(FormID)
 
 api_formid_2_registerid(FormID)
+
+api_registers()
 
 api_register(RegisterID)
 
@@ -66,6 +69,8 @@ Access open data from the Stratum API.
 \item \code{api_formid_2_formname()}: Convert FormID to FormName
 
 \item \code{api_formid_2_registerid()}: Get RegisterID for FormID
+
+\item \code{api_registers()}: Get a list of registers
 
 \item \code{api_register()}: All data for register from API
 

@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.0.13
+Version: 1.0.14
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 

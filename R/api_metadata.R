@@ -46,6 +46,12 @@ api_formid_2_registerid <- function(FormID) {
   api_get(sprintf("metadata/forms/%d", FormID))$data$Register$RegisterID
 }
 
+#' @describeIn api Get a list of registers
+#' @export
+api_registers <- function() {
+  api_get("metadata/registers")
+}
+
 # Register data -----------------------------------------------------------
 
 #' @export

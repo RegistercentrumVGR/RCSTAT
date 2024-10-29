@@ -86,8 +86,7 @@ var_to_char <- function(x, labels, name = NULL) {
 #' Returns data with descriptive data points
 #' instead of codes.
 #'
-#' @name decode_vars
-#' @title decode_vars
+#' @name decode_data
 #'
 #' @param data Data frame with Stratum register data
 #' @param labels Value labels for the same register
@@ -98,7 +97,6 @@ var_to_char <- function(x, labels, name = NULL) {
 #' @param suffix suffix to add to added columns
 #' @param as_character If `TRUE` variables
 #' will be set to characters. If `FALSE` variables will be factors.
-#' @param form_id Optional FormID to get labels for.
 #'
 #' @return data.frame with character values instead
 #'         of numerical values.
@@ -114,23 +112,9 @@ decode_data <- function(
     droplevels = TRUE,
     add_cols = FALSE,
     suffix = "_label",
-    as_character = FALSE,
-    form_id = NULL) {
-  checkmate::assert(
-    checkmate::check_null(form_id),
-    checkmate::check_integerish(form_id)
-  )
+    as_character = FALSE) {
 
-  checkmate::assert(
-    checkmate::check_null(labels),
-    checkmate::check_data_frame(labels)
-  )
-
-  if (is.null(labels) && is.null(form_id)) {
-    stop("Both labels and form_id can not be null")
-  } else if (is.null(labels) && !is.null(form_id)) {
-    labels <- RCDBT::GetValueLabels(FormID = form_id)
-  }
+  checkmate::assert_data_frame(labels)
 
   var_names <- colnames(data)
   label_names <- unique(labels[["ColumnName"]])

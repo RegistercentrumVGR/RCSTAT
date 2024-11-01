@@ -15,8 +15,7 @@ Suggests:
     roxygen2,
     testthat (>= 3.0.0),
     rcmdcheck,
-    usethis,
-    RCDBT
+    usethis
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 Imports: 
@@ -40,4 +39,3 @@ Imports:
     curl
 LinkingTo: 
     Rcpp
-Remotes: gitlab::registercentrum/statistikenheten/RCDBT

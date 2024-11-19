@@ -339,9 +339,7 @@ reason_col <- function(
       )
   }
 
-  if (!all_vars &&
-        any(statistics_vars %in% colnames(data)) &&
-        total_var %in% colnames(data)) {
+  if (!all_vars && any(statistics_vars %in% colnames(data)) && total_var %in% colnames(data)) {
     data <- data |>
       dplyr::mutate(
         obfuscated_reason = dplyr::if_else(

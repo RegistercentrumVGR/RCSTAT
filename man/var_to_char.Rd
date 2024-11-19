@@ -4,7 +4,7 @@
 \alias{var_to_char}
 \title{Convert variable to character}
 \usage{
-var_to_char(x, labels, name = NULL)
+var_to_char(x, labels, name = NULL, missing_labels_na = TRUE)
 }
 \arguments{
 \item{x}{Vector with codes to decode}
@@ -13,6 +13,8 @@ var_to_char(x, labels, name = NULL)
 decoding/translating.}
 
 \item{name}{name of input variable (optional)}
+
+\item{missing_labels_na}{If `TRUE` values with no label will be set to `NA`}
 }
 \value{
 character vector

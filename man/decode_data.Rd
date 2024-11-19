@@ -10,7 +10,8 @@ decode_data(
   droplevels = TRUE,
   add_cols = FALSE,
   suffix = "_label",
-  as_character = FALSE
+  as_character = FALSE,
+  missing_labels_na = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ then the specified variables will have its levels dropped.}
 
 \item{as_character}{If `TRUE` variables
 will be set to characters. If `FALSE` variables will be factors.}
+
+\item{missing_labels_na}{If `TRUE` values with no label will be set to `NA`}
 }
 \value{
 data.frame with character values instead

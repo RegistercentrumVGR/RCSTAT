@@ -143,3 +143,42 @@ test_that("set_factors works on data.tables", {
   )
   expect_equal(dtac, dtr)
 })
+
+test_that("decode_data handles missing labels", {
+
+  x <- data.frame(
+    x = 1:4,
+    y = 1:4
+  )
+
+  labels <- data.frame(
+    ColumnName = rep(c("x", "y"), each = 3),
+    ValueCode = rep(1:3, 2),
+    ValueName = c("Volvo", "Saab", "Opel", "Test1", "Test2", "Test3")
+  )
+
+  # Not possible (?) to expect several warnings
+  suppressWarnings({
+    res <- decode_data(x, labels, missing_labels_na = TRUE, as_character = TRUE)
+  })
+
+  expected_res <- data.frame(
+    x = c("Volvo", "Saab", "Opel", NA),
+    y = c("Test1", "Test2", "Test3", NA)
+  )
+
+  expect_equal(res, expected_res)
+
+  suppressWarnings({
+    res <- decode_data(x, labels, missing_labels_na = FALSE,
+                       as_character = TRUE)
+  })
+
+  expected_res <- data.frame(
+    x = c("Volvo", "Saab", "Opel", 4),
+    y = c("Test1", "Test2", "Test3", 4)
+  )
+
+  expect_equal(res, expected_res)
+
+})

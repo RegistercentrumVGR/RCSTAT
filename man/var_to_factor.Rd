@@ -4,7 +4,13 @@
 \alias{var_to_factor}
 \title{Convert vector to factor using supplied labels}
 \usage{
-var_to_factor(x, labels, name = NULL, droplevels = TRUE)
+var_to_factor(
+  x,
+  labels,
+  name = NULL,
+  droplevels = TRUE,
+  missing_labels_na = TRUE
+)
 }
 \arguments{
 \item{x}{Vector with codes to decode}
@@ -17,6 +23,8 @@ only to print the name of variable with missing labels.}
 
 \item{droplevels}{If `TRUE`, factor levels not present in data will be
 excluded.}
+
+\item{missing_labels_na}{If `TRUE` values with no label will be set to `NA`}
 }
 \value{
 Factor

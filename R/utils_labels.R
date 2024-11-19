@@ -7,6 +7,7 @@
 #' only to print the name of variable with missing labels.
 #' @param droplevels If `TRUE`, factor levels not present in data will be
 #' excluded.
+#' @param missing_labels_na If `TRUE` values with no label will be set to `NA`
 #'
 #' @return Factor
 #' @examples
@@ -19,7 +20,11 @@
 #' )
 #' var_to_factor(x, labels, name = "cars")
 #' @export
-var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
+var_to_factor <- function(x,
+                          labels,
+                          name = NULL,
+                          droplevels = TRUE,
+                          missing_labels_na = TRUE) {
   unique_levels <- as.character(unique(x))
   unique_levels <- unique_levels[!is.na(unique_levels)]
 
@@ -34,19 +39,51 @@ var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
   if (!is.null(x_no_label) && length(x_no_label) > 0 && !all(is.na(x_no_label))) {
     n_obs <- sum(x %in% x_no_label)
 
-    rlang::warn(
-      c(
-        paste(
-          "No labels for value(s):",
-          cli::col_blue(paste(x_no_label, collapse = ", ")), "in",
-          cli::col_blue(name)
-        ),
+    msg <- paste(
+      "No labels for value(s):",
+      cli::col_blue(paste(x_no_label, collapse = ", ")), "in",
+      cli::col_blue(name)
+    )
+
+    if (missing_labels_na) {
+
+      msg <- c(
+        msg,
         "x" = paste(
           cli::col_blue(sprintf("%d (%.0f%%)", n_obs, n_obs / length(x) * 100)),
           "cell(s) set to", cli::style_underline("NA")
         )
       )
-    )
+
+      rlang::warn(msg)
+    } else {
+
+      msg <- c(
+        msg,
+        "x" = paste(
+          cli::col_blue(sprintf("%d (%.0f%%)", n_obs, n_obs / length(x) * 100)),
+          "cell(s) unchanged"
+        )
+      )
+
+      rlang::warn(msg)
+
+      x_no_label_converted <- x_no_label
+
+      if (is.numeric(labels[["ValueCode"]])) {
+        x_no_label_converted <- as.numeric(x_no_label_converted)
+      }
+
+      labels <- dplyr::bind_rows(
+        labels,
+        data.frame(
+          ValueCode = x_no_label_converted,
+          ValueName = x_no_label
+        )
+      )
+
+    }
+
   }
 
   x <- factor(
@@ -64,6 +101,7 @@ var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
 #' @param labels data.frame with columns ValueCode and ValueName to use when
 #' decoding/translating.
 #' @param name name of input variable (optional)
+#' @param missing_labels_na If `TRUE` values with no label will be set to `NA`
 #'
 #' @return character vector
 #' @examples
@@ -77,8 +115,16 @@ var_to_factor <- function(x, labels, name = NULL, droplevels = TRUE) {
 #' var_to_char(x, labels, name = "cars")
 #'
 #' @export
-var_to_char <- function(x, labels, name = NULL) {
-  as.character(var_to_factor(x, labels, name = name, droplevels = TRUE))
+var_to_char <- function(x, labels, name = NULL, missing_labels_na = TRUE) {
+  as.character(
+    var_to_factor(
+      x,
+      labels,
+      name = name,
+      droplevels = TRUE,
+      missing_labels_na = missing_labels_na
+    )
+  )
 }
 
 #' Replace each value with its corresponding label
@@ -97,6 +143,7 @@ var_to_char <- function(x, labels, name = NULL) {
 #' @param suffix suffix to add to added columns
 #' @param as_character If `TRUE` variables
 #' will be set to characters. If `FALSE` variables will be factors.
+#' @param missing_labels_na If `TRUE` values with no label will be set to `NA`
 #'
 #' @return data.frame with character values instead
 #'         of numerical values.
@@ -112,7 +159,8 @@ decode_data <- function(
     droplevels = TRUE,
     add_cols = FALSE,
     suffix = "_label",
-    as_character = FALSE) {
+    as_character = FALSE,
+    missing_labels_na = TRUE) {
 
   checkmate::assert_data_frame(labels)
 
@@ -221,7 +269,8 @@ decode_data <- function(
         var_to_char,
         subset(data, select = vars_to_decode),
         labels_list,
-        vars_to_decode
+        vars_to_decode,
+        missing_labels_na
       )
     }
   } else {
@@ -230,7 +279,8 @@ decode_data <- function(
       subset(data, select = vars_to_decode),
       labels_list,
       vars_to_decode,
-      droplevels
+      droplevels,
+      missing_labels_na
     )
   }
   return(data)

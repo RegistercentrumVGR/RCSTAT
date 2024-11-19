@@ -141,3 +141,268 @@ proportion_missing <- function(
   }
   res
 }
+
+
+#' Create aggregate data across all combinations, including totals.
+#' Can specify if proportion or average should be used.
+#'
+#' @param df A data frame.
+#' @param group_cols The columns to group by.
+#' @param vars Variables to be used to calculate the proportion from.
+#' @param include_missing If missing values should be included in the total
+#' @param obfuscate_data If data should be obfuscated
+#' @param censored_value What value to replace censored values, used as argument in obfuscate_data
+#' @export get_aggregate_value
+
+get_aggregate_value <- function(
+    df,
+    group_cols = NULL,
+    vars = NULL,
+    include_missing = TRUE,
+    obfuscate_data = FALSE,
+    censored_value = 0) {
+  #### Warnings ####
+
+  checkmate::assert_data_frame(df, min.rows = 1)
+  checkmate::assert_list(vars, min.len = 1, any.missing = FALSE)
+  checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
+  checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
+  checkmate::assert_subset(group_cols, names(df), empty.ok = FALSE)
+  checkmate::assert_subset(unlist(vars), names(df), empty.ok = FALSE)
+  checkmate::assert_subset(
+    names(vars),
+    c("prop", "mean", "median", "prop_count"),
+    empty.ok = FALSE
+  )
+
+  prop_var <- vars[["prop"]]
+  mean_var <- vars[["mean"]]
+  median_var <- vars[["median"]]
+  prop_count_var <- vars[["prop_count"]]
+
+  numeric_vars <- c(prop_var, mean_var, median_var)
+
+  is_numeric <- sapply(df[, numeric_vars], is.numeric)
+
+  # Check if vars variables are numeric
+  if (!all(is_numeric)) {
+    non_numeric_vars <- numeric_vars[!is_numeric]
+    stop(paste0(
+      "Following values in 'vars' are not numeric:",
+      "\n",
+      paste(non_numeric_vars, collapse = "\n")
+    ))
+  }
+
+  #### Create the Groups ####
+  # Make all the grouping variables characters
+  df <- df |>
+    dplyr::mutate(
+      dplyr::across(
+        tidyselect::all_of(group_cols), as.character
+      )
+    )
+
+  # Return data frame
+  out <- data.frame()
+
+  # Get all the combinations of the variables
+  group_var_combinations <- do.call(
+    c,
+    lapply(
+      seq_along(group_cols) - 1,
+      utils::combn,
+      x = group_cols,
+      simplify = FALSE
+    )
+  )
+
+  group_var_combinations[[length(group_var_combinations) + 1]] <- group_cols
+
+
+  #### Calculation ####
+  # Get the variables and the corresponding statistic that is to be reported
+
+  # Create list to be used as argument .fns in across
+  prop_missing_list <- list(
+    total_non_missing = function(x) sum(!is.na(x)),
+    total_missing = function(x) sum(is.na(x)),
+    n = function(x) sum(x, na.rm = TRUE),
+    prop = function(x) sum(x, na.rm = TRUE) / sum(!is.na(x))
+  )
+
+  prop_list <- list(
+    n = function(x) sum(x, na.rm = TRUE),
+    prop = function(x) sum(x, na.rm = TRUE) / dplyr::n()
+  )
+
+
+  mean_list <- list(
+    mean = function(x) mean(x, na.rm = TRUE),
+    std = function(x) stats::sd(x, na.rm = TRUE)
+  )
+
+
+  median_list <- list(
+    median = function(x) stats::median(x, na.rm = TRUE),
+    quant_5 = function(x) stats::quantile(x, probs = 0.05, na.rm = TRUE),
+    quant_25 = function(x) stats::quantile(x, probs = 0.25, na.rm = TRUE),
+    quant_75 = function(x) stats::quantile(x, probs = 0.75, na.rm = TRUE),
+    quant_95 = function(x) stats::quantile(x, probs = 0.95, na.rm = TRUE)
+  )
+
+
+  if (include_missing) {
+    prop_fns <- prop_list
+  } else {
+    prop_fns <- prop_missing_list
+  }
+
+
+
+  # Perform the calculation
+  for (comb in group_var_combinations) {
+    all_cols <- setdiff(group_cols, comb)
+
+    temp <- df |>
+      dplyr::group_by(
+        dplyr::across(
+          tidyselect::all_of(comb)
+        )
+      ) |>
+      dplyr::summarise(
+        dplyr::across(
+          .cols = tidyselect::all_of(prop_var),
+          .fns = prop_fns
+        ),
+        dplyr::across(
+          .cols = tidyselect::all_of(mean_var),
+          .fns = mean_list
+        ),
+        dplyr::across(
+          .cols = tidyselect::all_of(median_var),
+          .fns = median_list
+        ),
+        dplyr::across(
+          .cols = tidyselect::all_of(prop_count_var),
+          .fns = ~ count_prop_wide(
+            .x,
+            include_missing = include_missing,
+            obfuscate_data = obfuscate_data,
+            censored_value = censored_value
+          ),
+          .unpack = TRUE
+        ),
+        total = dplyr::n(),
+        .groups = "drop"
+      )
+
+
+    for (cols in all_cols) {
+      # Change County variable to contain Riket not Alla
+      if (grepl("County", cols)) {
+        temp <- temp |>
+          dplyr::ungroup() |>
+          dplyr::mutate(!!dplyr::sym(cols) := "Riket")
+      } else {
+        temp <- temp |>
+          dplyr::ungroup() |>
+          dplyr::mutate(!!dplyr::sym(cols) := "Alla")
+      }
+    }
+
+
+    out <- dplyr::bind_rows(out, temp)
+  }
+
+  # Obfuscate the data with missing included.
+  if (obfuscate_data && include_missing) {
+    for (var in prop_var) {
+      out <- out |> RCStat::obfuscate_data(
+        total_var = "total",
+        count_var = paste0(var, "_n"),
+        prop_var = paste0(var, "_prop"),
+        censored_value = censored_value
+      )
+    }
+  } else if (obfuscate_data && !include_missing) {
+    # Obfuscate the data with missing not included.
+    for (var in prop_var) {
+      out <- out |> RCStat::obfuscate_data(
+        total_var = paste0(var, "_total_non_missing"),
+        count_var = paste0(var, "_n"),
+        prop_var = paste0(var, "_prop"),
+        censored_value = censored_value
+      )
+    }
+  }
+
+  if (obfuscate_data) {
+    out <- out |> RCStat::obfuscate_data(
+      total_var = "total",
+      statistics_vars = c(paste0(mean_var, "_mean"), paste0(median_var, "_median")),
+      censored_value = censored_value
+    )
+  }
+
+  return(out)
+}
+
+#' Summarise count into wide format
+#'
+#' Summarise a vector into columns of counts for each occurrence and each counts
+#' associated proportion
+#'
+#' @param x A vector, numeric or character
+#' @param include_missing logical indicating whether or not to include
+#' NA values
+#' @param obfuscate_data logical indicating whether or not to obfuscate data
+#' @param censored_value the value to replace censored proportions with
+
+count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored_value) {
+  checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
+  checkmate::assert_vector(x)
+  checkmate::assert(
+    checkmate::check_numeric(x),
+    checkmate::check_character(x),
+    combine = "or"
+  )
+  checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
+
+  use_na <- ifelse(include_missing, "ifany", "no")
+
+  tbl <- table(x, useNA = use_na)
+
+  res <- data.frame(tbl) |>
+    dplyr::rename(
+      n = "Freq"
+    ) |>
+    dplyr::mutate(
+      total = sum(.data[["n"]]),
+      prop = .data[["n"]] / .data[["total"]]
+    )
+
+  if (obfuscate_data) {
+    res <- RCStat::obfuscate_data(
+      data = res,
+      total_var = "total",
+      count_var = "n",
+      prop_var = "prop",
+      censored_value = censored_value,
+      liberal_obfuscation = TRUE
+    )
+  }
+
+  res <- res |>
+    tidyr::pivot_wider(
+      names_from = "x",
+      values_from = c("n", "prop")
+    )
+
+  if (include_missing) {
+    res <- dplyr::select(res, -tidyselect::all_of("total"))
+  }
+
+
+  return(res)
+}

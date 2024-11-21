@@ -36,6 +36,7 @@ Imports:
     tidyr,
     tidyselect,
     writexl,
-    curl
+    curl,
+    stringi
 LinkingTo: 
     Rcpp

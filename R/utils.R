@@ -221,7 +221,9 @@ sos_metadata <- function(dfs = list(),
     stop("Both file_names and dfs must be a list")
   }
 
-
+  if (!all(stringi::stri_enc_isascii(unlist(file_names)))) {
+    stop("file_names must only contain valid characters")
+  }
 
   for (i in seq_along(file_names)) {
     df <- dfs[[i]] |>

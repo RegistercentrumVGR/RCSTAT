@@ -1,4 +1,4 @@
-test_that("Metadata", {
+test_that("metadata", {
   df1 <- data.frame(
     a = 1:3,
     b = c(TRUE, TRUE, FALSE),
@@ -28,11 +28,13 @@ test_that("Metadata", {
   df2_res <- read.table("./Output/df2.csv", sep = ",", header = TRUE)
 
 
-  var_names_res <- readxl::read_xlsx("./Output/metadata.xlsx",
+  var_names_res <- readxl::read_xlsx(
+    "./Output/metadata.xlsx",
     sheet = "variabler"
   )
 
-  metadata_res <- readxl::read_xlsx("./Output/metadata.xlsx",
+  metadata_res <- readxl::read_xlsx(
+    "./Output/metadata.xlsx",
     sheet = "dataset"
   )
 
@@ -65,4 +67,27 @@ test_that("Metadata", {
   testthat::expect_equal(metadata_res, metadata)
 
   unlink("Output", recursive = TRUE)
+
+  expect_error({
+    sos_metadata(
+      dfs = list(df1, df2),
+      file_names = list("åäö1", "df2"),
+      output_dir = "Output",
+      zip_file_name = "zip_file",
+      separator = ",",
+      zip = FALSE
+    )
+  })
+
+  expect_error({
+    sos_metadata(
+      dfs = list(df1, df2),
+      file_names = list("Åabc1", "df2"),
+      output_dir = "Output",
+      zip_file_name = "zip_file",
+      separator = ",",
+      zip = FALSE
+    )
+  })
+
 })

@@ -10,9 +10,6 @@ include:
   - project: 'registercentrum/pipelines/r-package-ci'
     file: '/release.yml'
 
-variables:
-  RSCONNECT_IMAGE="rocker/shiny-verse:4.2.0"
-
 
 demo:
    stage: deploy

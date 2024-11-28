@@ -1,11 +1,15 @@
 stages:
   - test
   - build
+  - release
   - deploy
 
 include:
   - project: 'registercentrum/pipelines/r-package-ci'
     file: '/full-pipeline.yml'
+  - project: 'registercentrum/pipelines/r-package-ci'
+    file: '/release.yml'
+
 
 demo:
    stage: deploy

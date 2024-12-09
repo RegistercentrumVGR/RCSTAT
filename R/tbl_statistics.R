@@ -233,7 +233,8 @@ get_aggregate_value <- function(
 
   mean_list <- list(
     mean = function(x) mean(x, na.rm = TRUE),
-    std = function(x) stats::sd(x, na.rm = TRUE)
+    std = function(x) stats::sd(x, na.rm = TRUE),
+    total_non_missing = function(x) sum(!is.na(x))
   )
 
 
@@ -242,7 +243,8 @@ get_aggregate_value <- function(
     quant_5 = function(x) stats::quantile(x, probs = 0.05, na.rm = TRUE),
     quant_25 = function(x) stats::quantile(x, probs = 0.25, na.rm = TRUE),
     quant_75 = function(x) stats::quantile(x, probs = 0.75, na.rm = TRUE),
-    quant_95 = function(x) stats::quantile(x, probs = 0.95, na.rm = TRUE)
+    quant_95 = function(x) stats::quantile(x, probs = 0.95, na.rm = TRUE),
+    total_non_missing = function(x) sum(!is.na(x))
   )
 
 
@@ -333,10 +335,19 @@ get_aggregate_value <- function(
 
   if (obfuscate_data) {
     out <- out |> RCStat::obfuscate_data(
-      total_var = "total",
-      statistics_vars = c(paste0(mean_var, "_mean"), paste0(median_var, "_median")),
-      censored_value = censored_value
-    )
+      total_var = paste0(mean_var, "_total_non_missing"),
+      statistics_vars = c(
+        paste0(mean_var, "_mean"),
+        paste0(mean_var, "_std")
+        ),
+      censored_value = censored_value,
+      other_count_vars = "total"
+    ) |>
+      obfuscate_data(
+        total_var = paste0(median_var, "_median"),
+        statistics_vars = paste0(median_var, "_median"),
+        censored_value = censored_value
+      )
   }
 
   return(out)

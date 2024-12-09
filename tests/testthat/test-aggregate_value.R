@@ -40,17 +40,17 @@ test_that("get_aggregate_value works", {
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
-    ~z_mean, ~z_std, ~total, ~County, ~unit,
-    4.5, 1.87082869338697, 6L, "Riket", "Alla",
-    2.5, 0.707106781186548, 2L, "a", "Alla",
-    5, 1, 3L, "b", "Alla",
-    7, NA, 1L, "c", "Alla",
-    2.5, 0.707106781186548, 2L, "Riket", "1",
-    5, 1, 3L, "Riket", "2",
-    7, NA, 1L, "Riket", "3",
-    2.5, 0.707106781186548, 2L, "a", "1",
-    5, 1, 3L, "b", "2",
-    7, NA, 1L, "c", "3"
+    ~z_mean, ~z_std, ~z_total_non_missing, ~total, ~County, ~unit,
+    4.5, 1.87082869338697, 6L, 6L, "Riket", "Alla",
+    2.5, 0.707106781186548, 2L, 2L, "a", "Alla",
+    5, 1, 3L, 3L, "b", "Alla",
+    7, NA, 1L, 1L, "c", "Alla",
+    2.5, 0.707106781186548, 2L, 2L, "Riket", "1",
+    5, 1, 3L, 3L, "Riket", "2",
+    7, NA, 1L, 1L, "Riket", "3",
+    2.5, 0.707106781186548, 2L, 2L, "a", "1",
+    5, 1, 3L, 3L, "b", "2",
+    7, NA, 1L, 1L, "c", "3"
   )
 
   expect_equal(res, expected_res)
@@ -132,6 +132,25 @@ test_that("get_aggregate_value works", {
       vars = list(mean = "y")
     )
   })
+
+  res <- data.frame(
+    x = c(sample(1:10, 4), rep(NA, 11)),
+    y = 1
+  ) |>
+    get_aggregate_value(
+      group_cols = "y",
+      vars = list(mean = "x"),
+      obfuscate = TRUE
+    ) |>
+    tibble::as.tibble()
+
+  expected_res <- tibble::tribble(
+    ~x_mean, ~x_std, ~x_total_non_missing, ~total, ~y,
+    NA_integer_, NA_integer_, 0, 20, "Alla",
+    NA_integer_, NA_integer_, 0, 20, "1"
+  )
+
+  expect_equal(res, expected_res)
 
   expect_error({
     get_aggregate_value(

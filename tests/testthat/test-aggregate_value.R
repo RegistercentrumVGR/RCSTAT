@@ -132,6 +132,14 @@ test_that("get_aggregate_value works", {
       vars = list(mean = "y")
     )
   })
+
+  expect_error({
+    get_aggregate_value(
+      df,
+      vars = list(mean = "County")
+    )
+  })
+
 })
 
 test_that("prop_count works", {
@@ -299,5 +307,19 @@ test_that("prop_count works", {
     dplyr::pull(.data[["ok"]]) |>
     all() |>
     expect_true()
+
+  df <- data.frame(
+    unit = c(rep("a", 3), rep("b", 3)),
+    category = c(1:3, rep(NA, 3))
+  )
+
+  expect_no_error({
+    get_aggregate_value(
+      df,
+      group_cols = "unit",
+      vars = list(prop_count = "category"),
+      include_missing = FALSE
+    )
+  })
 
 })

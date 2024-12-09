@@ -182,17 +182,11 @@ get_aggregate_value <- function(
 
   numeric_vars <- c(prop_var, mean_var, median_var)
 
-  is_numeric <- sapply(df[, numeric_vars], is.numeric)
-
   # Check if vars variables are numeric
-  if (!all(is_numeric)) {
-    non_numeric_vars <- numeric_vars[!is_numeric]
-    stop(paste0(
-      "Following values in 'vars' are not numeric:",
-      "\n",
-      paste(non_numeric_vars, collapse = "\n")
-    ))
-  }
+  checkmate::assert_data_frame(
+    dplyr::select(df, tidyselect::all_of(numeric_vars)),
+    types = c("numeric", "logical")
+  )
 
   #### Create the Groups ####
   # Make all the grouping variables characters
@@ -372,6 +366,10 @@ count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored
   use_na <- ifelse(include_missing, "ifany", "no")
 
   tbl <- table(x, useNA = use_na)
+
+  if (nrow(tbl) == 0) {
+    return(NA)
+  }
 
   res <- data.frame(tbl) |>
     dplyr::rename(

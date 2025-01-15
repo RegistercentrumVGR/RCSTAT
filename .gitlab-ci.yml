@@ -1,38 +1,170 @@
+---
 stages:
   - test
   - build
   - release
   - deploy
 
-include:
-  - project: 'registercentrum/pipelines/r-package-ci'
-    file: '/full-pipeline.yml'
-  - project: 'registercentrum/pipelines/r-package-ci'
-    file: '/release.yml'
+.install_r_package_dev_deps:
+  image: rocker/r-ver:4.2.0
+  before_script:
+    - echo 'INSTALL SYSTEM DEPENDENCIES'
+    - apt-get update
+    - >
+      Rscript -e 'install.packages("pak",
+        repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s",
+        .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+    - Rscript -e 'pak::pak(pkg = "gitcreds")'
+    - echo 'SET GIT CREDENTIALS'
+    - git config --global credential.helper store
+    - >
+      echo "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com"
+      > ~/.git-credentials
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - >
+      echo "options(
+        repos = c(
+            CRAN = 'https://cloud.r-project.org',
+            PPM = 'https://packagemanager.posit.co/cran/__linux__/focal/latest'
+          )
+        )">>\
+         ${R_HOME}/etc/Rprofile.site
+    - Rscript -e 'pak::pak(c("MASS@7.3-60.2", "Matrix@1.6-5"))'
+    - Rscript -e 'pak::local_install_dev_deps()'
 
 
-demo:
-   stage: deploy
-   tags:
-     - rc-rdemo
-   before_script: []
-   script: .\PsScripts\deploy.ps1
-   environment:
-     name: demo
-   only:
-    refs:
-      - master
-   when: manual
 
-prod:
-   stage: deploy
-   tags:
-     - rc-r
-   before_script: []
-   script: .\PsScripts\deploy.ps1
-   environment:
-     name: prod
-   only:
-    refs:
-      - master
-   when: manual
+lint:
+  stage: test
+  extends: .install_r_package_dev_deps
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+  variables:
+    LINTR_ERROR_ON_LINT: true
+  script:
+    - >
+      Rscript -e 'pak::pkg_install(c("devtools", "lintr"))'
+    - echo "Lint package"
+    - Rscript -e "devtools::load_all();lintr::lint_package()"
+
+
+Testthat JUnit report:
+  stage: test
+  extends: .install_r_package_dev_deps
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+  script:
+    # Install libxt-dev for Cairo R-package
+    # that fails to compile otherwise
+    - apt-get install -y libxt-dev
+    - >
+      Rscript -e 'pak::pkg_install(
+        c("devtools", "testthat", "covr", "DT", "htmltools"),
+        dependencies = TRUE)'
+    - echo "Lint package"
+    - >
+      Rscript -e 'testthat::test_local(
+        reporter = testthat::JunitReporter$new(
+          file = "../../junit_result.xml"))'
+    - Rscript -e 'pak::pkg_install("local::.")'
+    - Rscript -e "covr::gitlab(quiet = FALSE)"
+  coverage: '/Coverage: \d+\.\d+/'
+  artifacts:
+    paths:
+      - public
+    reports:
+      junit: junit_result.xml
+
+Check package:
+  stage: test
+  extends: .install_r_package_dev_deps
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+  script:
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - >
+      Rscript -e 'pak::pkg_install(c("devtools", "Rcpp", "rcmdcheck"))'
+    - echo "CHECK PACKAGE"
+    - >
+      Rscript -e 'rcmdcheck::rcmdcheck(
+        args = c("--no-manual", "--no-build-vignettes", "--no-tests"),
+        error_on = "note")'
+
+R Package:
+  stage: build
+  extends: .install_r_package_dev_deps
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+  script:
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - >
+      Rscript -e 'pak::pkg_install(c("devtools", "Rcpp", "rcmdcheck"))'
+    - echo "BUILD PACKAGE"
+    - R CMD build . --no-build-vignettes --no-manual
+  artifacts:
+    paths:
+      - "*.tar.gz"
+
+check_version_bump:
+  image: debian:stable-slim
+  stage: test
+  rules:
+    # Only run on MR to master/main
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH
+      when: never
+  script:
+    - echo "Check that version is bumped before merge to release branch"
+    - apt-get update
+    - apt-get install -y git
+    - git fetch origin $CI_DEFAULT_BRANCH
+    - git show origin/$CI_DEFAULT_BRANCH:DESCRIPTION > default_branch_desc
+    - echo "$(awk '/Version:/ { print $2 }' DESCRIPTION)" >> version_branch
+    - >
+      echo "$(awk '/Version:/ { print $2 }' default_branch_desc)" >> \
+        version_default_branch
+    - cmp version_branch version_default_branch && exit 1 || exit 0
+
+
+pages:
+  stage: build
+  extends: .install_r_package_dev_deps
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo 'INSTALL R PACKAGE DEPENDENCIES'
+    - >
+      Rscript -e 'pak::pkg_install(
+        c("devtools", "pkgdown"),
+        dependencies = TRUE)'
+    - echo 'BUILD SITE'
+    - Rscript -e 'pkgdown::build_site(lazy = TRUE, preview = FALSE)'
+    - mv docs public
+  artifacts:
+    paths:
+      - public
+
+deploy:
+  stage: deploy
+  tags:
+    - $RUNNER_TAGS
+  parallel:
+    matrix:
+      - RUNNER_TAGS:
+        - rc-rdemo
+        - rc-r
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script: .\PsScripts\deploy.ps1

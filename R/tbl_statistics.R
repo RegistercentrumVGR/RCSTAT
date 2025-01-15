@@ -339,7 +339,7 @@ get_aggregate_value <- function(
       statistics_vars = c(
         paste0(mean_var, "_mean"),
         paste0(mean_var, "_std")
-        ),
+      ),
       censored_value = censored_value,
       other_count_vars = "total"
     ) |>

@@ -137,6 +137,38 @@ check_version_bump:
         version_default_branch
     - cmp version_branch version_default_branch && exit 1 || exit 0
 
+get_version:
+  image: alpine
+  stage: release
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo "Get version from DESCRIPTION file to use in release and tag"
+    - >
+      echo "TAG=v$(awk '/Version:/ { print $2 }' DESCRIPTION)" >> \
+        variables.env
+  artifacts:
+    reports:
+      dotenv: variables.env
+
+release_job:
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  stage: release
+  needs:
+    - job: get_version
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo "Running release_job for $TAG"
+  release:
+    tag_name: '$TAG'
+    description: 'Automatic tag and release using $TAG'
+    ref: '$CI_COMMIT_SHA'
 
 pages:
   stage: build

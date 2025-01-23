@@ -135,7 +135,15 @@ check_version_bump:
     - >
       echo "$(awk '/Version:/ { print $2 }' default_branch_desc)" >> \
         version_default_branch
-    - cmp version_branch version_default_branch && exit 1 || exit 0
+    # Check that versions are different
+    - cmp version_branch version_default_branch && exit 1 || echo "Versions are different"
+    # Create file with both versions
+    # Small version first
+    - cat version_default_branch > both_versions
+    # branch should be larger version
+    - cat version_branch >> both_versions
+    # Sort both_versions and check if sorted version is same as original
+    - sort --version-sort both_versions | cmp both_versions && echo "Version is increased" || exit 1
 
 get_version:
   image: alpine

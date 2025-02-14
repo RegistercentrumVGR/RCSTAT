@@ -295,8 +295,8 @@ get_aggregate_value <- function(
 
 
     for (cols in all_cols) {
-      # Change County variable to contain Riket not Alla
-      if (grepl("County", cols)) {
+      # Change County and Unit variables to contain Riket not Alla
+      if (grepl("County|Unit", cols)) {
         temp <- temp |>
           dplyr::ungroup() |>
           dplyr::mutate(!!dplyr::sym(cols) := "Riket")

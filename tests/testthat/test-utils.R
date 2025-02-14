@@ -77,3 +77,41 @@ test_that("Gender can be calculated from pnr ", {
     calculated_genders
   )
 })
+
+test_that("pseudonymizing data works", {
+  res <- pseudonymize_data(
+    df = dummy_data,
+    pseudonimzed_var = "lopnr",
+    subject_key = "id",
+    remove_subject_key = FALSE,
+    save_key = FALSE
+  )
+
+  expect_true("lopnr" %in% names(res))
+  expect_true("id" %in% names(res))
+
+  res <- pseudonymize_data(
+    df = dummy_data,
+    pseudonimzed_var = "abc",
+    subject_key = "id",
+    remove_subject_key = TRUE,
+    save_key = FALSE
+  )
+
+  expect_true("abc" %in% names(res))
+  expect_true(!"id" %in% names(res))
+
+  res <- pseudonymize_data(
+    df = dummy_data,
+    pseudonimzed_var = "abc",
+    subject_key = "id",
+    remove_subject_key = TRUE,
+    save_key = TRUE,
+    key_file_dir = "."
+  )
+
+  expect_true(file.exists("abc.xlsx"))
+  expect_named(readxl::read_xlsx("abc.xlsx"), c("id", "abc"))
+})
+
+withr::defer(unlink("abc.xlsx"), teardown_env())

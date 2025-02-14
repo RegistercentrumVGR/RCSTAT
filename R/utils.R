@@ -292,3 +292,53 @@ sos_metadata <- function(dfs = list(),
     }
   }
 }
+
+#' Pseudonymizes a data.frame
+#'
+#' @param df the data.frame to pseudonymize
+#' @param pseudonimzed_var the name of the variable to store the key in
+#' @param subject_key the name of the variable containing the subject identifier
+#' @param remove_subject_key whether to remove the variable after adding the keys
+#' @param save_key whether to save the key as an Excel-file
+#' @param key_file_dir the directory in which to save the key
+#'
+#' @return the data.frame passed to `df` with a pseudonymized variable added
+#' @export
+pseudonymize_data <- function(df,
+                              pseudonimzed_var = "lopnr",
+                              subject_key = "SubjectKey",
+                              remove_subject_key = TRUE,
+                              save_key = TRUE,
+                              key_file_dir) {
+
+  checkmate::assert_data_frame(df)
+  checkmate::assert_subset(subject_key, names(df))
+  checkmate::assert_character(pseudonimzed_var, len = 1)
+  checkmate::assert_logical(remove_subject_key, len = 1)
+  checkmate::assert_logical(save_key, len = 1)
+
+  if (save_key) {
+    checkmate::assert(
+      checkmate::check_character(key_file_dir),
+      checkmate::check_directory_exists(key_file_dir),
+      combine = "and"
+    )
+  }
+
+  keys <- df |>
+    dplyr::distinct(.data[[subject_key]]) |>
+    dplyr::mutate(!!pseudonimzed_var := seq_len(dplyr::n()))
+
+  if (save_key) {
+    if (!grepl("/$", key_file_dir)) {
+      key_file_dir <- paste0(key_file_dir, "/")
+    }
+    writexl::write_xlsx(keys, sprintf("%s%s.xlsx", key_file_dir, pseudonimzed_var))
+  }
+
+  df <- dplyr::left_join(df, keys, by = subject_key)
+  if (remove_subject_key) {
+    df <- dplyr::select(df, -tidyselect::all_of(subject_key))
+  }
+  return(df)
+}

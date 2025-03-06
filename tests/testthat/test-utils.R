@@ -115,3 +115,25 @@ test_that("pseudonymizing data works", {
 })
 
 withr::defer(unlink("abc.xlsx"), teardown_env())
+
+test_that("random_password works", {
+  # Test errors
+  expect_no_error(
+    random_password()
+  )
+
+  # Test erranous char_types
+  expect_error(
+    random_password(
+      char_types = c("U")
+    )
+  )
+
+  # Test password_length
+  random_password(
+    password_length = 10
+  ) |>
+    expect_type("character") |>
+    stringr::str_length() |>
+    expect_equal(10)
+})

@@ -93,18 +93,18 @@ gender <- function(x) {
 #' @title Random password
 #'
 #' @param char_types Possible character types to use in password as vector.
-#' Documentation on API:
-#' https://www.passwordrandom.com/pronounceable-password-generator
+#' Available char_types:
 #'      Syntax:
-#'        L - upper case letter; l (small L) - lower case letter;
-#'        R or r - random case letter;
-#'        N or n - number (0-9);
+#'        L - upper case letter;
+#'        l (small L) - lower case letter;
+#'        R - random case letter;
+#'        N - number (0-9);
 #'        # - symbol (!@#$.+);
 #'        ! - all symbols;
-#'        C - upper case consonant letter;
-#'        c - lower case consonant letter;
-#'        V - upper case vowel letter;
-#'        v - lower case vowel letter;
+#'        C - upper case consonant letter (english consonants);
+#'        c - lower case consonant letter (english consonants);
+#'        V - upper case vowel letter (english vowels);
+#'        v - lower case vowel letter (english vowels);
 #' @param password_length integer, number of characters in password
 #'
 #' @export
@@ -114,32 +114,50 @@ gender <- function(x) {
 random_password <- function(
     char_types = c("R", "N", "!"),
     password_length = 15) {
-  # Generera slumpmässig struktur för lösenord
-  schema_pass <- paste0(sample(
+
+  checkmate::assert_subset(
     char_types,
-    size = password_length,
-    replace = TRUE
-  ), collapse = "")
+    c("L", "l", "R", "N", "!", "#", "C", "c", "V", "v"),
+    empty.ok = FALSE
+  )
 
-  # Skapa API-anrop
-  query <-
-    paste0(
-      "https://www.passwordrandom.com/query?command=password&scheme=",
-      schema_pass
-    )
+  checkmate::assert_count(password_length)
 
-  # Hämta från API
-  random_password <-
-    httr::content(
-      httr::GET(
-        query,
-        encoding = "UTF-8"
-      ),
-      as = "text",
-      encoding = "UTF-8"
-    )
+  # List of the types of tokens available in the password
+  tokens <- list(
+    "L" = LETTERS,
+    "l" = letters,
+    "R" = c(LETTERS, letters),
+    "N" = 0:9,
+    "!" = c("!", "@", "#", "$", ".", "+", "%", "&", "/", "(", ")", "?", "\\"),
+    "#" = c("!", "@", "#", "$", ".", "+"),
+    "C" = c(
+      "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S",
+      "T", "V", "W", "X", "Y", "Z"
+    ),
+    "c" = c(
+      "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s",
+      "t", "v", "w", "x", "y", "z"
+    ),
+    "V" = c("A", "E", "I", "O", "U"),
+    "v" = c("a", "e", "i", "o", "u")
+  )
 
-  return(random_password)
+  # Sample the available tokens with replecment password_length-times.
+  password <- paste0(
+    sample(
+      unique(
+        unlist(
+          tokens[char_types]
+        )
+      ), # The chosen subset of tokens
+      password_length,
+      replace = TRUE
+    ),
+    collapse = ""
+  )
+
+  return(password)
 }
 
 #' zips chosen directory with password protection. Zip-file and

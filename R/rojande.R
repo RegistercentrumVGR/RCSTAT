@@ -113,7 +113,7 @@ obfuscate_data <- function(
           dplyr::across(
             tidyselect::any_of(prop_var),
             ~ dplyr::case_when(
-              .data[[total_var]] < 15 ~ 0,
+              .data[[total_var]] < 15 ~ censored_value,
               .data[[total_var]] < 45 ~ dplyr::if_else(
                 rep(any(.data[[count_var]] < 5), dplyr::n()),
                 rep(censored_value, dplyr::n()),

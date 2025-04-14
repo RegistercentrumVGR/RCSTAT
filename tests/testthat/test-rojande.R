@@ -230,6 +230,26 @@ test_that("censored_value works", {
   )
 
   expect_equal(res, expected_res)
+
+  res <- data.frame(
+    unit = "a",
+    n = c(3, 4, 10),
+    total = 17
+  ) |>
+    dplyr::mutate(prop = n / total) |>
+    dplyr::group_by(unit) |>
+    obfuscate_data(censored_value = -1) |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~unit, ~n, ~total, ~prop,
+    "a",  0,     20,    -1,
+    "a",  0,     20,    -1,
+    "a", 10,     20,    -1
+  )
+
+  expect_equal(res, expected_res)
+
 })
 
 test_that("round_statistics_digits list works", {

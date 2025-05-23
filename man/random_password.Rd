@@ -8,18 +8,18 @@ random_password(char_types = c("R", "N", "!"), password_length = 15)
 }
 \arguments{
 \item{char_types}{Possible character types to use in password as vector.
-Documentation on API:
-https://www.passwordrandom.com/pronounceable-password-generator
+Available char_types:
      Syntax:
-       L - upper case letter; l (small L) - lower case letter;
-       R or r - random case letter;
-       N or n - number (0-9);
+       L - upper case letter;
+       l (small L) - lower case letter;
+       R - random case letter;
+       N - number (0-9);
        # - symbol (!@#$.+);
        ! - all symbols;
-       C - upper case consonant letter;
-       c - lower case consonant letter;
-       V - upper case vowel letter;
-       v - lower case vowel letter;}
+       C - upper case consonant letter (english consonants);
+       c - lower case consonant letter (english consonants);
+       V - upper case vowel letter (english vowels);
+       v - lower case vowel letter (english vowels);}
 
 \item{password_length}{integer, number of characters in password}
 }

@@ -4,7 +4,12 @@
 \alias{validate_vis}
 \title{Validates a VIS data.frame}
 \usage{
-validate_vis(df, overall_rate = 0.25, measure_rate = 0.75)
+validate_vis(
+  df,
+  overall_rate = 0.25,
+  measure_rate = 0.75,
+  as_data_frame = FALSE
+)
 }
 \arguments{
 \item{df}{VIS data.frame}
@@ -12,6 +17,8 @@ validate_vis(df, overall_rate = 0.25, measure_rate = 0.75)
 \item{overall_rate}{the overall censor rate to warn at}
 
 \item{measure_rate}{the per-MeasureID censor rate to warn at}
+
+\item{as_data_frame}{whether to return the errors in a data.frame}
 }
 \value{
 a character vector of error messages

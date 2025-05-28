@@ -38,14 +38,14 @@ test_that("check_instruction works", {
     RegisterHSAID = "abc"
   ) |>
     check_instruction() |>
-    expect_equal("First cell does not contain keep or delete existing instruction")
+    expect_equal("First cell does not contain correct keep or delete existing instruction")
 
   data.frame(
     MeasureID = NA,
     RegisterHSAID = "DELETE_EXISTING_DATA_FOR_REGISTER_HSAID:abc"
   ) |>
     check_instruction() |>
-    expect_equal("First cell does not contain keep or delete existing instruction")
+    expect_equal("First cell does not contain correct keep or delete existing instruction")
 
   data.frame(
     RegisterHSAID = "DELETE_EXISTING_DATA_FOR_REGISTER_HSAID:abc"
@@ -638,6 +638,125 @@ test_that("validate_vis works", {
       paste0("MeasureID 1, period 2000-01-01-2000-12-31, RegionOrganisationId 01, unit/hospital name a",
              " is missing Numerator where Rate is present")
     )
+
+  data.frame(
+    RegionOrganisationId = "01",
+    RegionName = "Stockholm",
+    UnitName = "a",
+    UnitHSAID = 1,
+    HospitalName = NA,
+    HospitalHSAID = NA,
+    Rate = 0.5,
+    Numerator = NA,
+    Denominator = 10,
+    ReasonCode = NA,
+    PeriodReportedStartDate = lubridate::ymd("2000-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2000-12-31"),
+    MeasureID = 1,
+    HospitalOrganisationId = NA,
+    CountryName = "Sverige",
+    Value = NA,
+    Cohort = NA,
+    Version = 1,
+    ReferenceIntervalRate = NA,
+    ReferenceIntervalValue = NA,
+    MunicipalityOrganisationID = NA,
+    MunicipalityName = NA,
+    RegisterHSAID = 1,
+    RegisterNamn = "abc",
+    Coverage = NA,
+    ConfidenceIntervalLower = NA,
+    ConfidenceIntervalHigher = NA,
+    Standarddeviation = NA,
+    Measurepopulation = NA,
+    Exclusions = NA
+  ) |>
+    validate_vis() |>
+    expect_equal("First cell does not contain correct keep or delete existing instruction")
+
+  data.frame(
+    RegionOrganisationId = "01",
+    RegionName = "Stockholm",
+    UnitName = "a",
+    UnitHSAID = 1,
+    HospitalName = NA,
+    HospitalHSAID = NA,
+    Rate = 0.5,
+    Numerator = NA,
+    Denominator = 10,
+    ReasonCode = NA,
+    PeriodReportedStartDate = lubridate::ymd("2000-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2000-12-31"),
+    MeasureID = 1,
+    HospitalOrganisationId = NA,
+    CountryName = "Sverige",
+    Value = NA,
+    Cohort = NA,
+    Version = 1,
+    ReferenceIntervalRate = NA,
+    ReferenceIntervalValue = NA,
+    MunicipalityOrganisationID = NA,
+    MunicipalityName = NA,
+    RegisterHSAID = 1,
+    RegisterNamn = "abc",
+    Coverage = NA,
+    ConfidenceIntervalLower = NA,
+    ConfidenceIntervalHigher = NA,
+    Standarddeviation = NA,
+    Measurepopulation = NA,
+    Exclusions = NA
+  ) |>
+    dplyr::add_row(
+      RegionOrganisationId = "DELETE_EXISTING_DATA_FOR_REGISTER_HSAID:1",
+      .after = 1
+    ) |>
+    validate_vis() |>
+    expect_equal("First cell does not contain correct keep or delete existing instruction")
+
+  data.frame(
+    RegionOrganisationId = "01",
+    RegionName = "Stockholm",
+    UnitName = "a",
+    UnitHSAID = 1,
+    HospitalName = NA,
+    HospitalHSAID = NA,
+    Rate = 0.5,
+    Numerator = NA,
+    Denominator = 10,
+    ReasonCode = NA,
+    PeriodReportedStartDate = lubridate::ymd("2000-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2000-12-31"),
+    MeasureID = 1,
+    HospitalOrganisationId = NA,
+    CountryName = "Riket",
+    Value = NA,
+    Cohort = NA,
+    Version = 1,
+    ReferenceIntervalRate = NA,
+    ReferenceIntervalValue = NA,
+    MunicipalityOrganisationID = NA,
+    MunicipalityName = NA,
+    RegisterHSAID = 1,
+    RegisterNamn = "abc",
+    Coverage = NA,
+    ConfidenceIntervalLower = NA,
+    ConfidenceIntervalHigher = NA,
+    Standarddeviation = NA,
+    Measurepopulation = NA,
+    Exclusions = NA
+  ) |>
+    dplyr::add_row(
+      RegionOrganisationId = "DELETE_EXISTING_DATA_FOR_REGISTER_HSAID:1",
+      .before = 1
+    ) |>
+    validate_vis(as_data_frame = TRUE) |>
+    expect_equal(
+      data.frame(
+        errors = paste0("MeasureID 1, period 2000-01-01-2000-12-31, RegionOrganisationId 01, unit/hospital name a is",
+                        " missing Numerator where Rate is present")
+      )
+    )
+
 })
 
 test_that("check_unit_hospital works", {
@@ -719,5 +838,35 @@ test_that("check_reasoncode works", {
   ) |>
     check_reasoncode() |>
     expect_equal("ReasonCode contains disallowed values: abc, woops")
+
+})
+
+test_that("check_countryname works", {
+
+  data.frame(
+    CountryName = c("abc", "riket", "Riket", NA)
+  ) |>
+    check_countryname() |>
+    expect_equal("CountryName contains disallowed values: abc, NA")
+
+})
+
+test_that("check_measureid works", {
+
+  data.frame(
+    MeasureID = c("abc", NA)
+  ) |>
+    check_measureid() |>
+    expect_equal("MeasureID is NA in at least one row")
+
+})
+
+test_that("check_version works", {
+
+  data.frame(
+    Version = c("abc", NA, 1, 2)
+  ) |>
+    check_version() |>
+    expect_equal("Version contains disallowed values: abc, NA")
 
 })

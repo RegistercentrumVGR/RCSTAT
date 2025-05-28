@@ -17,22 +17,31 @@
 #' @param df VIS data.frame
 #' @param overall_rate the overall censor rate to warn at
 #' @param measure_rate the per-MeasureID censor rate to warn at
+#' @param as_data_frame whether to return the errors in a data.frame
 #'
 #' @return a character vector of error messages
 #' @export
 #' @md
-validate_vis <- function(df, overall_rate = 0.25, measure_rate = 0.75) {
+validate_vis <- function(df, overall_rate = 0.25, measure_rate = 0.75, as_data_frame = FALSE) {
   name_errors <- check_names(df)
 
   if (!is.null(name_errors)) {
-    return(name_errors)
+    return(return_errors(name_errors, as_data_frame))
   }
 
   errors <- c()
 
   errors <- c(
     errors,
-    check_instruction(df),
+    check_instruction(df)
+  )
+
+  if (!is.null(errors)) {
+    return(return_errors(errors, as_data_frame))
+  }
+
+  errors <- c(
+    errors,
     check_register_hsaid(df)
   )
 
@@ -52,7 +61,21 @@ validate_vis <- function(df, overall_rate = 0.25, measure_rate = 0.75) {
     check_unit_hospital(df)
   )
 
-  return(errors)
+  return(return_errors(errors, as_data_frame))
+}
+
+#' Format errors before return
+#'
+#' @param errors the vector of errors
+#' @param as_data_frame logical indicating whether to return a data.frame or vector
+#'
+#' @return a data.frame or vector of errors
+return_errors <- function(errors, as_data_frame) {
+  if (as_data_frame) {
+    return(data.frame(errors = errors))
+  } else {
+    return(errors)
+  }
 }
 
 #' Checks if the first cell in the row contains a KEEP or DELETE existing
@@ -66,10 +89,10 @@ check_instruction <- function(df) {
   first <- df |>
     dplyr::slice(1) |>
     dplyr::pull(1) |>
-    grepl(pattern = "^(KEEP|DELETE)_EXISTING")
+    grepl(pattern = "^(KEEP|DELETE)_EXISTING_DATA_FOR_REGISTER_HSAID:.+$")
 
   if (!first) {
-    return("First cell does not contain keep or delete existing instruction")
+    return("First cell does not contain correct keep or delete existing instruction")
   }
 }
 
@@ -945,6 +968,77 @@ check_unit_hospital <- function(df) {
 
   return(errors)
 
+}
+
+#' Checks that MeasureIDs have a value
+#'
+#' @param df VIS data.frame
+#'
+#' @return vector of error messages
+#' @md
+check_measureid <- function(df) {
+  errors <- c()
+  if (any(is.na(df$MeasureID))) {
+    errors <- c(
+      errors,
+      "MeasureID is NA in at least one row"
+    )
+  }
+  return(errors)
+}
+
+#' Checks that CountryName only contains the value "Riket"
+#'
+#' @param df VIS data.frame
+#'
+#' @return vector of error messages
+#' @md
+check_countryname <- function(df) {
+  errors <- c()
+  tmp <- df |>
+    dplyr::filter(tolower(.data$CountryName) != "riket" | is.na(.data$CountryName))
+
+  if (nrow(tmp) > 0) {
+    values <- tmp |>
+      dplyr::distinct(.data$CountryName) |>
+      dplyr::pull(.data$CountryName)
+    errors <- c(
+      errors,
+      sprintf(
+        "CountryName contains disallowed values: %s",
+        paste0(values, collapse = ", ")
+      )
+    )
+  }
+
+  return(errors)
+}
+
+#' Checks that Version is correct
+#'
+#' @param df VIS data.frame
+#'
+#' @return vector of error messages
+#' @md
+check_version <- function(df) {
+  errors <- c()
+  tmp <- df |>
+    dplyr::filter(!grepl("^\\d+$", .data$Version) | is.na(.data$Version))
+
+  if (nrow(tmp) > 0) {
+    values <- tmp |>
+      dplyr::distinct(.data$Version) |>
+      dplyr::pull(.data$Version)
+    errors <- c(
+      errors,
+      sprintf(
+        "Version contains disallowed values: %s",
+        paste0(values, collapse = ", ")
+      )
+    )
+  }
+
+  return(errors)
 }
 
 #' Get a vector of expect variable names for a VIS file

@@ -10,7 +10,9 @@ test_that("metadata", {
     a = 1:4,
     b = c(TRUE, TRUE, FALSE, FALSE),
     c = rep("abc657", 4),
-    d = rep("abcdefgh", 4)
+    d = rep("abcdefgh", 4),
+    date = Sys.Date(),
+    time = Sys.time()
   )
 
   dir.create("Output")
@@ -24,9 +26,12 @@ test_that("metadata", {
     zip = FALSE
   )
 
-  df1_res <- read.table("./Output/df1.csv", sep = ",", header = TRUE)
-  df2_res <- read.table("./Output/df2.csv", sep = ",", header = TRUE)
+  df1_res <- data.table::fread("./Output/df1.csv", sep = ",", header = TRUE) |>
+    as.data.frame()
+  df2_res <- data.table::fread("./Output/df2.csv", sep = ",", header = TRUE) |>
+    as.data.frame()
 
+  attr(df2_res$time, "tzone") <- NULL
 
   var_names_res <- readxl::read_xlsx(
     "./Output/metadata.xlsx",
@@ -44,18 +49,18 @@ test_that("metadata", {
     separator = rep(",", 2),
     end_of_line = rep("CRLF", 2),
     nrows = c(3, 4),
-    ncols = c(3, 4)
+    ncols = c(3, 6)
   )
 
   var_names <- data.frame(
-    filename = c(rep("df1.csv", 3), rep("df2.csv", 4)),
-    variable = c(c("a", "b", "c"), c("a", "b", "c", "d")),
-    position_in_file = c(1:3, 1:4),
+    filename = c(rep("df1.csv", 3), rep("df2.csv", 6)),
+    variable = c(c("a", "b", "c"), c("a", "b", "c", "d", "date", "time")),
+    position_in_file = c(1:3, 1:6),
     type = c(
       "integer", "logical", "character", "integer", "logical",
-      "character", "character"
+      "character", "character", "Date", "POSIXt"
     ),
-    length = c(1, 1, 3, 1, 1, 6, 8)
+    length = c(1, 1, 3, 1, 1, 6, 8, 10, 19)
   )
 
   var_names <- tibble::tibble(var_names)

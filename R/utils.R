@@ -275,23 +275,22 @@ sos_metadata <- function(dfs = list(),
       variable = names(dfs[[i]]),
       position_in_file = seq_along(dfs[[i]]),
       type = purrr::map_chr(dfs[[i]], \(x) utils::tail(class(x), 1)),
-      length =
-        dplyr::if_else(
-          # Ovan väljer vi att exportera logicals som 0/1 även om det är
-          # TRUE/FALSE i dt_out
-          .data$type == "logical", as.integer(1),
-          purrr::map_int(
-            dfs[[i]],
-            function(x) {
-              str_len <- stringr::str_length(x)
-              if (all(is.na(str_len))) {
-                return(1)
-              } else {
-                return(max(str_len, na.rm = TRUE))
-              }
-            }
-          )
-        )
+      length = purrr::map_int(
+        dfs[[i]],
+        function(x) {
+          if (inherits(x, "logical")) {
+            return(1)
+          } else if (all(is.na(x))) {
+            return(1)
+          } else if (inherits(x, "Date")) {
+            return(stringr::str_length(x[1]))
+          } else if (inherits(x, "POSIXct")) {
+            return(stringr::str_length(x[1]))
+          } else {
+            return(max(stringr::str_length(x), na.rm = TRUE))
+          }
+        }
+      )
     )
   })
 

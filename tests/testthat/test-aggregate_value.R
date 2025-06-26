@@ -283,6 +283,56 @@ test_that("get_aggregate_value works", {
   )
 
   expect_equal(res, expected_res)
+
+  df <- data.frame(
+    unit = letters[1:3],
+    x = rep(1:3, each = 3),
+    y = rep(4:6, each = 3)
+  )
+
+  res <- get_aggregate_value(
+    df = df,
+    group_cols = "unit",
+    vars = list(prop_count = "x"),
+    pivot_prop_count = TRUE
+  )
+
+  expected <- tibble::tribble(
+    ~total, ~unit, ~x, ~x_n, ~x_prop,
+    9L, "Alla", "1", 3L, 0.333333333333333,
+    9L, "Alla", "2", 3L, 0.333333333333333,
+    9L, "Alla", "3", 3L, 0.333333333333333,
+    3L, "a", "1", 1L, 0.333333333333333,
+    3L, "a", "2", 1L, 0.333333333333333,
+    3L, "a", "3", 1L, 0.333333333333333,
+    3L, "b", "1", 1L, 0.333333333333333,
+    3L, "b", "2", 1L, 0.333333333333333,
+    3L, "b", "3", 1L, 0.333333333333333,
+    3L, "c", "1", 1L, 0.333333333333333,
+    3L, "c", "2", 1L, 0.333333333333333,
+    3L, "c", "3", 1L, 0.333333333333333
+  )
+
+  expect_equal(res, expected)
+
+  expect_warning(
+    get_aggregate_value(
+      df = df,
+      group_cols = "unit",
+      vars = list(prop_count = c("x", "y")),
+      pivot_prop_count = TRUE
+    )
+  )
+
+  expect_warning(
+    get_aggregate_value(
+      df = df,
+      group_cols = "unit",
+      vars = list(prop_count = "x", mean = "y"),
+      pivot_prop_count = TRUE
+    )
+  )
+
 })
 
 test_that("prop_count works", {

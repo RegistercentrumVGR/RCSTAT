@@ -152,6 +152,8 @@ proportion_missing <- function(
 #' @param include_missing If missing values should be included in the total
 #' @param obfuscate_data If data should be obfuscated
 #' @param censored_value What value to replace censored values, used as argument in obfuscate_data
+#' @param pivot_prop_count whether to pivot the resulting data.frame into long format
+#'
 #' @export get_aggregate_value
 
 get_aggregate_value <- function(
@@ -160,7 +162,8 @@ get_aggregate_value <- function(
     vars = NULL,
     include_missing = TRUE,
     obfuscate_data = FALSE,
-    censored_value = 0) {
+    censored_value = 0,
+    pivot_prop_count = FALSE) {
   #### Warnings ####
 
   checkmate::assert_data_frame(df, min.rows = 1)
@@ -174,6 +177,7 @@ get_aggregate_value <- function(
     c("prop", "mean", "median", "prop_count"),
     empty.ok = FALSE
   )
+  checkmate::assert_logical(pivot_prop_count, len = 1, any.missing = FALSE)
 
   prop_var <- vars[["prop"]]
   mean_var <- vars[["mean"]]
@@ -413,6 +417,30 @@ get_aggregate_value <- function(
 
   }
 
+  if (pivot_prop_count) {
+
+    if (length(vars) > 1) {
+
+      warning(
+        paste0("pivot_prop_count is not supported when multiple",
+               " aggregation variables are specified")
+      )
+
+    } else if ("prop_count" %in% names(vars) && length(vars[["prop_count"]]) > 1) {
+
+      warning(
+        paste0("pivot_prop_count is not supported when multiple",
+               " variables are specified for prop_count")
+      )
+
+    } else {
+
+      out <- pivot_prop_count(out, category_name = vars[["prop_count"]])
+
+    }
+
+  }
+
   return(out)
 }
 
@@ -483,4 +511,20 @@ count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored
 
 
   return(res)
+}
+
+#' Pivots the result of a single prop_count from [RCStat::get_aggregate_value()]
+#'
+#' @param df the data.frame to plot
+#' @param category_name the name of the variable to store the outcomes of the
+#' variable in
+#'
+#' @return a data.frame pivoted into long format
+pivot_prop_count <- function(df, category_name = "kategori") {
+  df |>
+    tidyr::pivot_longer(
+      cols = dplyr::matches(".+_(n|prop)_"),
+      names_pattern = "(.+_(?:n|prop))_(.+)",
+      names_to = c(".value", category_name)
+    )
 }

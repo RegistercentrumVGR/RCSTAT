@@ -11,7 +11,8 @@ get_aggregate_value(
   vars = NULL,
   include_missing = TRUE,
   obfuscate_data = FALSE,
-  censored_value = 0
+  censored_value = 0,
+  pivot_prop_count = FALSE
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ get_aggregate_value(
 \item{obfuscate_data}{If data should be obfuscated}
 
 \item{censored_value}{What value to replace censored values, used as argument in obfuscate_data}
+
+\item{pivot_prop_count}{whether to pivot the resulting data.frame into long format}
 }
 \description{
 Create aggregate data across all combinations, including totals.

@@ -178,7 +178,7 @@ release_job:
     description: 'Automatic tag and release using $TAG'
     ref: '$CI_COMMIT_SHA'
 
-pages:
+.pages:
   stage: build
   extends: .install_r_package_dev_deps
   rules:
@@ -195,7 +195,6 @@ pages:
   artifacts:
     paths:
       - public
-  when: never
 
 deploy:
   stage: deploy

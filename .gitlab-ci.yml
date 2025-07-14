@@ -195,6 +195,7 @@ pages:
   artifacts:
     paths:
       - public
+  when: never
 
 deploy:
   stage: deploy

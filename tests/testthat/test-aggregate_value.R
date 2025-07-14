@@ -674,3 +674,69 @@ test_that("prop_count works", {
 
   expect_equal(res, expected_res)
 })
+
+test_that("get_aggregate_value works with no data", {
+
+  df <- data.frame(x = integer(0), unit = character(0))
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(prop = "x")
+  ) |>
+    expect_no_error()
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(mean = "x")
+  ) |>
+    expect_no_error()
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(median = "x")
+  ) |>
+    expect_no_error()
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(prop_count = "x")
+  ) |>
+    expect_no_error()
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(prop = "x"),
+    obfuscate_data = TRUE
+  ) |>
+    expect_no_error()
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(mean = "x"),
+    obfuscate_data = TRUE
+  ) |>
+    expect_no_error()
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(median = "x"),
+    obfuscate_data = TRUE
+  ) |>
+    expect_no_error()
+
+  get_aggregate_value(
+    df,
+    group_cols = "unit",
+    vars = list(prop_count = "x"),
+    obfuscate_data = TRUE
+  ) |>
+    expect_no_error()
+
+})

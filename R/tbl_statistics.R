@@ -166,7 +166,6 @@ get_aggregate_value <- function(
     pivot_prop_count = FALSE) {
   #### Warnings ####
 
-  checkmate::assert_data_frame(df, min.rows = 1)
   checkmate::assert_list(vars, min.len = 1, any.missing = FALSE)
   checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
   checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)

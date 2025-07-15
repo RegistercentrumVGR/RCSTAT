@@ -4,9 +4,8 @@ if (-not $Env:R_RCSTAT_DEPLOY_PATH) {
     exit
 }
 Write-Output "$(Get-Location)\$(Get-ChildItem *_*.tar.gz -Name)"
-Remove-Item -Path "$Env:R_RCSTAT_DEPLOY_PATH\$(Get-ChildItem *_*.tar.gz -Name)" -Force 
-Copy-Item -Path "$(Get-Location)\$(Get-ChildItem *_*.tar.gz -Name)" -Destination "$Env:R_RCSTAT_DEPLOY_PATH" -Force 
+Copy-Item -Path "$(Get-Location)\$(Get-ChildItem *_*.tar.gz -Name)" -Destination "$Env:R_RCSTAT_DEPLOY_PATH" -Force
 $runscript = "$(Get-Location)\PsScripts\start_R_Process.ps1"
-& $runscript 
+& $runscript
 Write-Output "Deploy Complete!"
 exit

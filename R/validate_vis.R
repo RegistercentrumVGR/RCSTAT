@@ -449,6 +449,60 @@ check_ci <- function(df) {
     )
   }
 
+  ci_low_wrong <- tmp |>
+    dplyr::filter(
+      !dplyr::between(.data$ConfidenceIntervalLower, 0, .data$Rate)
+    ) |>
+    dplyr::distinct(
+      .data$MeasureID,
+      .data$PeriodReportedStartDate,
+      .data$PeriodReportedEndDate,
+      .data$RegionOrganisationId,
+      .data$name
+    )
+
+  if (nrow(ci_low_wrong) > 0) {
+    errors <- c(
+      errors,
+      sprintf(
+        paste0("MeasureID %s, period %s-%s, RegionOrganisationId %s, unit/hospital name %s",
+               " has ConfidenceIntervalLower not between 0 and Rate"),
+        ci_low_wrong$MeasureID,
+        ci_low_wrong$PeriodReportedStartDate,
+        ci_low_wrong$PeriodReportedEndDate,
+        ci_low_wrong$RegionOrganisationId,
+        ci_low_wrong$name
+      )
+    )
+  }
+
+  ci_high_wrong <- tmp |>
+    dplyr::filter(
+      !dplyr::between(.data$ConfidenceIntervalHigher, .data$Rate, 1)
+    ) |>
+    dplyr::distinct(
+      .data$MeasureID,
+      .data$PeriodReportedStartDate,
+      .data$PeriodReportedEndDate,
+      .data$RegionOrganisationId,
+      .data$name
+    )
+
+  if (nrow(ci_high_wrong) > 0) {
+    errors <- c(
+      errors,
+      sprintf(
+        paste0("MeasureID %s, period %s-%s, RegionOrganisationId %s, unit/hospital name %s",
+               " has ConfidenceIntervalHigher not between Rate and 1"),
+        ci_high_wrong$MeasureID,
+        ci_high_wrong$PeriodReportedStartDate,
+        ci_high_wrong$PeriodReportedEndDate,
+        ci_high_wrong$RegionOrganisationId,
+        ci_high_wrong$name
+      )
+    )
+  }
+
   return(errors)
 }
 

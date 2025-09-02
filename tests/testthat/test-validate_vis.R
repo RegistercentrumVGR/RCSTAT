@@ -255,6 +255,7 @@ test_that("check_ci works", {
     UnitName = "a",
     HospitalName = NA,
     MeasureID = 1,
+    Rate = 0.5,
     PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
     PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
     RegionOrganisationId = "14"
@@ -269,6 +270,7 @@ test_that("check_ci works", {
     UnitName = "a",
     HospitalName = NA,
     MeasureID = 1,
+    Rate = 0.5,
     PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
     PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
     RegionOrganisationId = "14"
@@ -286,6 +288,29 @@ test_that("check_ci works", {
     UnitName = "a",
     HospitalName = NA,
     MeasureID = 1,
+    Rate = 0.5,
+    PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
+    RegionOrganisationId = "14"
+  ) |>
+    check_ci() |>
+    expect_equal(
+      c(
+        paste0("MeasureID 1, period 2024-01-01-2024-12-31, RegionOrganisationId 14, unit/hospital name a",
+               " has a higher ConfidenceIntervalLower than ConfidenceIntervalHigher"),
+        paste0("MeasureID 1, period 2024-01-01-2024-12-31, RegionOrganisationId 14, unit/hospital name a",
+               " has ConfidenceIntervalLower not between 0 and Rate")
+      )
+    )
+
+  data.frame(
+    ConfidenceIntervalLower = -0.01,
+    ConfidenceIntervalHigher = 1,
+    Rate = 0.95,
+    ReasonCode = NA,
+    UnitName = "a",
+    HospitalName = NA,
+    MeasureID = 1,
     PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
     PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
     RegionOrganisationId = "14"
@@ -293,7 +318,61 @@ test_that("check_ci works", {
     check_ci() |>
     expect_equal(
       paste0("MeasureID 1, period 2024-01-01-2024-12-31, RegionOrganisationId 14, unit/hospital name a",
-             " has a higher ConfidenceIntervalLower than ConfidenceIntervalHigher")
+             " has ConfidenceIntervalLower not between 0 and Rate")
+    )
+
+  data.frame(
+    ConfidenceIntervalLower = 0.01,
+    ConfidenceIntervalHigher = 1,
+    Rate = 0,
+    ReasonCode = NA,
+    UnitName = "a",
+    HospitalName = NA,
+    MeasureID = 1,
+    PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
+    RegionOrganisationId = "14"
+  ) |>
+    check_ci() |>
+    expect_equal(
+      paste0("MeasureID 1, period 2024-01-01-2024-12-31, RegionOrganisationId 14, unit/hospital name a",
+             " has ConfidenceIntervalLower not between 0 and Rate")
+    )
+
+  data.frame(
+    ConfidenceIntervalLower = 0,
+    ConfidenceIntervalHigher = 1.01,
+    Rate = 0.95,
+    ReasonCode = NA,
+    UnitName = "a",
+    HospitalName = NA,
+    MeasureID = 1,
+    PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
+    RegionOrganisationId = "14"
+  ) |>
+    check_ci() |>
+    expect_equal(
+      paste0("MeasureID 1, period 2024-01-01-2024-12-31, RegionOrganisationId 14, unit/hospital name a",
+             " has ConfidenceIntervalHigher not between Rate and 1")
+    )
+
+  data.frame(
+    ConfidenceIntervalLower = 0,
+    ConfidenceIntervalHigher = 0.94,
+    Rate = 0.95,
+    ReasonCode = NA,
+    UnitName = "a",
+    HospitalName = NA,
+    MeasureID = 1,
+    PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
+    RegionOrganisationId = "14"
+  ) |>
+    check_ci() |>
+    expect_equal(
+      paste0("MeasureID 1, period 2024-01-01-2024-12-31, RegionOrganisationId 14, unit/hospital name a",
+             " has ConfidenceIntervalHigher not between Rate and 1")
     )
 })
 

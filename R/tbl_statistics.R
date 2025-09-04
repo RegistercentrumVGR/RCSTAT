@@ -153,6 +153,15 @@ proportion_missing <- function(
 #' @param obfuscate_data If data should be obfuscated
 #' @param censored_value What value to replace censored values, used as argument in obfuscate_data
 #' @param pivot_prop_count whether to pivot the resulting data.frame into long format
+#' @param distinct_cols a set of columns that are used in
+#' [dplyr::distinct_by()]. Should be disjoint from `group_cols` to prevent
+#' misinterpretation of results.
+#' @param arrange_by a column used in [dplyr::arrange_by()] before calling
+#' [dplyr::distinct()] with the variables in `distinct_cols`. The variable is
+#' arranged in descending order.
+#' @param marginal_cols a subset of `group_cols` for which to marginally
+#' summarize. If not supplied all grouping columns will be used. Use `NULL`
+#' to not add any marginals.
 #'
 #' @export get_aggregate_value
 
@@ -163,25 +172,71 @@ get_aggregate_value <- function(
     include_missing = TRUE,
     obfuscate_data = FALSE,
     censored_value = 0,
-    pivot_prop_count = FALSE) {
+    pivot_prop_count = FALSE,
+    distinct_cols = NULL,
+    arrange_by = NULL,
+    marginal_cols) {
   #### Warnings ####
 
   checkmate::assert_list(vars, min.len = 1, any.missing = FALSE)
   checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
   checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
-  checkmate::assert_subset(group_cols, names(df), empty.ok = FALSE)
+  checkmate::assert_subset(group_cols, names(df))
   checkmate::assert_subset(unlist(vars), names(df), empty.ok = FALSE)
   checkmate::assert_subset(
     names(vars),
-    c("prop", "mean", "median", "prop_count"),
+    c("prop", "mean", "median", "prop_count", "count"),
     empty.ok = FALSE
   )
   checkmate::assert_logical(pivot_prop_count, len = 1, any.missing = FALSE)
+  checkmate::assert(
+    checkmate::check_null(distinct_cols),
+    checkmate::check_true(
+      checkmate::test_disjunct(
+        distinct_cols,
+        group_cols
+      ) && checkmate::test_subset(
+        distinct_cols,
+        names(df)
+      )
+    )
+  )
 
+  if (!is.null(distinct_cols)) {
+    checkmate::assert_choice(arrange_by, names(df))
+  }
+
+  id_vars <- c(
+    "SubjectKey",
+    "SubjectID",
+    "lopnr",
+    "LopNr"
+  )
+
+  if (!is.null(distinct_cols)) {
+    if (!any(id_vars %in% distinct_cols | grepl("^EventID", distinct_cols))) {
+      rlang::warn("No unique subject identifier supplied,
+                  this is probably a mistake")
+    }
+
+  }
   prop_var <- vars[["prop"]]
   mean_var <- vars[["mean"]]
   median_var <- vars[["median"]]
   prop_count_var <- vars[["prop_count"]]
+  count_var <- vars[["count"]]
+
+  if (!is.null(count_var) && !setequal(count_var, vars)) {
+    stop("count can not be supplied to vars with any other summarizing function")
+  }
+
+  group_cols <- c(count_var, group_cols)
+
+  if (rlang::is_missing(marginal_cols)) {
+    marginal_cols <- group_cols
+  } else {
+    checkmate::assert_subset(marginal_cols, group_cols)
+  }
 
   numeric_vars <- c(prop_var, mean_var, median_var)
 
@@ -204,17 +259,7 @@ get_aggregate_value <- function(
   out <- data.frame()
 
   # Get all the combinations of the variables
-  group_var_combinations <- do.call(
-    c,
-    lapply(
-      seq_along(group_cols) - 1,
-      utils::combn,
-      x = group_cols,
-      simplify = FALSE
-    )
-  )
-
-  group_var_combinations[[length(group_var_combinations) + 1]] <- group_cols
+  group_var_combinations <- get_group_combinations(group_cols, marginal_cols)
 
 
   #### Calculation ####
@@ -268,7 +313,18 @@ get_aggregate_value <- function(
         dplyr::across(
           tidyselect::all_of(comb)
         )
-      ) |>
+      )
+
+    if (!is.null(distinct_cols)) {
+      temp <- temp |>
+        dplyr::arrange(dplyr::desc(.data[[arrange_by]])) |>
+        dplyr::distinct(
+          dplyr::across(dplyr::all_of(distinct_cols)),
+          .keep_all = TRUE
+        )
+    }
+
+    temp <- temp |>
       dplyr::summarise(
         dplyr::across(
           .cols = tidyselect::all_of(prop_var),
@@ -526,4 +582,43 @@ pivot_prop_count <- function(df, category_name = "kategori") {
       names_pattern = "(.+_(?:n|prop))_(.+)",
       names_to = c(".value", category_name)
     )
+}
+
+#' Get a list of all combinations of columns defined in `group_cols`
+#'
+#' Also finds which columns to always group by and adds these to the
+#' combinations.
+#'
+#' @param group_cols the columns to group by
+#' @param marginal_cols the columns for which to create marginal summaries
+#'
+#' @return a list of combinations
+get_group_combinations <- function(group_cols, marginal_cols) {
+
+  if (!is.null(group_cols)) {
+    group_var_combinations <- do.call(
+      c,
+      lapply(
+        seq_along(group_cols) - 1,
+        utils::combn,
+        x = group_cols,
+        simplify = FALSE
+      )
+    )
+
+    group_var_combinations[[length(group_var_combinations) + 1]] <- group_cols
+  } else {
+    group_var_combinations <- list(character(0))
+  }
+
+  always_group_by <- setdiff(group_cols, marginal_cols)
+  group_var_combinations <- unique(
+    lapply(
+      group_var_combinations,
+      \(x) unique(c(always_group_by, x))
+    )
+  )
+
+  return(group_var_combinations)
+
 }

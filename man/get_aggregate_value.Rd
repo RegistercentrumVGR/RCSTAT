@@ -12,7 +12,10 @@ get_aggregate_value(
   include_missing = TRUE,
   obfuscate_data = FALSE,
   censored_value = 0,
-  pivot_prop_count = FALSE
+  pivot_prop_count = FALSE,
+  distinct_cols = NULL,
+  arrange_by = NULL,
+  marginal_cols
 )
 }
 \arguments{
@@ -29,6 +32,18 @@ get_aggregate_value(
 \item{censored_value}{What value to replace censored values, used as argument in obfuscate_data}
 
 \item{pivot_prop_count}{whether to pivot the resulting data.frame into long format}
+
+\item{distinct_cols}{a set of columns that are used in
+[dplyr::distinct_by()]. Should be disjoint from `group_cols` to prevent
+misinterpretation of results.}
+
+\item{arrange_by}{a column used in [dplyr::arrange_by()] before calling
+[dplyr::distinct()] with the variables in `distinct_cols`. The variable is
+arranged in descending order.}
+
+\item{marginal_cols}{a subset of `group_cols` for which to marginally
+summarize. If not supplied all grouping columns will be used. Use `NULL`
+to not add any marginals.}
 }
 \description{
 Create aggregate data across all combinations, including totals.

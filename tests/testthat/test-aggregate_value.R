@@ -740,3 +740,296 @@ test_that("get_aggregate_value works with no data", {
     expect_no_error()
 
 })
+
+test_that("get_aggregate_value works with distinct_cols", {
+
+  withr::local_seed(1)
+
+  df <- data.frame(
+    SubjectID = 1:2,
+    county = rep(1:2, each = 2),
+    hba1c = 1:4,
+    date = lubridate::today() - 0:3
+  ) |>
+    dplyr::mutate(
+      year = lubridate::year(.data$date)
+    )
+
+  df |>
+    get_aggregate_value(
+      group_cols = "county",
+      vars = list(mean = "hba1c")
+    ) |>
+    expect_snapshot()
+
+  df |>
+    get_aggregate_value(
+      group_cols = "county",
+      vars = list(mean = "hba1c"),
+      distinct_cols = "SubjectID",
+      arrange_by = "date"
+    ) |>
+    expect_snapshot()
+
+  df |>
+    get_aggregate_value(
+      group_cols = "county",
+      vars = list(mean = "hba1c"),
+      distinct_cols = c("subjectid", "county"),
+      arrange_by = "date"
+    ) |>
+    expect_error()
+
+  df |>
+    get_aggregate_value(
+      group_cols = "county",
+      vars = list(mean = "hba1c"),
+      distinct_cols = c("year"),
+      arrange_by = "date"
+    ) |>
+    expect_warning()
+
+  df |>
+    get_aggregate_value(
+      group_cols = "county",
+      vars = list(mean = "hba1c"),
+      distinct_cols = c("year"),
+      arrange_by = "abcdef"
+    ) |>
+    expect_error()
+
+})
+
+test_that("get_aggregate_value works with count", {
+
+  df <- data.frame(
+    SubjectID = 1,
+    county = 1:2,
+    year = 2010:2013,
+    ind = 1
+  )
+
+  res1 <- get_aggregate_value(
+    df = df,
+    group_cols = "county",
+    vars = list(count = "year")
+  ) |>
+    dplyr::arrange(
+      .data$county, .data$year
+    ) |>
+    dplyr::relocate(
+      "total",
+      "county",
+      "year"
+    )
+
+  res2 <- get_aggregate_value(
+    df = df,
+    group_cols = "year",
+    vars = list(count = "county")
+  ) |>
+    dplyr::arrange(
+      .data$county, .data$year
+    ) |>
+    dplyr::relocate(
+      "total",
+      "county",
+      "year"
+    )
+
+  expect_identical(res1, res2)
+
+  expected <- tibble::tribble(
+    ~total, ~county, ~year,
+    1L, "1", "2010",
+    1L, "1", "2012",
+    2L, "1", "Alla",
+    1L, "2", "2011",
+    1L, "2", "2013",
+    2L, "2", "Alla",
+    1L, "Alla", "2010",
+    1L, "Alla", "2011",
+    1L, "Alla", "2012",
+    1L, "Alla", "2013",
+    4L, "Alla", "Alla"
+  ) |>
+    as.data.frame()
+
+  expect_equal(res1, expected)
+
+  get_aggregate_value(
+    df = df,
+    group_cols = "county",
+    vars = list(
+      prop = "ind",
+      count = "year"
+    )
+  ) |>
+    expect_error()
+
+})
+
+test_that("get_aggregate_value works with marginal_cols", {
+
+  withr::local_seed(1)
+
+  df <- data.frame(
+    SubjectID = sample(1:10, 100, TRUE),
+    year = sample(2019:2020, 100, TRUE),
+    county = sample(1:2, 100, TRUE),
+    ind = sample(0:1, 100, TRUE)
+  )
+
+  get_aggregate_value(
+    df = df,
+    group_cols = "county",
+    vars = list(count = "year"),
+    marginal_cols = "county"
+  ) |>
+    expect_snapshot()
+
+  res1 <- get_aggregate_value(
+    df = df,
+    group_cols = "county",
+    vars = list(count = "year")
+  )
+
+  res1 |>
+    expect_snapshot()
+
+  res2 <- get_aggregate_value(
+    df = df,
+    group_cols = "county",
+    vars = list(count = "year"),
+    marginal_cols = c("county", "year")
+  )
+
+  expect_identical(res1, res2)
+
+
+  get_aggregate_value(
+    df = df,
+    group_cols = "county",
+    marginal_cols = "year",
+    vars = list(prop = "ind")
+  ) |>
+    expect_error()
+
+  get_aggregate_value(
+    df = df,
+    group_cols = c("county", "year"),
+    vars = list(prop = "ind"),
+    marginal_cols = NULL
+  ) |>
+    expect_snapshot()
+
+})
+
+test_that("get_aggregate_value works with no group_cols", {
+
+  df <- data.frame(
+    SubjectID = rep(1:2, each = 5),
+    county = 1:2,
+    ind = rep(1, 10),
+    date = lubridate::today() - 10:1
+  )
+
+  res <- get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    vars = list(prop = "ind")
+  )
+
+  expected <- data.frame(
+    ind_n = c(10),
+    ind_prop = c(1),
+    total = c(10L)
+  )
+
+  expect_identical(res, expected)
+
+  get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    marginal_cols = "county",
+    vars = list(prop = "ind")
+  ) |>
+    expect_error()
+
+  res <- get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    vars = list(prop = "ind"),
+    distinct_cols = "SubjectID",
+    arrange_by = "date"
+  )
+
+  expected <- data.frame(
+    ind_n = c(2),
+    ind_prop = c(1),
+    total = c(2L)
+  )
+
+  expect_identical(res, expected)
+
+  df <- data.frame(
+    SubjectID = 1,
+    county = 1:2,
+    year = 2010:2013,
+    ind = 1
+  )
+
+  get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    vars = list(count = "county")
+  ) |>
+    expect_identical(
+      data.frame(
+        total = c(4L, 2L, 2L),
+        county = c("Alla", "1", "2")
+      )
+    )
+
+  get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    vars = list(count = "county"),
+    marginal_cols = NULL
+  ) |>
+    expect_identical(
+      data.frame(
+        county = c("1", "2"),
+        total = c(2L, 2L)
+      )
+    )
+
+  get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    vars = list(count = "county"),
+    marginal_cols = "county"
+  ) |>
+    expect_identical(
+      data.frame(
+        total = c(4L, 2L, 2L),
+        county = c("Alla", "1", "2")
+      )
+    )
+
+  get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    vars = list(count = "county"),
+    distinct_cols = "SubjectID",
+    arrange_by = "year",
+    marginal_cols = NULL
+  ) |>
+    expect_identical(
+      data.frame(
+        county = c("1", "2"),
+        total = c(1L, 1L)
+      )
+    )
+
+})

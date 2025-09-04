@@ -65,7 +65,7 @@ Testthat JUnit report:
     - apt-get install -y libxt-dev
     - >
       Rscript -e 'pak::pkg_install(
-        c("devtools", "testthat", "covr", "DT", "htmltools"),
+        c("devtools", "testthat", "covr", "DT", "htmltools", "Cairo@1.6-2"),
         dependencies = TRUE)'
     - echo "Lint package"
     - >

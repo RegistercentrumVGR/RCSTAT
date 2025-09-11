@@ -8,17 +8,23 @@ zip_dir_with_pass(
   directory = "output",
   pass = random_password(),
   file = "output",
-  overwrite = TRUE
+  overwrite = TRUE,
+  sink_password = TRUE
 )
 }
 \arguments{
 \item{directory}{directory to zip. Defaults to `output`}
 
-\item{pass}{password to use. Defaults to `random_password()`}
+\item{pass}{password to use. Defaults to `[random_password()]`. May only
+contain `a–z`, `A–Z`, `0–9`, and `!`, `@`, `#`, `$`, `.`, `+`, `%`, `&`, `/`,
+`(`, `)`, `?`.}
 
 \item{file}{name of zip-file}
 
 \item{overwrite}{Overwrite zip-file if it exists}
+
+\item{sink_password}{whether or not to save the password in a file called
+password.txt in the current working directory}
 }
 \description{
 zips chosen directory with password protection. Zip-file and

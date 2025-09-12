@@ -129,7 +129,7 @@ random_password <- function(
     "l" = letters,
     "R" = c(LETTERS, letters),
     "N" = 0:9,
-    "!" = c("!", "@", "#", "$", ".", "+", "%", "&", "/", "(", ")", "?", "\\"),
+    "!" = c("!", "@", "#", "$", ".", "+", "%", "&", "/", "(", ")", "?"),
     "#" = c("!", "@", "#", "$", ".", "+"),
     "C" = c(
       "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S",
@@ -167,9 +167,13 @@ random_password <- function(
 #' @title Zip directory with password
 #'
 #' @param directory directory to zip. Defaults to `output`
-#' @param pass password to use. Defaults to `random_password()`
+#' @param pass password to use. Defaults to `[random_password()]`. May only
+#' contain `a–z`, `A–Z`, `0–9`, and `!`, `@`, `#`, `$`, `.`, `+`, `%`, `&`, `/`,
+#' `(`, `)`, `?`.
 #' @param file name of zip-file
 #' @param overwrite Overwrite zip-file if it exists
+#' @param sink_password whether or not to save the password in a file called
+#' password.txt in the current working directory
 #'
 #' @export
 #' @examples \dontrun{
@@ -178,13 +182,18 @@ random_password <- function(
 zip_dir_with_pass <- function(
     directory = "output",
     pass = random_password(),
-    # TODO: get DNR from Environment variable instead?
     file = "output",
-    overwrite = TRUE) {
-  sink("password.txt")
-  # TODO: add additional info to password.txt
-  cat(pass)
-  sink()
+    overwrite = TRUE,
+    sink_password = TRUE) {
+
+  checkmate::assert_string(pass, pattern = "^[a-zA-Z0-9!@#$.+%&/()?]+$")
+
+  if (sink_password) {
+    sink("password.txt")
+    cat(pass)
+    sink()
+  }
+
 
   filenames <- dir(directory, full.names = TRUE)
 

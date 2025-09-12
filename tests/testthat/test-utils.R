@@ -122,7 +122,7 @@ test_that("random_password works", {
     random_password()
   )
 
-  # Test erranous char_types
+  # Test erroneous char_types
   expect_error(
     random_password(
       char_types = c("U")

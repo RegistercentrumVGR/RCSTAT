@@ -11,7 +11,9 @@ decode_data(
   add_cols = FALSE,
   suffix = "_label",
   as_character = FALSE,
-  missing_labels_na = TRUE
+  missing_labels_na = TRUE,
+  decode_names = FALSE,
+  variable_names = NULL
 )
 }
 \arguments{
@@ -31,6 +33,10 @@ then the specified variables will have its levels dropped.}
 will be set to characters. If `FALSE` variables will be factors.}
 
 \item{missing_labels_na}{If `TRUE` values with no label will be set to `NA`}
+
+\item{decode_names}{If `TRUE` column names will be decode aswel}
+
+\item{variable_names}{Names for columns}
 }
 \value{
 data.frame with character values instead

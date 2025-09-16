@@ -182,3 +182,85 @@ test_that("decode_data handles missing labels", {
   expect_equal(res, expected_res)
 
 })
+
+test_that("decode names works", {
+  # Test 1
+  df <- data.frame(
+    "SubjectKey" = c(1, 2, 3),
+    "RC_Age" = c(1, 2, 3),
+    "RC_Gender" = c(1, 2, 3),
+    "RC_Unit" = c("a", "b", "C"),
+    "FollowUp_Unit" = c("a", "b", "b"),
+    "County" = c("A", "B", "C")
+  )
+
+  labels <- data.frame(
+    "ColumnName" = c(
+      "RC_Age",
+      "RC_Gender",
+      "RC_Unit",
+      "FollowUp_Unit"
+    ),
+    "Description" = c(
+      "Ålder",
+      "Kön",
+      "Enhet",
+      "Enhet"
+    )
+  )
+  df_decoded <- decode_names(df, labels)
+
+  expect_setequal(
+    colnames(df_decoded),
+    c(
+      "Personnummer",
+      "Ålder",
+      "Kön",
+      "Enhet (RC_Unit)",
+      "Enhet (FollowUp_Unit)",
+      "County"
+    )
+  )
+
+  #Test 2
+  df <- data.frame(
+    "SubjectKey" = c(1, 2, 3),
+    "RC_Age" = c(1, 2, 3),
+    "RC_Gender" = c(1, 2, 3),
+    "RC_Unit" = c("a", "b", "C"),
+    "FollowUp_Unit" = c("a", "b", "b"),
+    "County" = c("A", "B", "C")
+  )
+
+  labels <- data.frame(
+    "ColumnName" = c(
+      "RC_Age",
+      "RC_Gender",
+      "RC_Unit",
+      "RC_Unit",
+      "FollowUp_Unit"
+    ),
+    "Description" = c(
+      "Ålder",
+      "Kön",
+      "Enhet",
+      "Enhet",
+      "Enhet"
+    )
+  )
+  df_decoded <- decode_names(df, labels)
+
+  expect_setequal(
+    colnames(df_decoded),
+    c(
+      "Personnummer",
+      "Ålder",
+      "Kön",
+      "Enhet (RC_Unit)",
+      "Enhet (FollowUp_Unit)",
+      "County"
+    )
+  )
+
+
+})

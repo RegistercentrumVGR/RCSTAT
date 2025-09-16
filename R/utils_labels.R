@@ -127,6 +127,64 @@ var_to_char <- function(x, labels, name = NULL, missing_labels_na = TRUE) {
   )
 }
 
+#' Decode variabel names
+#'
+#' Replaces the names of the columns with description of column
+#'
+#' @name decode_names
+#'
+#' @param df data.frame
+#' @param labels data frame containing column names
+#'
+#' @return data frame with description as column names
+decode_names <- function(
+    df,
+    labels = NULL) {
+  checkmate::assert_subset(
+    c("ColumnName", "Description"),
+    colnames(labels)
+  )
+
+  labels <- labels |>
+    dplyr::bind_rows(data.frame(
+      "ColumnName" = c(
+        "SubjectKey",
+        "SubjectID",
+        "DateOfDeath",
+        "DateCorrectness",
+        "StatusDate",
+        "StatusCode"
+      ),
+      "Description" = c(
+        "Personnummer",
+        "Identifierare av patienten",
+        "D\u00f6dsdatum",
+        "Noggrannhet av d\u00f6dsdatum",
+        "Statusdatum",
+        "Statuskod"
+      )
+    )) |>
+    dplyr::filter(!is.na(.data$Description)) |>
+    dplyr::mutate(Description = dplyr::if_else(
+      duplicated(.data$Description) | duplicated(.data$Description,
+        fromLast = TRUE
+      ),
+      paste0(.data$Description, " (", .data$ColumnName, ")"),
+      .data$Description
+    ))
+
+  df <- df |>
+    dplyr::rename_with(
+      ~ stats::setNames(
+        labels$Description,
+        labels$ColumnName
+      )[.x],
+      .cols = dplyr::any_of(labels$ColumnName)
+    )
+
+  return(df)
+}
+
 #' Replace each value with its corresponding label
 #'
 #' Returns data with descriptive data points
@@ -144,6 +202,8 @@ var_to_char <- function(x, labels, name = NULL, missing_labels_na = TRUE) {
 #' @param as_character If `TRUE` variables
 #' will be set to characters. If `FALSE` variables will be factors.
 #' @param missing_labels_na If `TRUE` values with no label will be set to `NA`
+#' @param decode_names If `TRUE` column names will be decode aswel
+#' @param variable_names Names for columns
 #'
 #' @return data.frame with character values instead
 #'         of numerical values.
@@ -160,7 +220,9 @@ decode_data <- function(
     add_cols = FALSE,
     suffix = "_label",
     as_character = FALSE,
-    missing_labels_na = TRUE) {
+    missing_labels_na = TRUE,
+    decode_names = FALSE,
+    variable_names = NULL) {
 
   checkmate::assert_data_frame(labels)
 
@@ -283,5 +345,11 @@ decode_data <- function(
       missing_labels_na
     )
   }
+
+  if (decode_names) {
+    checkmate::assert_data_frame(variable_names)
+    data <- decode_names(data, variable_names)
+  }
+
   return(data)
 }

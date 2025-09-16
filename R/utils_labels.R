@@ -137,6 +137,7 @@ var_to_char <- function(x, labels, name = NULL, missing_labels_na = TRUE) {
 #' @param labels data frame containing column names
 #'
 #' @return data frame with description as column names
+#' @export
 decode_names <- function(
     df,
     labels = NULL) {

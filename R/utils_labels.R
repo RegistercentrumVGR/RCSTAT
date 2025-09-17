@@ -165,7 +165,11 @@ decode_names <- function(
         "Statuskod"
       )
     )) |>
-    dplyr::filter(!is.na(.data$Description)) |>
+    dplyr::filter(
+      !is.na(.data$Description),
+      !(.data$Description == ""),
+      !(.data$Description == " ")
+    ) |>
     dplyr::mutate(Description = dplyr::if_else(
       duplicated(.data$Description) | duplicated(.data$Description,
         fromLast = TRUE

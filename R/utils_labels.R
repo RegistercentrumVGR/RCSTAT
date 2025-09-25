@@ -358,3 +358,163 @@ decode_data <- function(
 
   return(data)
 }
+#' Get value labels from socialstyrelsen
+#' @param register Register at socialstyrelsen
+#' @export
+get_sos_vl <- function(
+    register = NULL) {
+  checkmate::assert_choice(
+    register,
+    c(
+      "barn_och_unga",
+      "dodsorsak",
+      "lss",
+      "halso_sjukvard",
+      "lakemedel",
+      "med_fodelse",
+      "par",
+      "tvangsvard_missbrukare",
+      "aldre_funktionsnedsattning"
+    )
+  )
+
+  # Create links
+  main_link <- paste0(
+    "https://www.socialstyrelsen.se/globalassets",
+    "/sharepoint-dokument/dokument-webb/statistik/"
+  )
+  sos_link_list <- list(
+    "barn_och_unga" = paste0(
+      main_link,
+      "register-variabelforteckning-",
+      "registret-insatser-barn-och-unga.xlsx"
+    ),
+    "dodsorsak" = paste0(
+      main_link,
+      "register-dodsorsaksregistret",
+      "-variabelforteckning.xls"
+    ),
+    "lss" = paste0(
+      main_link,
+      "register-variabelforteckning-registret",
+      "-over-insatser-enligt-lss.xls"
+    ),
+    "halso_sjukvard" = paste0(
+      main_link,
+      "register-variabelforteckning-",
+      "hsl-registret-ny.xlsx"
+    ),
+    "lakemedel" = paste0(
+      main_link,
+      "register-variabelforteckning-",
+      "lakemedelsregistret.xlsx"
+    ),
+    "med_fodelse" = paste0(
+      main_link,
+      "register-medicinska-fodelseregistret-",
+      "variabelforteckning.xls"
+    ),
+    "par" = paste0(
+      "https://www.socialstyrelsen.se/globalassets/",
+      "sharepoint-dokument/dokument-webb/ovrigt/",
+      "register-variabelforteckning-patientregistret.xlsx"
+    ),
+    "tvangsvard_missbrukare" = paste0(
+      main_link,
+      "register-variabelforteckning-",
+      "lvm-registret.xlsx"
+    ),
+    "aldre_funktionsnedsattning" = paste0(
+      main_link,
+      "register-variabelforteckning-",
+      "socialtjanstinsatser-aldre-",
+      "personer-funktionsnedsattning.xlsx"
+    )
+  )
+
+  if (register != "par") {
+    # Get data
+    temp <- tempfile(fileext = ifelse(register %in% c(
+      "dodsorsak",
+      "lss",
+      "med_fodelse"
+    ),
+    ".xls",
+    ".xlsx"
+    ))
+    utils::download.file(sos_link_list[[register]],
+                         temp,
+                         mode = "wb",
+                         quiet = TRUE)
+    df <- readxl::read_excel(temp, sheet = ifelse(register == "barn_och_unga",
+      2,
+      1
+    ))
+    unlink(temp)
+
+    # Create final data
+    df <- df |>
+      dplyr::select(dplyr::all_of(c("Variabelnamn", "V\u00e4rdem\u00e4ngd"))) |>
+      dplyr::rename("vn" = "Variabelnamn", "vm" = "V\u00e4rdem\u00e4ngd") |>
+      dplyr::filter(stringr::str_detect(stringr::str_trim(
+        .data$vm
+      ), "^(\\w+)\\s*=")) |>
+      tidyr::separate_rows(.data$vm, sep = "[,;]|(?=\\s+\\w+\\s*=)") |>
+      dplyr::filter(grepl("=", .data$vm)) |>
+      tidyr::separate(.data$vm,
+        into = c("code", "label"),
+        sep = "=",
+        fill = "right"
+      ) |>
+      dplyr::mutate(code = gsub(" ", "", .data$code)) |>
+      dplyr::filter(tolower(.data$code) != "blank") |>
+      dplyr::distinct() |>
+      dplyr::mutate(label = stringr::str_trim(.data$label)) |>
+      dplyr::rename(
+        "ColumnName" = "vn",
+        "ValueCode" = "code",
+        "ValueName" = "label"
+      )
+  } else {
+    df <- data.frame()
+    for (i in 1:3) {
+      # Get data
+      temp <- tempfile(fileext = ".xlsx")
+      utils::download.file(sos_link_list[[register]],
+                           temp,
+                           mode = "wb",
+                           quiet = TRUE)
+      df_temp <- readxl::read_excel(temp, sheet = i)
+      unlink(temp)
+      if (i %in% c(2, 3)) {
+        df_temp <- df_temp |> dplyr::filter(.data$Variabelnamn != "PSVARD")
+      }
+      df <- df |> dplyr::bind_rows(df_temp)
+    }
+
+    df <- df |>
+      dplyr::select(dplyr::all_of(c("Variabelnamn", "V\u00e4rdem\u00e4ngd"))) |>
+      dplyr::rename("vn" = "Variabelnamn", "vm" = "V\u00e4rdem\u00e4ngd") |>
+      dplyr::filter(stringr::str_detect(stringr::str_trim(
+        .data$vm
+      ), "^(\\w+)\\s*=")) |>
+      tidyr::separate_rows(.data$vm, sep = "[,;]|(?=\\s+\\w+\\s*=)") |>
+      dplyr::filter(grepl("=", .data$vm)) |>
+      tidyr::separate(.data$vm,
+        into = c("code", "label"),
+        sep = "=",
+        fill = "right"
+      ) |>
+      dplyr::mutate(code = gsub(" ", "", .data$code)) |>
+      dplyr::filter(tolower(.data$code) != "blank") |>
+      dplyr::distinct() |>
+      dplyr::mutate(label = stringr::str_trim(.data$label)) |>
+      dplyr::rename(
+        "ColumnName" = "vn",
+        "ValueCode" = "code",
+        "ValueName" = "label"
+      )
+  }
+
+  return(df)
+}

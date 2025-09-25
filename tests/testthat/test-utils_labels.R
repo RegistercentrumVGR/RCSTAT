@@ -264,3 +264,55 @@ test_that("decode names works", {
 
 
 })
+
+test_that("get_soc_vl works", {
+  # test 1
+  testthat::local_mocked_bindings(
+    download.file = function(url, destfile, ...) {
+      NULL
+    },
+    .package = "utils"
+  )
+
+  output <- data.frame(
+    "Variabelnamn" = c("ALDER",
+                       "PNRQ",
+                       "KON",
+                       "REGDAT"),
+    "Värdemängd" = c("0-",
+                     "0 = giltigt pnr,4 = samordningsnummer,8 = Ogiltigt pnr",
+                     "1 = man,  2 = kvinna,  blank = okänt",
+                     "Registreringsdatum")
+  )
+
+  testthat::local_mocked_bindings(
+    read_excel = function(...) {
+      return(output)
+    },
+    .package = "readxl"
+  )
+
+  df <- get_sos_vl(register = "dodsorsak")
+
+  testthat::expect_equal(
+    as.data.frame(df),
+    expected = data.frame(
+      "ColumnName" = c("PNRQ",
+                       "PNRQ",
+                       "PNRQ",
+                       "KON",
+                       "KON"),
+      "ValueCode" = c("0",
+                      "4",
+                      "8",
+                      "1",
+                      "2"),
+      "ValueName" = c("giltigt pnr",
+                      "samordningsnummer",
+                      "Ogiltigt pnr",
+                      "man",
+                      "kvinna")
+    )
+  )
+
+})

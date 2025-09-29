@@ -4,7 +4,13 @@
 \alias{count_prop_wide}
 \title{Summarise count into wide format}
 \usage{
-count_prop_wide(x, include_missing = FALSE, obfuscate_data, censored_value)
+count_prop_wide(
+  x,
+  include_missing = FALSE,
+  obfuscate_data,
+  censored_value,
+  add_reason_col
+)
 }
 \arguments{
 \item{x}{A vector, numeric or character}
@@ -15,6 +21,9 @@ NA values}
 \item{obfuscate_data}{logical indicating whether or not to obfuscate data}
 
 \item{censored_value}{the value to replace censored proportions with}
+
+\item{add_reason_col}{whether or not to add a variable describing why an
+observation was obfuscate, passed to [obfuscate_data()]}
 }
 \description{
 Summarise a vector into columns of counts for each occurrence and each counts

@@ -15,7 +15,8 @@ get_aggregate_value(
   pivot_prop_count = FALSE,
   distinct_cols = NULL,
   arrange_by = NULL,
-  marginal_cols
+  marginal_cols,
+  add_reason_col = FALSE
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ arranged in descending order.}
 \item{marginal_cols}{a subset of `group_cols` for which to marginally
 summarize. If not supplied all grouping columns will be used. Use `NULL`
 to not add any marginals.}
+
+\item{add_reason_col}{whether or not to add a variable describing why an
+observation was obfuscate, passed to [obfuscate_data()]}
 }
 \description{
 Create aggregate data across all combinations, including totals.

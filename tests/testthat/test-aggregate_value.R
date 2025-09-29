@@ -867,6 +867,23 @@ test_that("get_aggregate_value works with count", {
   ) |>
     expect_error()
 
+  df <- data.frame(
+    x = rep(1, 9)
+  )
+
+  get_aggregate_value(
+    df,
+    vars = list(count = "x"),
+    obfuscate_data = TRUE,
+    marginal_cols = NULL
+  ) |>
+    expect_equal(
+      data.frame(
+        x = "1",
+        total = 10
+      )
+    )
+
 })
 
 test_that("get_aggregate_value works with marginal_cols", {
@@ -1031,5 +1048,106 @@ test_that("get_aggregate_value works with no group_cols", {
         total = c(1L, 1L)
       )
     )
+
+})
+
+test_that("add_reason_col works", {
+
+  df <- data.frame(
+    x = c(rep(1, 4), rep(0, 20))
+  )
+
+  get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop = "x"),
+    marginal_cols = NULL,
+    obfuscate_data = TRUE,
+    add_reason_col = TRUE
+  ) |>
+    expect_equal(
+      data.frame(
+        x_n = 0,
+        x_prop = 0,
+        total = 20,
+        obfuscated_reason = "n < 5"
+      )
+    )
+
+  withr::local_seed(1)
+  df <- data.frame(
+    x = stats::rnorm(14)
+  )
+
+  get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(mean = "x"),
+    marginal_cols = NULL,
+    obfuscate_data = TRUE,
+    add_reason_col = TRUE
+  ) |>
+    expect_snapshot()
+
+  df <- data.frame(
+    x = sample(1:10, size = 14, replace = TRUE)
+  )
+
+  get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(median = "x"),
+    marginal_cols = NULL,
+    obfuscate_data = TRUE,
+    add_reason_col = TRUE
+  ) |>
+    expect_snapshot()
+
+  get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(mean = "x"),
+    marginal_cols = NULL,
+    obfuscate_data = TRUE,
+    add_reason_col = TRUE
+  ) |>
+    expect_snapshot()
+
+  df <- data.frame(
+    x = c(rep("a", 4), rep("b", 36))
+  )
+
+  get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop_count = "x"),
+    marginal_cols = NULL,
+    obfuscate_data = TRUE,
+    add_reason_col = TRUE,
+    pivot_prop_count = TRUE
+  ) |>
+    expect_equal(
+      tibble::tibble(
+        total = 40,
+        x = c("a", "b"),
+        x_n = c(0, 40),
+        x_prop = 0,
+        x_obfuscated_reason = "n < 5"
+      )
+    )
+
+  df <- data.frame(
+    x = c(rep(0, 4), rep(1, 200), rep(2, 30))
+  )
+
+  get_aggregate_value(
+    df,
+    vars = list(prop_count = "x"),
+    obfuscate_data = TRUE,
+    add_reason_col = TRUE,
+    group_cols = NULL,
+    pivot_prop_count = TRUE
+  ) |>
+    expect_snapshot()
 
 })

@@ -2,7 +2,7 @@
 % Please edit documentation in R/tbl_statistics.R
 \name{pivot_prop_count}
 \alias{pivot_prop_count}
-\title{Pivots the result of a single prop_count from [RCStat::get_aggregate_value()]}
+\title{Pivots the result of a single prop_count from [get_aggregate_value()]}
 \usage{
 pivot_prop_count(df, category_name = "kategori")
 }
@@ -16,5 +16,5 @@ variable in}
 a data.frame pivoted into long format
 }
 \description{
-Pivots the result of a single prop_count from [RCStat::get_aggregate_value()]
+Pivots the result of a single prop_count from [get_aggregate_value()]
 }

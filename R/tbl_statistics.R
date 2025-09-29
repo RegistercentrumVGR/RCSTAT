@@ -162,6 +162,8 @@ proportion_missing <- function(
 #' @param marginal_cols a subset of `group_cols` for which to marginally
 #' summarize. If not supplied all grouping columns will be used. Use `NULL`
 #' to not add any marginals.
+#' @param add_reason_col whether or not to add a variable describing why an
+#' observation was obfuscate, passed to [obfuscate_data()]
 #'
 #' @export get_aggregate_value
 
@@ -175,7 +177,8 @@ get_aggregate_value <- function(
     pivot_prop_count = FALSE,
     distinct_cols = NULL,
     arrange_by = NULL,
-    marginal_cols) {
+    marginal_cols,
+    add_reason_col = FALSE) {
   #### Warnings ####
 
   checkmate::assert_list(vars, min.len = 1, any.missing = FALSE)
@@ -201,6 +204,8 @@ get_aggregate_value <- function(
       )
     )
   )
+  checkmate::assert_logical(add_reason_col, len = 1, any.missing = FALSE)
+
 
   if (!is.null(distinct_cols)) {
     checkmate::assert_choice(arrange_by, names(df))
@@ -344,7 +349,8 @@ get_aggregate_value <- function(
             .x,
             include_missing = include_missing,
             obfuscate_data = obfuscate_data,
-            censored_value = censored_value
+            censored_value = censored_value,
+            add_reason_col = add_reason_col
           ),
           .unpack = TRUE
         ),
@@ -371,105 +377,117 @@ get_aggregate_value <- function(
   }
 
   # Obfuscate the data with missing included.
-  if (obfuscate_data && include_missing) {
-    for (var in prop_var) {
-      out <- out |> RCStat::obfuscate_data(
-        total_var = "total",
-        count_var = paste0(var, "_n"),
-        prop_var = paste0(var, "_prop"),
-        censored_value = censored_value
-      )
-    }
-
-    for (var in median_var) {
-      out <- RCStat::obfuscate_data(
-        data = out,
-        total_var = "total",
-        statistics_vars = paste0(
-          var,
-          c(
-            "_median",
-            "_quant_5",
-            "_quant_25",
-            "_quant_75",
-            "_quant_95"
+  if (obfuscate_data) {
+    if (include_missing) {
+      for (var in prop_var) {
+        out <- out |>
+          obfuscate_data(
+            total_var = "total",
+            count_var = paste0(var, "_n"),
+            prop_var = paste0(var, "_prop"),
+            censored_value = censored_value,
+            add_reason_col = add_reason_col
           )
-        ),
-        censored_value = censored_value
-      )
-    }
+      }
 
-    for (var in mean_var) {
-      out <- RCStat::obfuscate_data(
-        data = out,
-        total_var = "total",
-        statistics_vars = c(
-          paste0(var, "_mean"),
-          paste0(var, "_std")
-        ),
-        censored_value = censored_value
-      )
-    }
+      for (var in median_var) {
+        out <- obfuscate_data(
+          data = out,
+          total_var = "total",
+          statistics_vars = paste0(
+            var,
+            c(
+              "_median",
+              "_quant_5",
+              "_quant_25",
+              "_quant_75",
+              "_quant_95"
+            )
+          ),
+          censored_value = censored_value,
+          add_reason_col = add_reason_col
+        )
+      }
 
-    for (var in prop_count_var) {
-      out <- RCStat::obfuscate_data(
-        data = out,
-        total_var = "total"
-      )
-    }
+      for (var in mean_var) {
+        out <- obfuscate_data(
+          data = out,
+          total_var = "total",
+          statistics_vars = c(
+            paste0(var, "_mean"),
+            paste0(var, "_std")
+          ),
+          censored_value = censored_value,
+          add_reason_col = add_reason_col
+        )
+      }
 
-  } else if (obfuscate_data && !include_missing) {
-    # Obfuscate the data with missing not included.
-    for (var in prop_var) {
-      out <- out |> RCStat::obfuscate_data(
-        total_var = paste0(var, "_total_non_missing"),
-        count_var = paste0(var, "_n"),
-        prop_var = paste0(var, "_prop"),
-        censored_value = censored_value,
-        other_count_vars = c("total", paste0(var, "_total_missing"))
-      )
-    }
+      for (var in prop_count_var) {
+        out <- obfuscate_data(
+          data = out,
+          total_var = "total"
+        )
+      }
 
-    for (var in median_var) {
-      out <- RCStat::obfuscate_data(
-        data = out,
-        total_var = paste0(var, "_total_non_missing"),
-        statistics_vars = paste0(
-          var,
-          c(
-            "_median",
-            "_quant_5",
-            "_quant_25",
-            "_quant_75",
-            "_quant_95"
+    } else if (!include_missing) {
+      # Obfuscate the data with missing not included.
+      for (var in prop_var) {
+        out <- out |>
+          obfuscate_data(
+            total_var = paste0(var, "_total_non_missing"),
+            count_var = paste0(var, "_n"),
+            prop_var = paste0(var, "_prop"),
+            censored_value = censored_value,
+            other_count_vars = c("total", paste0(var, "_total_missing")),
+            add_reason_col = add_reason_col
           )
-        ),
-        censored_value = censored_value,
-        other_count_vars = "total"
-      )
-    }
+      }
 
-    for (var in mean_var) {
-      out <- RCStat::obfuscate_data(
-        data = out,
-        total_var = paste0(var, "_total_non_missing"),
-        statistics_vars = c(
-          paste0(var, "_mean"),
-          paste0(var, "_std")
-        ),
-        censored_value = censored_value,
-        other_count_vars = "total"
-      )
-    }
+      for (var in median_var) {
+        out <- obfuscate_data(
+          data = out,
+          total_var = paste0(var, "_total_non_missing"),
+          statistics_vars = paste0(
+            var,
+            c(
+              "_median",
+              "_quant_5",
+              "_quant_25",
+              "_quant_75",
+              "_quant_95"
+            )
+          ),
+          censored_value = censored_value,
+          other_count_vars = "total",
+          add_reason_col = add_reason_col
+        )
+      }
 
-    for (var in prop_count_var) {
-      out <- RCStat::obfuscate_data(
-        data = out,
-        total_var = "total_non_missing",
-        other_count_vars = "total"
-      )
-    }
+      for (var in mean_var) {
+        out <- obfuscate_data(
+          data = out,
+          total_var = paste0(var, "_total_non_missing"),
+          statistics_vars = c(
+            paste0(var, "_mean"),
+            paste0(var, "_std")
+          ),
+          censored_value = censored_value,
+          other_count_vars = "total",
+          add_reason_col = add_reason_col
+        )
+      }
 
+      for (var in prop_count_var) {
+        out <- obfuscate_data(
+          data = out,
+          total_var = "total_non_missing",
+          other_count_vars = "total"
+        )
+      }
+
+    }
+    out <- out |>
+      obfuscate_data(total_var = "total")
   }
 
   if (pivot_prop_count) {
@@ -509,8 +527,13 @@ get_aggregate_value <- function(
 #' NA values
 #' @param obfuscate_data logical indicating whether or not to obfuscate data
 #' @param censored_value the value to replace censored proportions with
-
-count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored_value) {
+#' @param add_reason_col whether or not to add a variable describing why an
+#' observation was obfuscate, passed to [obfuscate_data()]
+count_prop_wide <- function(x,
+                            include_missing = FALSE,
+                            obfuscate_data,
+                            censored_value,
+                            add_reason_col) {
   checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
   checkmate::assert_vector(x)
   checkmate::assert(
@@ -519,6 +542,7 @@ count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored
     combine = "or"
   )
   checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
+  checkmate::assert_logical(add_reason_col, len = 1, any.missing = FALSE)
 
   use_na <- ifelse(include_missing, "ifany", "no")
 
@@ -540,13 +564,14 @@ count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored
   if (obfuscate_data) {
     res <- res |>
       dplyr::mutate(dummy = "a") |>
-      RCStat::obfuscate_data(
+      obfuscate_data(
         total_var = "total",
         count_var = "n",
         prop_var = "prop",
         censored_value = censored_value,
         liberal_obfuscation = TRUE,
-        group_var = "dummy"
+        group_var = "dummy",
+        add_reason_col = add_reason_col
       ) |>
       dplyr::ungroup() |>
       dplyr::select(-"dummy")
@@ -555,7 +580,7 @@ count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored
   res <- res |>
     tidyr::pivot_wider(
       names_from = "x",
-      values_from = c("n", "prop")
+      values_from = dplyr::any_of(c("n", "prop", "obfuscated_reason"))
     )
 
   if (include_missing) {
@@ -568,7 +593,7 @@ count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored
   return(res)
 }
 
-#' Pivots the result of a single prop_count from [RCStat::get_aggregate_value()]
+#' Pivots the result of a single prop_count from [get_aggregate_value()]
 #'
 #' @param df the data.frame to plot
 #' @param category_name the name of the variable to store the outcomes of the
@@ -578,8 +603,8 @@ count_prop_wide <- function(x, include_missing = FALSE, obfuscate_data, censored
 pivot_prop_count <- function(df, category_name = "kategori") {
   df |>
     tidyr::pivot_longer(
-      cols = dplyr::matches(".+_(n|prop)_"),
-      names_pattern = "(.+_(?:n|prop))_(.+)",
+      cols = dplyr::matches(".+_(n|prop|obfuscated_reason)_"),
+      names_pattern = "(.+_(?:n|prop|obfuscated_reason))_(.+)",
       names_to = c(".value", category_name)
     )
 }

@@ -61,3 +61,43 @@
       3      2 2019    12 0.3750000    32
       4      2 2020    11 0.5000000    22
 
+# add_reason_col works
+
+    Code
+      get_aggregate_value(df, group_cols = NULL, vars = list(mean = "x"),
+      marginal_cols = NULL, obfuscate_data = TRUE, add_reason_col = TRUE)
+    Output
+        x_mean x_std total obfuscated_reason
+      1     NA    NA    10            N < 15
+
+---
+
+    Code
+      get_aggregate_value(df, group_cols = NULL, vars = list(median = "x"),
+      marginal_cols = NULL, obfuscate_data = TRUE, add_reason_col = TRUE)
+    Output
+        x_median x_quant_5 x_quant_25 x_quant_75 x_quant_95 total obfuscated_reason
+      1       NA        NA         NA         NA         NA    10            N < 15
+
+---
+
+    Code
+      get_aggregate_value(df, group_cols = NULL, vars = list(mean = "x"),
+      marginal_cols = NULL, obfuscate_data = TRUE, add_reason_col = TRUE)
+    Output
+        x_mean x_std total obfuscated_reason
+      1     NA    NA    10            N < 15
+
+---
+
+    Code
+      get_aggregate_value(df, vars = list(prop_count = "x"), obfuscate_data = TRUE,
+      add_reason_col = TRUE, group_cols = NULL, pivot_prop_count = TRUE)
+    Output
+      # A tibble: 3 x 5
+        total x       x_n x_prop x_obfuscated_reason  
+        <dbl> <chr> <dbl>  <dbl> <chr>                
+      1   230 0         0   0    rounded to nearest 5%
+      2   230 1       200   0.85 <NA>                 
+      3   230 2        30   0.13 <NA>                 
+

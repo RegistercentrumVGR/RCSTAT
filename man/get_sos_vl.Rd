@@ -2,13 +2,13 @@
 % Please edit documentation in R/utils_labels.R
 \name{get_sos_vl}
 \alias{get_sos_vl}
-\title{Funktion för att hämta value labels från Socialstyrelsen}
+\title{Get value labels from socialstyrelsen}
 \usage{
 get_sos_vl(register = NULL)
 }
 \arguments{
-\item{register}{Register på Socialstyrelsen}
+\item{register}{Register at socialstyrelsen}
 }
 \description{
-Funktion för att hämta value labels från Socialstyrelsen
+Get value labels from socialstyrelsen
 }

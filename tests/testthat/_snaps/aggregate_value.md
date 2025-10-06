@@ -1,3 +1,57 @@
+# prop_count works
+
+    Code
+      res
+    Output
+      # A tibble: 6 x 6
+        var_total_non_missing total unit  var   var_n var_prop
+                        <int> <int> <chr> <chr> <int>    <dbl>
+      1                    10    20 Alla  1         5      0.5
+      2                    10    20 Alla  2         5      0.5
+      3                     0    10 1     1         0    NaN  
+      4                     0    10 1     2         0    NaN  
+      5                    10    10 2     1         5      0.5
+      6                    10    10 2     2         5      0.5
+
+---
+
+    Code
+      res
+    Output
+      # A tibble: 12 x 5
+         total unit  var   var_n var_prop
+         <int> <chr> <chr> <int>    <dbl>
+       1    20 Alla  a         5     0.25
+       2    20 Alla  b         5     0.25
+       3    20 Alla  c         0     0   
+       4    20 Alla  NA       10     0.5 
+       5    10 1     a         0     0   
+       6    10 1     b         0     0   
+       7    10 1     c         0     0   
+       8    10 1     NA       10     1   
+       9    10 2     a         5     0.5 
+      10    10 2     b         5     0.5 
+      11    10 2     c         0     0   
+      12    10 2     NA       NA    NA   
+
+---
+
+    Code
+      res
+    Output
+      # A tibble: 9 x 6
+        var_total_non_missing total unit  var   var_n var_prop
+                        <int> <int> <chr> <chr> <int>    <dbl>
+      1                    10    20 Alla  a         5      0.5
+      2                    10    20 Alla  b         5      0.5
+      3                    10    20 Alla  c         0      0  
+      4                     0    10 1     a         0    NaN  
+      5                     0    10 1     b         0    NaN  
+      6                     0    10 1     c         0    NaN  
+      7                    10    10 2     a         5      0.5
+      8                    10    10 2     b         5      0.5
+      9                    10    10 2     c         0      0  
+
 # get_aggregate_value works with distinct_cols
 
     Code

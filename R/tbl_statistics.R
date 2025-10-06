@@ -223,8 +223,12 @@ get_aggregate_value <- function(
       rlang::warn("No unique subject identifier supplied,
                   this is probably a mistake")
     }
-
   }
+
+  if (nrow(df) == 0) {
+    rlang::warn("You are trying to aggregate a data.frame that contains 0 rows")
+  }
+
   prop_var <- vars[["prop"]]
   mean_var <- vars[["mean"]]
   median_var <- vars[["median"]]
@@ -257,6 +261,10 @@ get_aggregate_value <- function(
     dplyr::mutate(
       dplyr::across(
         tidyselect::all_of(group_cols), as.character
+      ),
+      dplyr::across(
+        dplyr::all_of(prop_count_var) & dplyr::where(~ !is.factor(.x)),
+        as.factor
       )
     )
 
@@ -539,6 +547,7 @@ count_prop_wide <- function(x,
   checkmate::assert(
     checkmate::check_numeric(x),
     checkmate::check_character(x),
+    checkmate::check_factor(x),
     combine = "or"
   )
   checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
@@ -601,6 +610,11 @@ count_prop_wide <- function(x,
 #'
 #' @return a data.frame pivoted into long format
 pivot_prop_count <- function(df, category_name = "kategori") {
+
+  if (!any(grepl("(n|prop|obfuscated_reason)", names(df)))) {
+    return(df)
+  }
+
   df |>
     tidyr::pivot_longer(
       cols = dplyr::matches(".+_(n|prop|obfuscated_reason)_"),

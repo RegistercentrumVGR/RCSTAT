@@ -673,6 +673,107 @@ test_that("prop_count works", {
   )
 
   expect_equal(res, expected_res)
+
+  df <- data.frame(
+    some_var = integer(0),
+    unit = character(0)
+  )
+
+  expect_warning(
+    res <- get_aggregate_value(
+      df = df,
+      group_cols = "unit",
+      vars = list(prop_count = "some_var")
+    )
+  )
+
+  expect_equal(
+    res,
+    data.frame(
+      some_var = NA,
+      total = 0,
+      unit = "Alla"
+    )
+  )
+
+  expect_warning(
+    res <- get_aggregate_value(
+      df = df,
+      group_cols = NULL,
+      vars = list(prop_count = "some_var")
+    )
+  )
+
+  expect_equal(
+    res,
+    data.frame(
+      some_var = NA,
+      total = 0
+    )
+  )
+
+
+
+  expect_warning(
+    res <- get_aggregate_value(
+      df = df,
+      group_cols = NULL,
+      vars = list(prop_count = "some_var"),
+      pivot_prop_count = TRUE
+    ),
+    "You are trying to aggregate a data.frame that contains 0 rows"
+  )
+
+  expect_equal(
+    res,
+    data.frame(
+      some_var = NA,
+      total = 0
+    )
+  )
+
+  df <- data.frame(
+    unit = c(rep(1, 10), rep(2, 10)),
+    var = c(rep(NA, 10), rep(1, 5), rep(2, 5))
+  )
+
+  expect_no_error(
+    res <- get_aggregate_value(
+      df = df,
+      group_cols = "unit",
+      vars = list(prop_count = "var"),
+      pivot_prop_count = TRUE,
+      include_missing = FALSE
+    )
+  )
+
+  expect_snapshot(res)
+
+  df <- data.frame(
+    unit = c(rep(1, 10), rep(2, 10)),
+    var = c(rep(NA, 10), rep("a", 5), rep("b", 5))
+  ) |>
+    dplyr::mutate(var = factor(.data$var, levels = letters[1:3]))
+
+  res <- get_aggregate_value(
+    df = df,
+    group_cols = "unit",
+    vars = list(prop_count = "var"),
+    pivot_prop_count = TRUE
+  )
+
+  expect_snapshot(res)
+
+  res <- get_aggregate_value(
+    df = df,
+    group_cols = "unit",
+    vars = list(prop_count = "var"),
+    pivot_prop_count = TRUE,
+    include_missing = FALSE
+  )
+
+  expect_snapshot(res)
+
 })
 
 test_that("get_aggregate_value works with no data", {
@@ -684,28 +785,32 @@ test_that("get_aggregate_value works with no data", {
     group_cols = "unit",
     vars = list(prop = "x")
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
   get_aggregate_value(
     df,
     group_cols = "unit",
     vars = list(mean = "x")
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
   get_aggregate_value(
     df,
     group_cols = "unit",
     vars = list(median = "x")
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
   get_aggregate_value(
     df,
     group_cols = "unit",
     vars = list(prop_count = "x")
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
   get_aggregate_value(
     df,
@@ -713,7 +818,8 @@ test_that("get_aggregate_value works with no data", {
     vars = list(prop = "x"),
     obfuscate_data = TRUE
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
   get_aggregate_value(
     df,
@@ -721,7 +827,8 @@ test_that("get_aggregate_value works with no data", {
     vars = list(mean = "x"),
     obfuscate_data = TRUE
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
   get_aggregate_value(
     df,
@@ -729,7 +836,8 @@ test_that("get_aggregate_value works with no data", {
     vars = list(median = "x"),
     obfuscate_data = TRUE
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
   get_aggregate_value(
     df,
@@ -737,7 +845,8 @@ test_that("get_aggregate_value works with no data", {
     vars = list(prop_count = "x"),
     obfuscate_data = TRUE
   ) |>
-    expect_no_error()
+    expect_no_error() |>
+    expect_warning()
 
 })
 

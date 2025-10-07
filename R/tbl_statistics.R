@@ -611,7 +611,7 @@ count_prop_wide <- function(x,
 #' @return a data.frame pivoted into long format
 pivot_prop_count <- function(df, category_name = "kategori") {
 
-  if (!any(grepl("(n|prop|obfuscated_reason)", names(df)))) {
+  if (!any(grepl("_(n|prop|obfuscated_reason)_", names(df)))) {
     return(df)
   }
 

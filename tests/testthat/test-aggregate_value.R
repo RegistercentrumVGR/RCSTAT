@@ -774,6 +774,18 @@ test_that("prop_count works", {
 
   expect_snapshot(res)
 
+  df <- data.frame(
+    sign = rep(NA, 50)
+  )
+
+  get_aggregate_value(
+    df = df,
+    vars = list(prop_count = "sign"),
+    pivot_prop_count = TRUE,
+    include_missing = FALSE
+  ) |>
+    expect_no_error()
+
 })
 
 test_that("get_aggregate_value works with no data", {

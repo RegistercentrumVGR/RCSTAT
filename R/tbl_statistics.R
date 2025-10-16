@@ -260,7 +260,7 @@ get_aggregate_value <- function(
   df <- df |>
     dplyr::mutate(
       dplyr::across(
-        tidyselect::all_of(group_cols), as.character
+        tidyselect::all_of(marginal_cols), as.character
       ),
       dplyr::across(
         dplyr::all_of(prop_count_var) & dplyr::where(~ !is.factor(.x)),

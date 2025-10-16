@@ -11,6 +11,7 @@
 #' @importFrom data.table .SD
 #' @importFrom data.table data.table
 #' @importFrom Rcpp sourceCpp
+#' @importFrom rlang %||%
 #' @useDynLib RCStat, .registration = TRUE
 ## usethis namespace: end
 NULL

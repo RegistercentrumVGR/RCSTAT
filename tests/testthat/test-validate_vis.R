@@ -509,8 +509,8 @@ test_that("check_counties_and_units works", {
   data.frame(
     RegionOrganisationId = "01",
     RegionName = "Stockholm",
-    UnitName = "a",
-    UnitHSAID = NA,
+    UnitName = c("a", "b"),
+    UnitHSAID = c(NA, ""),
     HospitalName = NA,
     HospitalHSAID = NA,
     MeasureID = 1,
@@ -519,7 +519,12 @@ test_that("check_counties_and_units works", {
     HospitalOrganisationId = NA
   ) |>
     check_counties_and_units() |>
-    expect_equal("Unit a is missing HSA/PAR-id")
+    expect_equal(
+      c(
+        "Unit a is missing HSA/PAR-id",
+        "Unit b is missing HSA/PAR-id"
+      )
+    )
 
   data.frame(
     RegionOrganisationId = "01",

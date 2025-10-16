@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.1.18
+Version: 1.2.0
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 
@@ -30,7 +30,7 @@ Imports:
     purrr,
     Rcpp,
     readxl,
-    rlang (>= 0.4.11),
+    rlang,
     stats,
     stringr,
     tibble,
@@ -38,6 +38,7 @@ Imports:
     tidyselect,
     writexl,
     curl,
-    stringi
+    stringi,
+    memoise
 LinkingTo: 
     Rcpp

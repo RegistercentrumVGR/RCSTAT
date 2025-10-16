@@ -620,8 +620,8 @@ check_counties_and_units <- function(df) {
       .data$PeriodReportedStartDate,
       .data$PeriodReportedEndDate
     ) |>
-    dplyr::filter(is.na(.data$name) & is.na(.data$hsaid)) |>
-    dplyr::summarise(n = sum(is.na(.data$name) & is.na(.data$hsaid))) |>
+    dplyr::filter(is.na(.data$name) & (is.na(.data$hsaid) | .data$hsaid == "")) |>
+    dplyr::summarise(n = dplyr::n()) |>
     dplyr::filter(.data$n > 1)
 
   if (nrow(na_name_hsa) > 0) {
@@ -641,7 +641,7 @@ check_counties_and_units <- function(df) {
 
   name_na <- tmp |>
     dplyr::filter(
-      is.na(.data$name) & !is.na(.data$hsaid)
+      is.na(.data$name) & !(is.na(.data$hsaid) | .data$hsaid == "")
     ) |>
     dplyr::distinct(.data$hsaid)
 
@@ -669,7 +669,7 @@ check_counties_and_units <- function(df) {
 
   hsaid_na <- tmp |>
     dplyr::filter(
-      is.na(.data$hsaid) & !is.na(.data$name)
+      (is.na(.data$hsaid) | .data$hsaid == "") & !is.na(.data$name)
     ) |>
     dplyr::distinct(.data$name)
 

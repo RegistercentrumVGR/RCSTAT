@@ -1000,7 +1000,7 @@ test_that("get_aggregate_value works with count", {
   ) |>
     expect_equal(
       data.frame(
-        x = "1",
+        x = 1,
         total = 10
       )
     )
@@ -1137,7 +1137,7 @@ test_that("get_aggregate_value works with no group_cols", {
   ) |>
     expect_identical(
       data.frame(
-        county = c("1", "2"),
+        county = 1:2,
         total = c(2L, 2L)
       )
     )
@@ -1165,7 +1165,7 @@ test_that("get_aggregate_value works with no group_cols", {
   ) |>
     expect_identical(
       data.frame(
-        county = c("1", "2"),
+        county = 1:2,
         total = c(1L, 1L)
       )
     )

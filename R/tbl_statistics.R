@@ -360,7 +360,7 @@ get_aggregate_value <- function(
             censored_value = censored_value,
             add_reason_col = add_reason_col
           ),
-          .unpack = TRUE
+          .unpack = !is.null(prop_count_var)
         ),
         total = dplyr::n(),
         .groups = "drop"

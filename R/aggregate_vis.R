@@ -171,7 +171,8 @@ aggregate_vis <- function(df,
       "group_cols",
       "obfuscate_data",
       "aggregate",
-      "marginal_cols"
+      "marginal_cols",
+      "add_reason_col"
     )
   )
 
@@ -189,6 +190,7 @@ aggregate_vis <- function(df,
       obfuscate_data = TRUE,
       aggregate = TRUE,
       marginal_cols = NULL,
+      add_reason_col = TRUE,
       group_cols = c(
         "PeriodReportedStartDate",
         "PeriodReportedEndDate",
@@ -328,6 +330,8 @@ postprocess_indicator <- function(df, cfg, register_id) {
   df |>
     postprocess_indicator_org(register_id) |>
     postprocess_indicator_register(register_id) |>
+    postprocess_indicator_names() |>
+    postprocess_indicator_reason() |>
     dplyr::mutate(Version = cfg$version)
 }
 
@@ -430,4 +434,34 @@ postprocess_indicator_register <- function(df, register_id) {
       RegisterNamn = register$data$RegisterName,
       RegisterHSAID = register$data$HSAID %||% NA
     )
+}
+
+#' @describeIn postprocess_indicator adds remaining variables
+postprocess_indicator_names <- function(df) {
+
+  name_diff <- setdiff(get_vis_names(), names(df))
+
+  purrr::reduce(
+    name_diff,
+    ~ dplyr::mutate(.x, !!.y := NA),
+    .init = df
+  )
+}
+
+#' @describeIn postprocess_indicator adds ReasonCode
+postprocess_indicator_reason <- function(df) {
+
+  df |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::matches("obfuscated_reason"),
+        ~ dplyr::case_when(
+          stringr::str_detect(.x, "[Nn] < \\d+") ~ "MSK",
+          .default = NA
+        ),
+        .names = "ReasonCode"
+      )
+    ) |>
+    dplyr::select(-dplyr::matches("obfuscated_reason"))
+
 }

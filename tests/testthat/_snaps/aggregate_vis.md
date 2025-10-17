@@ -174,3 +174,72 @@
       NULL
       
 
+# aggregate_vis works
+
+    Code
+      res
+    Output
+        PeriodReportedStartDate PeriodReportedEndDate Denominator Rate Numerator
+      1              2024-01-01            2024-12-31          10    0        10
+      2              2024-01-01            2024-12-31         110    1       110
+      3              2024-01-01            2024-12-31         100    1       100
+      4              2024-01-01            2024-12-31         110    1       110
+      5              2024-07-01            2024-09-30          10    0        10
+      6              2024-07-01            2024-09-30         110    1       110
+      7              2024-07-01            2024-09-30         100    1       100
+      8              2024-07-01            2024-09-30         110    1       110
+        RegionOrganisationId        UnitName UnitHSAID      RegionName
+      1                   14            <NA>      <NA> Västra Götaland
+      2                   14            <NA>      <NA> Västra Götaland
+      3                   14 Registercentrum           Västra Götaland
+      4                 <NA>            <NA>      <NA>            <NA>
+      5                   14            <NA>      <NA> Västra Götaland
+      6                   14            <NA>      <NA> Västra Götaland
+      7                   14 Registercentrum           Västra Götaland
+      8                 <NA>            <NA>      <NA>            <NA>
+                           RegisterNamn RegisterHSAID MeasureID HospitalName
+      1 Registercentrum Västra Götaland            NA    abc123           NA
+      2 Registercentrum Västra Götaland            NA    abc123           NA
+      3 Registercentrum Västra Götaland            NA    abc123           NA
+      4 Registercentrum Västra Götaland            NA    abc123           NA
+      5 Registercentrum Västra Götaland            NA    abc123           NA
+      6 Registercentrum Västra Götaland            NA    abc123           NA
+      7 Registercentrum Västra Götaland            NA    abc123           NA
+      8 Registercentrum Västra Götaland            NA    abc123           NA
+        HospitalHSAID HospitalOrganisationId CountryName Value Cohort Version
+      1            NA                     NA          NA    NA     NA       1
+      2            NA                     NA          NA    NA     NA       1
+      3            NA                     NA          NA    NA     NA       1
+      4            NA                     NA          NA    NA     NA       1
+      5            NA                     NA          NA    NA     NA       1
+      6            NA                     NA          NA    NA     NA       1
+      7            NA                     NA          NA    NA     NA       1
+      8            NA                     NA          NA    NA     NA       1
+        ReferenceIntervalRate ReferenceIntervalValue MunicipalityOrganisationID
+      1                    NA                     NA                         NA
+      2                    NA                     NA                         NA
+      3                    NA                     NA                         NA
+      4                    NA                     NA                         NA
+      5                    NA                     NA                         NA
+      6                    NA                     NA                         NA
+      7                    NA                     NA                         NA
+      8                    NA                     NA                         NA
+        MunicipalityName Coverage ConfidenceIntervalLower ConfidenceIntervalHigher
+      1               NA       NA                      NA                       NA
+      2               NA       NA                      NA                       NA
+      3               NA       NA                      NA                       NA
+      4               NA       NA                      NA                       NA
+      5               NA       NA                      NA                       NA
+      6               NA       NA                      NA                       NA
+      7               NA       NA                      NA                       NA
+      8               NA       NA                      NA                       NA
+        Standarddeviation Measurepopulation Exclusions ReasonCode
+      1                NA                NA         NA        MSK
+      2                NA                NA         NA       <NA>
+      3                NA                NA         NA       <NA>
+      4                NA                NA         NA       <NA>
+      5                NA                NA         NA        MSK
+      6                NA                NA         NA       <NA>
+      7                NA                NA         NA       <NA>
+      8                NA                NA         NA       <NA>
+

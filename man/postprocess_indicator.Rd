@@ -7,6 +7,8 @@
 \alias{postprocess_indicator_count}
 \alias{postprocess_indicator_org}
 \alias{postprocess_indicator_register}
+\alias{postprocess_indicator_names}
+\alias{postprocess_indicator_reason}
 \title{Handles the necessary postprocessing of an aggregated indicator by renaming
 and adding necessary variables as well as adding the version}
 \usage{
@@ -21,6 +23,10 @@ postprocess_indicator_count(df)
 postprocess_indicator_org(df, register_id)
 
 postprocess_indicator_register(df, register_id)
+
+postprocess_indicator_names(df)
+
+postprocess_indicator_reason(df)
 }
 \arguments{
 \item{df}{an aggregated indicator}
@@ -50,5 +56,9 @@ count
 \item \code{postprocess_indicator_org()}: renames county and unit variables
 
 \item \code{postprocess_indicator_register()}: adds the register name and HSAID variables
+
+\item \code{postprocess_indicator_names()}: adds remaining variables
+
+\item \code{postprocess_indicator_reason()}: adds ReasonCode
 
 }}

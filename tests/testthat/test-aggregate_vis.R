@@ -269,16 +269,17 @@ test_that("aggregate_vis works", {
 
   df <- data.frame(
     date = lubridate::ymd("2024-09-14"),
-    unit_var = 999,
+    unit_var = c(rep(999, 100), rep(1000, 10)),
     county_var = "14",
-    some_value = rep(1, 100)
+    some_value = c(rep(1, 100), rep(1, 10))
   )
 
   indicator_function <- function(df,
                                  group_cols,
                                  aggregate = TRUE,
                                  marginal_cols,
-                                 obfuscate_data = TRUE) {
+                                 obfuscate_data = TRUE,
+                                 add_reason_col = TRUE) {
     df <- df |>
       dplyr::mutate(
         urval_indicator = TRUE,
@@ -292,6 +293,7 @@ test_that("aggregate_vis works", {
           group_cols = group_cols,
           marginal_cols = marginal_cols,
           obfuscate_data = obfuscate_data,
+          add_reason_col = add_reason_col,
           vars = list(prop = "indicator")
         )
       return(res)
@@ -346,53 +348,5 @@ test_that("aggregate_vis works", {
     register_id = 100
   )
 
-  expected <- data.frame(
-    PeriodReportedStartDate = lubridate::ymd(
-      c(
-        "2024-01-01",
-        "2024-01-01",
-        "2024-01-01",
-        "2024-07-01",
-        "2024-07-01",
-        "2024-07-01"
-      )
-    ),
-    PeriodReportedEndDate = lubridate::ymd(
-      c(
-        "2024-12-31",
-        "2024-12-31",
-        "2024-12-31",
-        "2024-09-30",
-        "2024-09-30",
-        "2024-09-30"
-      )
-    ),
-    Denominator = 100,
-    Rate = 1,
-    Numerator = 100,
-    RegionOrganisationId = c("14", "14", NA, "14", "14", NA),
-    UnitName = c(
-      NA,
-      "Registercentrum",
-      NA,
-      NA,
-      "Registercentrum",
-      NA
-    ),
-    UnitHSAID = c(NA, "", NA, NA, "", NA),
-    RegionName = c(
-      "Västra Götaland",
-      "Västra Götaland",
-      NA,
-      "Västra Götaland",
-      "Västra Götaland",
-      NA
-    ),
-    RegisterNamn = "Registercentrum Västra Götaland",
-    RegisterHSAID = NA,
-    Version = 1,
-    MeasureID = "abc123"
-  )
-
-  expect_equal(res, expected)
+  expect_snapshot(res)
 })

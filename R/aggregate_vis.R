@@ -155,9 +155,10 @@ aggregate_vis <- function(df,
   cfg <- get_measure_config(measure_id)
 
   if (is.null(cfg)) {
-    stop(
-      sprintf("No config found for measure ID %s", measure_id)
+    rlang::warn(
+      sprintf("No config found for MeasureID '%s', skipping", measure_id)
     )
+    return(NULL)
   }
 
   if (cfg$status == "UNPUBLISHED") {

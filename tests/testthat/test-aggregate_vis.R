@@ -264,8 +264,13 @@ test_that("postprocess_indicator works", {
 })
 
 test_that("aggregate_vis works", {
-  aggregate_vis(measure_id = "0-0-0-0-0") |>
-    expect_error(regexp = "No config found for measure ID 0-0-0-0-0")
+
+  expect_warning(
+    res <- aggregate_vis(measure_id = "0-0-0-0-0"),
+    regexp = "No config found for MeasureID '0-0-0-0-0', skipping"
+  )
+
+  expect_null(res)
 
   df <- data.frame(
     date = lubridate::ymd("2024-09-14"),

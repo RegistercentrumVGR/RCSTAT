@@ -14,72 +14,55 @@ test_that("get_measure_config works", {
         title = "Vårdplan upprättad vid ADHD",
         status = "UNPUBLISHED",
         valid_from = as.POSIXct("2016-01-01 14:56:00 CET", tz = "Europe/Berlin"),
-        type = "Andel"
+        type = "Andel",
+        submeasures = list(
+          list(
+            gender_code = "2",
+            measure_id = "6a984524-3ea9-4561-89d6-f5d46dc9ad9e"
+          ),
+          list(
+            gender_code = "1",
+            measure_id = "9d187574-e549-48fb-beb2-931ac035fda9"
+          )
+        )
       )
     )
 
   get_measure_config("doesnotexist") |>
     expect_error(regexp = "Assertion on 'measure_id' failed")
+
+  expect_no_error(get_measure_config("99000"))
+
 })
 
 test_that("add_groups_long works", {
   df <- data.frame(
     date = lubridate::ymd("2024-09-14"),
     unit_var = 1,
-    county_var = "14"
+    county_var = "14",
+    gender_var = 1
   )
 
   cfg <- list(
     org = c("Riksnivå", "Länsnivå", "Mottagningsnivå"),
-    freq = c("Kvartal", "År", "Månad", "Halvår")
+    freq = c("Kvartal", "År", "Månad", "Halvår"),
+    submeasures = list(
+      list(gender_code = "1", measure_id = 1),
+      list(gender_code = "2", measure_id = 2)
+    )
   )
 
-  res <- add_groups_long(
+  add_groups_long(
     df,
     cfg,
     "date",
     "unit_var",
-    "county_var"
-  )
+    "county_var",
+    "gender_var"
+  ) |>
+    expect_snapshot()
 
-  expected <- data.frame(
-    date = lubridate::ymd("2024-09-14"),
-    unit_var = "1",
-    county_var = "14",
-    PeriodReportedStartDate = lubridate::ymd(
-      c(
-        "2024-07-01",
-        "2024-01-01", "2024-09-01", "2024-07-01",
-        "2024-07-01", "2024-01-01", "2024-09-01", "2024-07-01",
-        "2024-07-01", "2024-01-01", "2024-09-01", "2024-07-01"
-      )
-    ),
-    PeriodReportedEndDate = lubridate::ymd(
-      c(
-        "2024-09-30",
-        "2024-12-31", "2024-09-30", "2024-12-31",
-        "2024-09-30", "2024-12-31", "2024-09-30", "2024-12-31",
-        "2024-09-30", "2024-12-31", "2024-09-30", "2024-12-31"
-      )
-    )
-    ,
-    unit = c(
-      "Riket", "Riket",
-      "Riket", "Riket", "14", "14", "14", "14", "1",
-      "1", "1", "1"
-    ),
-    unit_type = c(
-      "country",
-      "country", "country", "country", "county", "county",
-      "county", "county", "unit", "unit", "unit", "unit"
-    ),
-    county = c(
-      NA, NA, NA, NA,
-      NA, NA, NA, NA, "14", "14", "14", "14"
-    )
-  )
 
-  expect_equal(res, expected)
 
   add_groups_long(
     df,
@@ -111,7 +94,8 @@ test_that("add_groups_long works", {
       lubridate::today() - 365
     ),
     unit_var = 1,
-    county_var = "14"
+    county_var = "14",
+    gender_var = 2
   )
 
   cfg <- list(
@@ -124,10 +108,59 @@ test_that("add_groups_long works", {
     cfg = cfg,
     date_var = "date",
     unit_var = "unit_var",
-    county_var = "county_var"
+    county_var = "county_var",
+    gender_var = "gender_var"
   )
 
   expect_true(all(res$PeriodReportedEndDate < lubridate::today()))
+
+  df <- data.frame(gender_var = 1:2)
+
+  add_groups_long_gender(df, list(), "gender_var") |>
+    expect_equal(
+      data.frame(
+        gender_var = 1:2,
+        gender = "all"
+      )
+    )
+
+  add_groups_long_gender(
+    df,
+    list(
+      list(gender_code = "1", measure_id = 1)
+    ),
+    "gender_var"
+  ) |>
+    expect_equal(
+      data.frame(
+        gender_var = c(1, 2, 1),
+        gender = c("all", "all", "1")
+      )
+    )
+
+  add_groups_long_gender(
+    df,
+    list(
+      list(gender_code = "1", measure_id = 1),
+      list(gender_code = "2", measure_id = 2)
+    ),
+    "gender_var"
+  ) |>
+    expect_equal(
+      data.frame(
+        gender_var = c(1, 2, 1, 2),
+        gender = c("all", "all", "1", "2")
+      )
+    )
+
+  add_groups_long_gender(
+    df,
+    list(
+      list(gender_code = "def", measure_id = 1)
+    ),
+    "gender_var"
+  ) |>
+    expect_error()
 
 })
 
@@ -276,7 +309,8 @@ test_that("aggregate_vis works", {
     date = lubridate::ymd("2024-09-14"),
     unit_var = c(rep(999, 100), rep(1000, 10)),
     county_var = "14",
-    some_value = c(rep(1, 100), rep(1, 10))
+    some_value = c(rep(1, 100), rep(1, 10)),
+    SubjectKey = "111111-1111"
   )
 
   indicator_function <- function(df,
@@ -284,7 +318,8 @@ test_that("aggregate_vis works", {
                                  aggregate = TRUE,
                                  marginal_cols,
                                  obfuscate_data = TRUE,
-                                 add_reason_col = TRUE) {
+                                 add_reason_col = TRUE,
+                                 censored_value = NA) {
     df <- df |>
       dplyr::mutate(
         urval_indicator = TRUE,
@@ -299,7 +334,8 @@ test_that("aggregate_vis works", {
           marginal_cols = marginal_cols,
           obfuscate_data = obfuscate_data,
           add_reason_col = add_reason_col,
-          vars = list(prop = "indicator")
+          vars = list(prop = "indicator"),
+          censored_value = censored_value
         )
       return(res)
     }
@@ -354,4 +390,90 @@ test_that("aggregate_vis works", {
   )
 
   expect_snapshot(res)
+
+  tmp_func <- function(df,
+                       obfuscate_data,
+                       aggregate,
+                       group_cols,
+                       marginal_cols) {
+    "Hello, World!"
+  }
+
+  aggregate_vis(
+    df = df,
+    measure_id = "abc123",
+    indicator_function = tmp_func,
+    date_var = "date",
+    unit_var = "unit_var",
+    county_var = "county_var",
+    register_id = 100
+  ) |>
+    expect_error(
+      "Assertion on 'indicator_function' failed: Must have formal arguments:"
+    )
+
+  testthat::local_mocked_bindings(
+    get_measure_config = function(...) {
+      return(
+        list(
+          org = c("Riksnivå", "Region"),
+          freq = c("År"),
+          valid_from = "2024-01-01",
+          type = "Andel",
+          version = 1,
+          status = "PUBLISHED"
+        )
+      )
+    }
+  )
+
+  aggregate_vis(
+    df = df,
+    measure_id = "abc123",
+    indicator_function = indicator_function,
+    date_var = "date",
+    unit_var = "unit_var",
+    county_var = "county_var",
+    register_id = 100
+  ) |>
+    expect_no_error()
+
+  aggregate_vis(
+    df = dplyr::select(df, -"SubjectKey"),
+    gender_var = NULL
+  ) |>
+    expect_error()
+
+  testthat::local_mocked_bindings(
+    get_measure_config = function(...) {
+      return(
+        list(
+          org = c("Riksnivå", "Vårdenhet", "Region"),
+          freq = c("År", "Kvartal"),
+          valid_from = "2024-01-01",
+          type = "Andel",
+          version = 1,
+          status = "PUBLISHED",
+          submeasures = list(
+            list(gender_code = "1", measure_id = "abc124"),
+            list(gender_code = "2", measure_id = "abc125")
+          )
+        )
+      )
+    }
+  )
+
+  # Duplicated MeasureID columns with submeasures
+  df |>
+    dplyr::mutate(gender_var = c(rep(1, 55), rep(2, 55))) |>
+    aggregate_vis(
+      measure_id = "abc123",
+      indicator_function = indicator_function,
+      date_var = "date",
+      unit_var = "unit_var",
+      county_var = "county_var",
+      register_id = 100
+    ) |>
+    expect_no_error()
+
 })

@@ -9,10 +9,11 @@
 \alias{postprocess_indicator_register}
 \alias{postprocess_indicator_names}
 \alias{postprocess_indicator_reason}
+\alias{postprocess_indicator_mid}
 \title{Handles the necessary postprocessing of an aggregated indicator by renaming
 and adding necessary variables as well as adding the version}
 \usage{
-postprocess_indicator(df, cfg, register_id)
+postprocess_indicator(df, cfg, register_id, measure_id)
 
 postprocess_indicator_prop(df)
 
@@ -27,6 +28,8 @@ postprocess_indicator_register(df, register_id)
 postprocess_indicator_names(df)
 
 postprocess_indicator_reason(df)
+
+postprocess_indicator_mid(df, submeasures, measure_id)
 }
 \arguments{
 \item{df}{an aggregated indicator}
@@ -34,6 +37,10 @@ postprocess_indicator_reason(df)
 \item{cfg}{the measure config, the result of [get_measure_config()]}
 
 \item{register_id}{the register ID}
+
+\item{measure_id}{the MeasureID passed to [aggregate_vis]}
+
+\item{submeasures}{the submeasures key from [get_measure_config]}
 }
 \value{
 renamed data.frame
@@ -60,5 +67,7 @@ count
 \item \code{postprocess_indicator_names()}: adds remaining variables
 
 \item \code{postprocess_indicator_reason()}: adds ReasonCode
+
+\item \code{postprocess_indicator_mid()}: adds MeasureID
 
 }}

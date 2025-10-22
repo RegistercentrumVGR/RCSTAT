@@ -173,6 +173,144 @@
       $thresholdForViewing
       NULL
       
+      $submeasures
+      $submeasures[[1]]
+      $submeasures[[1]]$id
+      [1] "6a984524-3ea9-4561-89d6-f5d46dc9ad9e"
+      
+      $submeasures[[1]]$ownerMeasureId
+      NULL
+      
+      $submeasures[[1]]$linkedMeasureVersions
+      NULL
+      
+      $submeasures[[1]]$gender
+      $submeasures[[1]]$gender$id
+      [1] "9d9f9d94-df7c-4887-b0af-b8664f30ce87"
+      
+      $submeasures[[1]]$gender$codeId
+      [1] "545779e637874129a8ef8af5"
+      
+      $submeasures[[1]]$gender$codeValue
+      [1] "2"
+      
+      $submeasures[[1]]$gender$oid
+      [1] "5457794537874129a8ef8aaf"
+      
+      $submeasures[[1]]$gender$displayName
+      [1] "Kvinna"
+      
+      $submeasures[[1]]$gender$description
+      [1] "Kvinna"
+      
+      $submeasures[[1]]$gender$version
+      [1] "1.0"
+      
+      
+      $submeasures[[1]]$age
+      NULL
+      
+      $submeasures[[1]]$restriction
+      NULL
+      
+      
+      $submeasures[[2]]
+      $submeasures[[2]]$id
+      [1] "9d187574-e549-48fb-beb2-931ac035fda9"
+      
+      $submeasures[[2]]$ownerMeasureId
+      NULL
+      
+      $submeasures[[2]]$linkedMeasureVersions
+      NULL
+      
+      $submeasures[[2]]$gender
+      $submeasures[[2]]$gender$id
+      [1] "664df7f8-488d-4c51-aba7-bb1b090452cf"
+      
+      $submeasures[[2]]$gender$codeId
+      [1] "545779c937874129a8ef8ace"
+      
+      $submeasures[[2]]$gender$codeValue
+      [1] "1"
+      
+      $submeasures[[2]]$gender$oid
+      [1] "5457794537874129a8ef8aaf"
+      
+      $submeasures[[2]]$gender$displayName
+      [1] "Man"
+      
+      $submeasures[[2]]$gender$description
+      [1] "Man"
+      
+      $submeasures[[2]]$gender$version
+      [1] "1.0"
+      
+      
+      $submeasures[[2]]$age
+      NULL
+      
+      $submeasures[[2]]$restriction
+      NULL
+      
+      
+      
+
+# add_groups_long works
+
+    Code
+      add_groups_long(df, cfg, "date", "unit_var", "county_var", "gender_var")
+    Output
+               date unit_var county_var gender_var PeriodReportedStartDate
+      1  2024-09-14        1         14          1              2024-07-01
+      2  2024-09-14        1         14          1              2024-01-01
+      3  2024-09-14        1         14          1              2024-09-01
+      4  2024-09-14        1         14          1              2024-07-01
+      5  2024-09-14        1         14          1              2024-07-01
+      6  2024-09-14        1         14          1              2024-01-01
+      7  2024-09-14        1         14          1              2024-09-01
+      8  2024-09-14        1         14          1              2024-07-01
+      9  2024-09-14        1         14          1              2024-07-01
+      10 2024-09-14        1         14          1              2024-01-01
+      11 2024-09-14        1         14          1              2024-09-01
+      12 2024-09-14        1         14          1              2024-07-01
+      13 2024-09-14        1         14          1              2024-07-01
+      14 2024-09-14        1         14          1              2024-01-01
+      15 2024-09-14        1         14          1              2024-09-01
+      16 2024-09-14        1         14          1              2024-07-01
+      17 2024-09-14        1         14          1              2024-07-01
+      18 2024-09-14        1         14          1              2024-01-01
+      19 2024-09-14        1         14          1              2024-09-01
+      20 2024-09-14        1         14          1              2024-07-01
+      21 2024-09-14        1         14          1              2024-07-01
+      22 2024-09-14        1         14          1              2024-01-01
+      23 2024-09-14        1         14          1              2024-09-01
+      24 2024-09-14        1         14          1              2024-07-01
+         PeriodReportedEndDate  unit unit_type county gender
+      1             2024-09-30 Riket   country   <NA>    all
+      2             2024-12-31 Riket   country   <NA>    all
+      3             2024-09-30 Riket   country   <NA>    all
+      4             2024-12-31 Riket   country   <NA>    all
+      5             2024-09-30    14    county   <NA>    all
+      6             2024-12-31    14    county   <NA>    all
+      7             2024-09-30    14    county   <NA>    all
+      8             2024-12-31    14    county   <NA>    all
+      9             2024-09-30     1      unit     14    all
+      10            2024-12-31     1      unit     14    all
+      11            2024-09-30     1      unit     14    all
+      12            2024-12-31     1      unit     14    all
+      13            2024-09-30 Riket   country   <NA>      1
+      14            2024-12-31 Riket   country   <NA>      1
+      15            2024-09-30 Riket   country   <NA>      1
+      16            2024-12-31 Riket   country   <NA>      1
+      17            2024-09-30    14    county   <NA>      1
+      18            2024-12-31    14    county   <NA>      1
+      19            2024-09-30    14    county   <NA>      1
+      20            2024-12-31    14    county   <NA>      1
+      21            2024-09-30     1      unit     14      1
+      22            2024-12-31     1      unit     14      1
+      23            2024-09-30     1      unit     14      1
+      24            2024-12-31     1      unit     14      1
 
 # aggregate_vis works
 
@@ -180,11 +318,11 @@
       res
     Output
         PeriodReportedStartDate PeriodReportedEndDate Denominator Rate Numerator
-      1              2024-01-01            2024-12-31          10    0        10
+      1              2024-01-01            2024-12-31          10   NA        10
       2              2024-01-01            2024-12-31         110    1       110
       3              2024-01-01            2024-12-31         100    1       100
       4              2024-01-01            2024-12-31         110    1       110
-      5              2024-07-01            2024-09-30          10    0        10
+      5              2024-07-01            2024-09-30          10   NA        10
       6              2024-07-01            2024-09-30         110    1       110
       7              2024-07-01            2024-09-30         100    1       100
       8              2024-07-01            2024-09-30         110    1       110
@@ -197,49 +335,49 @@
       6                   14            <NA>      <NA> Västra Götaland
       7                   14 Registercentrum           Västra Götaland
       8                 <NA>            <NA>      <NA>            <NA>
-                           RegisterNamn RegisterHSAID MeasureID HospitalName
-      1 Registercentrum Västra Götaland            NA    abc123           NA
-      2 Registercentrum Västra Götaland            NA    abc123           NA
-      3 Registercentrum Västra Götaland            NA    abc123           NA
-      4 Registercentrum Västra Götaland            NA    abc123           NA
-      5 Registercentrum Västra Götaland            NA    abc123           NA
-      6 Registercentrum Västra Götaland            NA    abc123           NA
-      7 Registercentrum Västra Götaland            NA    abc123           NA
-      8 Registercentrum Västra Götaland            NA    abc123           NA
-        HospitalHSAID HospitalOrganisationId CountryName Value Cohort Version
-      1            NA                     NA          NA    NA     NA       1
-      2            NA                     NA          NA    NA     NA       1
-      3            NA                     NA          NA    NA     NA       1
-      4            NA                     NA          NA    NA     NA       1
-      5            NA                     NA          NA    NA     NA       1
-      6            NA                     NA          NA    NA     NA       1
-      7            NA                     NA          NA    NA     NA       1
-      8            NA                     NA          NA    NA     NA       1
-        ReferenceIntervalRate ReferenceIntervalValue MunicipalityOrganisationID
-      1                    NA                     NA                         NA
-      2                    NA                     NA                         NA
-      3                    NA                     NA                         NA
-      4                    NA                     NA                         NA
-      5                    NA                     NA                         NA
-      6                    NA                     NA                         NA
-      7                    NA                     NA                         NA
-      8                    NA                     NA                         NA
-        MunicipalityName Coverage ConfidenceIntervalLower ConfidenceIntervalHigher
-      1               NA       NA                      NA                       NA
-      2               NA       NA                      NA                       NA
-      3               NA       NA                      NA                       NA
-      4               NA       NA                      NA                       NA
-      5               NA       NA                      NA                       NA
-      6               NA       NA                      NA                       NA
-      7               NA       NA                      NA                       NA
-      8               NA       NA                      NA                       NA
-        Standarddeviation Measurepopulation Exclusions ReasonCode
-      1                NA                NA         NA        MSK
-      2                NA                NA         NA       <NA>
-      3                NA                NA         NA       <NA>
-      4                NA                NA         NA       <NA>
-      5                NA                NA         NA        MSK
-      6                NA                NA         NA       <NA>
-      7                NA                NA         NA       <NA>
-      8                NA                NA         NA       <NA>
+                           RegisterNamn RegisterHSAID ReasonCode MeasureID
+      1 Registercentrum Västra Götaland            NA        MSK    abc123
+      2 Registercentrum Västra Götaland            NA       <NA>    abc123
+      3 Registercentrum Västra Götaland            NA       <NA>    abc123
+      4 Registercentrum Västra Götaland            NA       <NA>    abc123
+      5 Registercentrum Västra Götaland            NA        MSK    abc123
+      6 Registercentrum Västra Götaland            NA       <NA>    abc123
+      7 Registercentrum Västra Götaland            NA       <NA>    abc123
+      8 Registercentrum Västra Götaland            NA       <NA>    abc123
+        HospitalName HospitalHSAID HospitalOrganisationId CountryName Value Cohort
+      1           NA            NA                     NA          NA    NA     NA
+      2           NA            NA                     NA          NA    NA     NA
+      3           NA            NA                     NA          NA    NA     NA
+      4           NA            NA                     NA          NA    NA     NA
+      5           NA            NA                     NA          NA    NA     NA
+      6           NA            NA                     NA          NA    NA     NA
+      7           NA            NA                     NA          NA    NA     NA
+      8           NA            NA                     NA          NA    NA     NA
+        Version ReferenceIntervalRate ReferenceIntervalValue
+      1       1                    NA                     NA
+      2       1                    NA                     NA
+      3       1                    NA                     NA
+      4       1                    NA                     NA
+      5       1                    NA                     NA
+      6       1                    NA                     NA
+      7       1                    NA                     NA
+      8       1                    NA                     NA
+        MunicipalityOrganisationID MunicipalityName Coverage ConfidenceIntervalLower
+      1                         NA               NA       NA                      NA
+      2                         NA               NA       NA                      NA
+      3                         NA               NA       NA                      NA
+      4                         NA               NA       NA                      NA
+      5                         NA               NA       NA                      NA
+      6                         NA               NA       NA                      NA
+      7                         NA               NA       NA                      NA
+      8                         NA               NA       NA                      NA
+        ConfidenceIntervalHigher Standarddeviation Measurepopulation Exclusions
+      1                       NA                NA                NA         NA
+      2                       NA                NA                NA         NA
+      3                       NA                NA                NA         NA
+      4                       NA                NA                NA         NA
+      5                       NA                NA                NA         NA
+      6                       NA                NA                NA         NA
+      7                       NA                NA                NA         NA
+      8                       NA                NA                NA         NA
 

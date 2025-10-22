@@ -11,7 +11,8 @@ aggregate_vis(
   date_var,
   unit_var,
   county_var,
-  register_id
+  register_id,
+  gender_var = NULL
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ aggregating the indicator}
 \item{county_var}{the name of the county variable}
 
 \item{register_id}{the register ID}
+
+\item{gender_var}{the name of the gender variable, if `NULL` the variable
+`SubjectKey` must be present in `df`}
 }
 \value{
 an aggregated data.frame with VIS appropriate names and metadata

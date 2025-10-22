@@ -459,7 +459,7 @@ get_sos_vl <- function(
       dplyr::filter(stringr::str_detect(stringr::str_trim(
         .data$vm
       ), "^(\\w+)\\s*=")) |>
-      tidyr::separate_rows(.data$vm, sep = "[,;]|(?=\\s+\\w+\\s*=)") |>
+      tidyr::separate_rows("vm", sep = "[,;]|(?=\\s+\\w+\\s*=)") |>
       dplyr::filter(grepl("=", .data$vm)) |>
       tidyr::separate(.data$vm,
         into = c("code", "label"),

@@ -4,13 +4,16 @@
 \alias{add_groups_long}
 \alias{add_groups_long_date}
 \alias{add_groups_long_organization}
+\alias{add_groups_long_gender}
 \title{Adds appropriate groups in long format}
 \usage{
-add_groups_long(df, cfg, date_var, unit_var, county_var)
+add_groups_long(df, cfg, date_var, unit_var, county_var, gender_var)
 
 add_groups_long_date(df, date_var, type)
 
 add_groups_long_organization(df, unit_var, county_var, type)
+
+add_groups_long_gender(df, submeasures, gender_var)
 }
 \arguments{
 \item{df}{a data.frame}
@@ -23,7 +26,11 @@ add_groups_long_organization(df, unit_var, county_var, type)
 
 \item{county_var}{the name of county variable}
 
+\item{gender_var}{the name of the gender variable}
+
 \item{type}{the type of date or organizational level to be added}
+
+\item{submeasures}{the submeasures key from [get_measure_config]}
 }
 \value{
 a data.frame with extra rows added
@@ -36,5 +43,7 @@ Adds appropriate groups in long format
 \item \code{add_groups_long_date()}: adds long date groups
 
 \item \code{add_groups_long_organization()}: adds long organization (unit and county) groups
+
+\item \code{add_groups_long_gender()}: adds long gender groups
 
 }}

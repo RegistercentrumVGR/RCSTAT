@@ -510,7 +510,8 @@ postprocess_indicator_org <- function(df, register_id) {
       UnitName = dplyr::case_when(
         .data$unit_type == "unit" ~ .data$unit,
         .default = NA
-      )
+      ),
+      CountryName = "Riket"
     ) |>
     dplyr::left_join(
       units |>

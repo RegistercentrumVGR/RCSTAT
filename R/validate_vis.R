@@ -58,7 +58,12 @@ validate_vis <- function(df, overall_rate = 0.25, measure_rate = 0.75, as_data_f
     ),
     check_counties_and_units(df),
     check_duplicate_rows(df),
-    check_unit_hospital(df)
+    check_unit_hospital(df),
+    check_countryname(df),
+    check_version(df),
+    check_measureid(df),
+    check_reasoncode(df),
+    check_censored(df)
   )
 
   return(return_errors(errors, as_data_frame))
@@ -836,13 +841,17 @@ check_reasoncode <- function(df) {
 #' @return vector of error messages
 #' @md
 check_censored <- function(df) {
+  errors <- c()
+
   tmp <- df |>
-    dplyr::filter(!is.na(.data$ReasonCode)) |>
+    dplyr::filter(!is.na(.data$ReasonCode))
+
+  if (nrow(tmp) == 0) return(errors)
+
+  tmp <- tmp |>
     dplyr::mutate(
       name = dplyr::coalesce(.data$UnitName, .data$HospitalName)
     )
-
-  errors <- c()
 
   na_value <- tmp |>
     dplyr::filter(!is.na(.data$Value)) |>

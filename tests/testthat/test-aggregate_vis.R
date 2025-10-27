@@ -252,6 +252,7 @@ test_that("postprocess_indicator works", {
       data.frame(
         RegionOrganisationId = c("14", "14", NA),
         UnitName = c(NA, "Test U/Sahlgrenska", NA),
+        CountryName = "Riket",
         UnitHSAID = c(NA, "SE2321000131-F000000000207", NA),
         RegionName = c("Västra Götaland", "Västra Götaland", NA)
       )

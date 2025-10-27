@@ -10,7 +10,7 @@
       [1] "UNPUBLISHED"
       
       $lastUpdated
-      NULL
+      [1] 1.670253e+12
       
       $lastUpdatedBy
       [1] "[Dold personuppgift]"
@@ -326,15 +326,15 @@
       6              2024-07-01            2024-09-30         110    1       110
       7              2024-07-01            2024-09-30         100    1       100
       8              2024-07-01            2024-09-30         110    1       110
-        RegionOrganisationId        UnitName UnitHSAID      RegionName
-      1                   14            <NA>      <NA> Västra Götaland
-      2                   14            <NA>      <NA> Västra Götaland
-      3                   14 Registercentrum           Västra Götaland
-      4                 <NA>            <NA>      <NA>            <NA>
-      5                   14            <NA>      <NA> Västra Götaland
-      6                   14            <NA>      <NA> Västra Götaland
-      7                   14 Registercentrum           Västra Götaland
-      8                 <NA>            <NA>      <NA>            <NA>
+        RegionOrganisationId        UnitName CountryName UnitHSAID      RegionName
+      1                   14            <NA>       Riket      <NA> Västra Götaland
+      2                   14            <NA>       Riket      <NA> Västra Götaland
+      3                   14 Registercentrum       Riket           Västra Götaland
+      4                 <NA>            <NA>       Riket      <NA>            <NA>
+      5                   14            <NA>       Riket      <NA> Västra Götaland
+      6                   14            <NA>       Riket      <NA> Västra Götaland
+      7                   14 Registercentrum       Riket           Västra Götaland
+      8                 <NA>            <NA>       Riket      <NA>            <NA>
                            RegisterNamn RegisterHSAID ReasonCode MeasureID
       1 Registercentrum Västra Götaland            NA        MSK    abc123
       2 Registercentrum Västra Götaland            NA       <NA>    abc123
@@ -344,40 +344,40 @@
       6 Registercentrum Västra Götaland            NA       <NA>    abc123
       7 Registercentrum Västra Götaland            NA       <NA>    abc123
       8 Registercentrum Västra Götaland            NA       <NA>    abc123
-        HospitalName HospitalHSAID HospitalOrganisationId CountryName Value Cohort
-      1           NA            NA                     NA          NA    NA     NA
-      2           NA            NA                     NA          NA    NA     NA
-      3           NA            NA                     NA          NA    NA     NA
-      4           NA            NA                     NA          NA    NA     NA
-      5           NA            NA                     NA          NA    NA     NA
-      6           NA            NA                     NA          NA    NA     NA
-      7           NA            NA                     NA          NA    NA     NA
-      8           NA            NA                     NA          NA    NA     NA
-        Version ReferenceIntervalRate ReferenceIntervalValue
-      1       1                    NA                     NA
-      2       1                    NA                     NA
-      3       1                    NA                     NA
-      4       1                    NA                     NA
-      5       1                    NA                     NA
-      6       1                    NA                     NA
-      7       1                    NA                     NA
-      8       1                    NA                     NA
-        MunicipalityOrganisationID MunicipalityName Coverage ConfidenceIntervalLower
-      1                         NA               NA       NA                      NA
-      2                         NA               NA       NA                      NA
-      3                         NA               NA       NA                      NA
-      4                         NA               NA       NA                      NA
-      5                         NA               NA       NA                      NA
-      6                         NA               NA       NA                      NA
-      7                         NA               NA       NA                      NA
-      8                         NA               NA       NA                      NA
-        ConfidenceIntervalHigher Standarddeviation Measurepopulation Exclusions
-      1                       NA                NA                NA         NA
-      2                       NA                NA                NA         NA
-      3                       NA                NA                NA         NA
-      4                       NA                NA                NA         NA
-      5                       NA                NA                NA         NA
-      6                       NA                NA                NA         NA
-      7                       NA                NA                NA         NA
-      8                       NA                NA                NA         NA
+        HospitalName HospitalHSAID HospitalOrganisationId Value Cohort Version
+      1           NA            NA                     NA    NA     NA       1
+      2           NA            NA                     NA    NA     NA       1
+      3           NA            NA                     NA    NA     NA       1
+      4           NA            NA                     NA    NA     NA       1
+      5           NA            NA                     NA    NA     NA       1
+      6           NA            NA                     NA    NA     NA       1
+      7           NA            NA                     NA    NA     NA       1
+      8           NA            NA                     NA    NA     NA       1
+        ReferenceIntervalRate ReferenceIntervalValue MunicipalityOrganisationID
+      1                    NA                     NA                         NA
+      2                    NA                     NA                         NA
+      3                    NA                     NA                         NA
+      4                    NA                     NA                         NA
+      5                    NA                     NA                         NA
+      6                    NA                     NA                         NA
+      7                    NA                     NA                         NA
+      8                    NA                     NA                         NA
+        MunicipalityName Coverage ConfidenceIntervalLower ConfidenceIntervalHigher
+      1               NA       NA                      NA                       NA
+      2               NA       NA                      NA                       NA
+      3               NA       NA                      NA                       NA
+      4               NA       NA                      NA                       NA
+      5               NA       NA                      NA                       NA
+      6               NA       NA                      NA                       NA
+      7               NA       NA                      NA                       NA
+      8               NA       NA                      NA                       NA
+        Standarddeviation Measurepopulation Exclusions
+      1                NA                NA         NA
+      2                NA                NA         NA
+      3                NA                NA         NA
+      4                NA                NA         NA
+      5                NA                NA         NA
+      6                NA                NA         NA
+      7                NA                NA         NA
+      8                NA                NA         NA
 

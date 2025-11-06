@@ -226,6 +226,22 @@ test_that("postprocess_indicator works", {
     )
 
   data.frame(
+    ind_n = 10,
+    total = 20,
+    ind_total_non_missing = 10,
+    ind_mean = 1
+  ) |>
+    postprocess_indicator_mean() |>
+    expect_equal(
+      data.frame(
+        ind_n = 10,
+        total = 20,
+        Measurepopulation = 10,
+        Value = 1
+      )
+    )
+
+  data.frame(
     total = 10
   ) |>
     postprocess_indicator_count() |>

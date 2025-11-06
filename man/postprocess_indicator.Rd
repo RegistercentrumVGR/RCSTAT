@@ -10,6 +10,7 @@
 \alias{postprocess_indicator_names}
 \alias{postprocess_indicator_reason}
 \alias{postprocess_indicator_mid}
+\alias{postprocess_indicator_mean}
 \title{Handles the necessary postprocessing of an aggregated indicator by renaming
 and adding necessary variables as well as adding the version}
 \usage{
@@ -30,6 +31,8 @@ postprocess_indicator_names(df)
 postprocess_indicator_reason(df)
 
 postprocess_indicator_mid(df, submeasures, measure_id)
+
+postprocess_indicator_mean(df)
 }
 \arguments{
 \item{df}{an aggregated indicator}
@@ -69,5 +72,8 @@ count
 \item \code{postprocess_indicator_reason()}: adds ReasonCode
 
 \item \code{postprocess_indicator_mid()}: adds MeasureID
+
+\item \code{postprocess_indicator_mean()}: renames columns if the indicator is a
+mean
 
 }}

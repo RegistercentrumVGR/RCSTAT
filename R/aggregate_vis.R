@@ -421,7 +421,10 @@ add_groups_long_gender <- function(df, submeasures, gender_var) {
 #' @return renamed data.frame
 postprocess_indicator <- function(df, cfg, register_id, measure_id) {
 
-  checkmate::assert_choice(cfg$type, c("Andel", "Dagar", "Median", "Antal"))
+  checkmate::assert_choice(
+    cfg$type,
+    c("Andel", "Dagar", "Median", "Antal", "Medelv\u00e4rde")
+  )
 
   if (cfg$type == "Andel") {
     df <- postprocess_indicator_prop(df)
@@ -429,6 +432,8 @@ postprocess_indicator <- function(df, cfg, register_id, measure_id) {
     df <- postprocess_indicator_median(df)
   } else if (cfg$type == "Antal") {
     df <- postprocess_indicator_count(df)
+  } else if (cfg$type == "Medelv\u00e4rde") {
+    df <- postprocess_indicator_mean(df)
   }
 
   df |>
@@ -590,4 +595,23 @@ postprocess_indicator_mid <- function(df, submeasures, measure_id) {
       dplyr::rename(MeasureID = "measure_id")
   }
   dplyr::select(df, -"gender")
+}
+
+#' @describeIn postprocess_indicator renames columns if the indicator is a
+#' mean
+postprocess_indicator_mean <- function(df) {
+
+  if (any(stringr::str_detect(names(df), "_total_non_missing$"))) {
+    df |>
+      dplyr::rename(
+        Value = dplyr::ends_with("_mean"),
+        Measurepopulation = dplyr::ends_with("_total_non_missing")
+      )
+  } else {
+    df |>
+      dplyr::rename(
+        Value = dplyr::ends_with("_mean"),
+        Measurepopulation = dplyr::all_of("total")
+      )
+  }
 }

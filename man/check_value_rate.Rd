@@ -16,5 +16,7 @@ vector of error messages
 \itemize{
 \item Ensures that all rows that are not censored have Value or Rate
 \item Ensures that all Rates have Numerator and Denominator
+\item Ensures that all Rates are in [0, 1] or NA
+\item Ensures that all Denominators and Numerators are \\u2265 0 or NA
 }
 }

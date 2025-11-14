@@ -245,6 +245,28 @@ test_that("check_value_rate works", {
                " is missing Denominator where Rate is present")
       )
     )
+
+  data.frame(
+    Rate = c(50, 0.5),
+    Numerator = c(5, -1),
+    Denominator = c(10, 20),
+    ReasonCode = NA,
+    UnitName = "a",
+    HospitalName = NA,
+    MeasureID = 1,
+    PeriodReportedStartDate = lubridate::ymd("2024-01-01"),
+    PeriodReportedEndDate = lubridate::ymd("2024-12-31"),
+    RegionOrganisationId = "14",
+    Value = NA
+  ) |>
+    check_value_rate() |>
+    expect_equal(
+      c(
+        "Rate contains values that are not in [0, 1] or NA",
+        "Numerator contains values that are not ≥ 0 or NA"
+      )
+    )
+
 })
 
 test_that("check_ci works", {

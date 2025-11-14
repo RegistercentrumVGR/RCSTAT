@@ -289,6 +289,8 @@ check_register_hsaid <- function(df) {
 #'
 #' * Ensures that all rows that are not censored have Value or Rate
 #' * Ensures that all Rates have Numerator and Denominator
+#' * Ensures that all Rates are in \[0, 1\] or NA
+#' * Ensures that all Denominators and Numerators are \\u2265 0 or NA
 #'
 #' @param df VIS data.frame
 #'
@@ -378,6 +380,33 @@ check_value_rate <- function(df) {
         na_denominator$RegionOrganisationId,
         na_denominator$name
       )
+    )
+  }
+
+  tmp <- all(dplyr::between(df$Rate, 0, 1) | is.na(df$Rate))
+
+  if (!tmp) {
+    errors <- c(
+      errors,
+      "Rate contains values that are not in [0, 1] or NA"
+    )
+  }
+
+  tmp <- all(df$Numerator >= 0 | is.na(df$Numerator))
+
+  if (!tmp) {
+    errors <- c(
+      errors,
+      "Numerator contains values that are not \u2265 0 or NA"
+    )
+  }
+
+  tmp <- all(df$Denominator >= 0 | is.na(df$Denominator))
+
+  if (!tmp) {
+    errors <- c(
+      errors,
+      "Denominator contains values that are not \u2265 0 or NA"
     )
   }
 

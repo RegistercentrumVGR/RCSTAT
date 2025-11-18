@@ -343,7 +343,8 @@ add_groups_long_organization <- function(df, unit_var, county_var, type) {
       "L\u00e4nsniv\u00e5",
       "Mottagningsniv\u00e5",
       "Region",
-      "V\u00e5rdenhet"
+      "V\u00e5rdenhet",
+      "H\u00e4lso-och sjukv\u00e5rdsregion"
     )
   )
 
@@ -368,6 +369,11 @@ add_groups_long_organization <- function(df, unit_var, county_var, type) {
         unit_type = "unit",
         county = .data[[county_var]]
       )
+  } else if (type == "H\u00e4lso-och sjukv\u00e5rdsregion") {
+    cli::cli_alert_warning(
+      sprintf("Type '%s' is not yet supported, ignoring", type)
+    )
+    NULL
   }
 
 }

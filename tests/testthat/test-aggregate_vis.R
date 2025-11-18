@@ -62,8 +62,6 @@ test_that("add_groups_long works", {
   ) |>
     expect_snapshot()
 
-
-
   add_groups_long(
     df,
     list(
@@ -161,6 +159,30 @@ test_that("add_groups_long works", {
     "gender_var"
   ) |>
     expect_error()
+
+  df <- data.frame(
+    date = lubridate::ymd("2024-09-14"),
+    unit_var = 1,
+    county_var = "14",
+    gender_var = 1
+  )
+
+  cfg <- list(
+    org = c("Riksnivå", "Hälso-och sjukvårdsregion"),
+    freq = "År"
+  )
+
+  expect_message(
+    res <- add_groups_long_organization(
+      df,
+      "unit_var",
+      "county_var",
+      "Hälso-och sjukvårdsregion"
+    ),
+    "! Type 'Hälso-och sjukvårdsregion' is not yet supported, ignoring"
+  )
+
+  expect_null(res)
 
 })
 

@@ -78,6 +78,98 @@ test_that("Gender can be calculated from pnr ", {
   )
 })
 
+test_that("format of pnr can be validated", {
+  dummy_pnr <- c(
+    7,
+    "19110908-453Z",
+    "19001219_8750",
+    "19390524-1224",
+    "160404-7850",
+    "193004303099",
+    "19350320-7452",
+    "19390914-1131",
+    "Hemliga meddelanden till flitiga reviewers"
+  )
+
+  expected <-
+    c(
+      FALSE,
+      FALSE,
+      FALSE,
+      TRUE,
+      FALSE,
+      FALSE,
+      TRUE,
+      TRUE,
+      FALSE
+    )
+  testthat::expect_equal(
+    valid_pnr_format(dummy_pnr),
+    expected
+  )
+})
+
+test_that("the control number can be validated", {
+  dummy_pnr <- c(
+    "193004303099",
+    "19350320-7452",
+    "19390914-1131",
+    "19591912-1331",
+    "Hemliga meddelanden till flitiga reviewers"
+  )
+
+  expected <-
+    c(
+      FALSE,
+      TRUE,
+      TRUE,
+      FALSE,
+      FALSE
+    )
+  testthat::expect_equal(
+    valid_pnr(dummy_pnr),
+    expected
+  )
+})
+
+test_that("the control number can be validated", {
+  dummy_pnr <- c(
+    "193004303099",
+    "19350320-7452",
+    "19390914-1131",
+    "19591912-1331",
+    "Hemliga meddelanden till flitiga reviewers"
+  )
+
+  expected <-
+    c(
+      FALSE,
+      TRUE,
+      TRUE,
+      FALSE,
+      FALSE
+    )
+
+  testthat::expect_equal(
+    valid_pnr(dummy_pnr),
+    expected
+  )
+
+  expected <-
+    c(
+      NA,
+      TRUE,
+      TRUE,
+      FALSE,
+      NA
+    )
+
+  testthat::expect_equal(
+    valid_pnr(dummy_pnr, handle_invalid = FALSE),
+    expected
+  )
+})
+
 test_that("pseudonymizing data works", {
   res <- pseudonymize_data(
     df = dummy_data,

@@ -87,6 +87,73 @@ gender <- function(x) {
   data.table::fifelse(is_female(x), 2L, 1L)
 }
 
+#' Checks if the Swedish social security number is in the expected stratum
+#' format "XXXXXXXX-XXXX"
+#'
+#' @param pnr Swedish social security number
+#' @return Boolean indicating correct (TRUE) or incorrect (FALSE) format
+#' @export valid_pnr_format
+valid_pnr_format <- function(pnr) {
+
+  pattern <- "^[0-9]{8}-[0-9]{4}$"
+
+  return(
+    grepl(pattern, pnr)
+  )
+}
+
+#' Checks if the Swedish social security number is correctly formatted and
+#' has the correct control number.
+#'
+#' @param pnr Swedish social security number
+#' @param handle_invalid How to process social security numbers with invalid
+#' formatting. If TRUE returns FALSE, if FALSE returns NA
+#' @return Boolean indicating correct (TRUE) or incorrect (FALSE) social
+#' security number
+#' @export valid_pnr
+valid_pnr <- function(pnr, handle_invalid = TRUE) {
+  is_valid_format <- vapply(pnr, valid_pnr_format, logical(1))
+
+  if (handle_invalid) {
+    output <- rep(FALSE, length(pnr))
+  } else {
+    output <- rep(NA, length(pnr))
+  }
+
+  if (!any(is_valid_format)) {
+    return(output)
+  }
+
+  good_pnr <- pnr[is_valid_format]
+
+  pnr_digits <- stringr::str_remove(good_pnr, "-") |>
+    stringr::str_split("")
+
+  compute_check_digit <- function(digits) {
+    nums <- as.integer(digits[3:11])
+
+    multiplier <- rep(c(2, 1), length.out = length(nums))
+
+    vals <- nums * multiplier
+
+    vals <- ifelse(vals > 9, vals %/% 10 + vals %% 10, vals)
+
+    check <- (10 - sum(vals) %% 10)
+    if (check == 10) check <- 0
+
+    check
+  }
+
+  check_digits <- vapply(pnr_digits, compute_check_digit, numeric(1))
+
+  last_digits <- substring(good_pnr, 13, 13)
+
+  output[is_valid_format] <- check_digits == as.integer(last_digits)
+
+  output
+}
+
+
 #' Gets random password from API
 #'
 #' @name random_password

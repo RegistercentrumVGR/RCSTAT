@@ -333,6 +333,28 @@ test_that("postprocess_indicator works", {
         RegisterHSAID = "ännu-finare-hsa-id-!"
       )
     )
+
+  df <- data.frame(
+    x_prop = 1e-16,
+    x_median = 1e-16,
+    x_mean = 1e-16,
+    total = 10
+  )
+
+  df |>
+    postprocess_indicator_mean() |>
+    dplyr::pull("Value") |>
+    expect_equal(0)
+
+  df |>
+    postprocess_indicator_median() |>
+    dplyr::pull("Value") |>
+    expect_equal(0)
+
+  df |>
+    postprocess_indicator_prop() |>
+    dplyr::pull("Rate") |>
+    expect_equal(0)
 })
 
 test_that("aggregate_vis works", {

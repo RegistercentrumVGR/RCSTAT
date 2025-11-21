@@ -456,20 +456,24 @@ postprocess_indicator <- function(df, cfg, register_id, measure_id) {
 postprocess_indicator_prop <- function(df) {
 
   if (any(stringr::str_detect(names(df), "_total_non_missing$"))) {
-    df |>
+    df <- df |>
       dplyr::rename(
         Rate = dplyr::ends_with("_prop"),
         Denominator = dplyr::ends_with("_n"),
         Numerator = dplyr::ends_with("_total_non_missing")
       )
   } else {
-    df |>
+    df <- df |>
       dplyr::rename(
         Rate = dplyr::ends_with("_prop"),
         Denominator = dplyr::ends_with("_n"),
         Numerator = dplyr::all_of("total")
       )
   }
+  df |>
+    dplyr::mutate(
+      Rate = round(.data$Rate, 2)
+    )
 }
 
 #' @describeIn postprocess_indicator renames columns if the indicator is a
@@ -477,18 +481,23 @@ postprocess_indicator_prop <- function(df) {
 postprocess_indicator_median <- function(df) {
 
   if (any(stringr::str_detect(names(df), "_total_non_missing$"))) {
-    df |>
+    df <- df |>
       dplyr::rename(
         Value = dplyr::ends_with("_median"),
         Measurepopulation = dplyr::ends_with("_total_non_missing")
       )
   } else {
-    df |>
+    df <- df |>
       dplyr::rename(
         Value = dplyr::ends_with("_median"),
         Measurepopulation = dplyr::all_of("total")
       )
   }
+
+  df |>
+    dplyr::mutate(
+      Value = round(.data$Value, 2)
+    )
 }
 
 #' @describeIn postprocess_indicator renames columns if the indicator is a
@@ -608,16 +617,21 @@ postprocess_indicator_mid <- function(df, submeasures, measure_id) {
 postprocess_indicator_mean <- function(df) {
 
   if (any(stringr::str_detect(names(df), "_total_non_missing$"))) {
-    df |>
+    df <- df |>
       dplyr::rename(
         Value = dplyr::ends_with("_mean"),
         Measurepopulation = dplyr::ends_with("_total_non_missing")
       )
   } else {
-    df |>
+    df <- df |>
       dplyr::rename(
         Value = dplyr::ends_with("_mean"),
         Measurepopulation = dplyr::all_of("total")
       )
   }
+
+  df |>
+    dplyr::mutate(
+      Value = round(.data$Value, 2)
+    )
 }

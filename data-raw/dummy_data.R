@@ -39,7 +39,7 @@ dummy_data <-
       rnorm(n, mean = 0, sd = 1),
       as.numeric(NA)
     )
-  ) %>%
+  ) |>
   dplyr::arrange(id, adate)
 
 usethis::use_data(dummy_data, overwrite = TRUE)

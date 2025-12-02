@@ -202,6 +202,20 @@ test_that("postprocess_indicator works", {
     )
 
   data.frame(
+    estimate = 0.5,
+    cum_events = 5,
+    total = 10
+  ) |>
+    postprocess_indicator_prop() |>
+    expect_equal(
+      data.frame(
+        Rate = 0.5,
+        Numerator = 5,
+        Denominator = 10
+      )
+    )
+
+  data.frame(
     ind_n = 10,
     total = 20,
     ind_total_non_missing = 10,

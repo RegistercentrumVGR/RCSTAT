@@ -10,7 +10,11 @@ get_surv_value(
   time_col = "time",
   event_col = "status",
   group_cols = NULL,
-  marginal_cols
+  marginal_cols,
+  obfuscate_data = FALSE,
+  add_reason_col = TRUE,
+  censored_value = NA,
+  censored_limit = 15
 )
 }
 \arguments{
@@ -25,6 +29,15 @@ get_surv_value(
 \item{group_cols}{the columns to group by}
 
 \item{marginal_cols}{the columns to add marginal groups for}
+
+\item{obfuscate_data}{whether or not to obfuscate data}
+
+\item{add_reason_col}{whether or not to add the reason for data being
+censored}
+
+\item{censored_value}{the value to use when observations are censored}
+
+\item{censored_limit}{lower limir for at risk before censoring}
 }
 \value{
 estimated survival at the requested point in time for each group

@@ -287,26 +287,26 @@
       23 2024-09-14        1         14          1              2024-09-01
       24 2024-09-14        1         14          1              2024-07-01
          PeriodReportedEndDate  unit unit_type county gender
-      1             2024-09-30 Riket   country   <NA>    all
-      2             2024-12-31 Riket   country   <NA>    all
-      3             2024-09-30 Riket   country   <NA>    all
-      4             2024-12-31 Riket   country   <NA>    all
-      5             2024-09-30    14    county   <NA>    all
-      6             2024-12-31    14    county   <NA>    all
-      7             2024-09-30    14    county   <NA>    all
-      8             2024-12-31    14    county   <NA>    all
+      1             2024-09-30 Riket   country  Riket    all
+      2             2024-12-31 Riket   country  Riket    all
+      3             2024-09-30 Riket   country  Riket    all
+      4             2024-12-31 Riket   country  Riket    all
+      5             2024-09-30    14    county     14    all
+      6             2024-12-31    14    county     14    all
+      7             2024-09-30    14    county     14    all
+      8             2024-12-31    14    county     14    all
       9             2024-09-30     1      unit     14    all
       10            2024-12-31     1      unit     14    all
       11            2024-09-30     1      unit     14    all
       12            2024-12-31     1      unit     14    all
-      13            2024-09-30 Riket   country   <NA>      1
-      14            2024-12-31 Riket   country   <NA>      1
-      15            2024-09-30 Riket   country   <NA>      1
-      16            2024-12-31 Riket   country   <NA>      1
-      17            2024-09-30    14    county   <NA>      1
-      18            2024-12-31    14    county   <NA>      1
-      19            2024-09-30    14    county   <NA>      1
-      20            2024-12-31    14    county   <NA>      1
+      13            2024-09-30 Riket   country  Riket      1
+      14            2024-12-31 Riket   country  Riket      1
+      15            2024-09-30 Riket   country  Riket      1
+      16            2024-12-31 Riket   country  Riket      1
+      17            2024-09-30    14    county     14      1
+      18            2024-12-31    14    county     14      1
+      19            2024-09-30    14    county     14      1
+      20            2024-12-31    14    county     14      1
       21            2024-09-30     1      unit     14      1
       22            2024-12-31     1      unit     14      1
       23            2024-09-30     1      unit     14      1

@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.3.0
+Version: 1.3.1
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 
@@ -16,7 +16,9 @@ Suggests:
     testthat (>= 3.0.0),
     rcmdcheck,
     usethis,
-    withr
+    withr,
+    broom,
+    survival
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 Imports: 
@@ -39,8 +41,6 @@ Imports:
     writexl,
     curl,
     stringi,
-    memoise,
-    broom,
-    survival
+    memoise
 LinkingTo: 
     Rcpp

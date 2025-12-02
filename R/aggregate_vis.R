@@ -353,14 +353,14 @@ add_groups_long_organization <- function(df, unit_var, county_var, type) {
       dplyr::mutate(
         unit = "Riket",
         unit_type = "country",
-        county = NA
+        county = "Riket"
       )
   } else if (type %in% c("L\u00e4nsniv\u00e5", "Region")) {
     df |>
       dplyr::mutate(
         unit = .data[[county_var]],
         unit_type = "county",
-        county = NA
+        county = .data[[county_var]]
       )
   } else if (type %in% c("Mottagningsniv\u00e5", "V\u00e5rdenhet")) {
     df |>
@@ -455,24 +455,33 @@ postprocess_indicator <- function(df, cfg, register_id, measure_id) {
 #' proportion
 postprocess_indicator_prop <- function(df) {
 
-  if (any(stringr::str_detect(names(df), "_total_non_missing$"))) {
+  if ("estimate" %in% names(df)) {
+    df <- df |>
+      dplyr::rename(
+        Rate = "estimate",
+        Numerator = dplyr::any_of("cum_events"),
+        Denominator = dplyr::any_of("total")
+      )
+  } else if (any(stringr::str_detect(names(df), "_total_non_missing$"))) {
     df <- df |>
       dplyr::rename(
         Rate = dplyr::ends_with("_prop"),
         Denominator = dplyr::ends_with("_n"),
         Numerator = dplyr::ends_with("_total_non_missing")
       )
-  } else {
+  } else if ("total" %in% names(df)) {
     df <- df |>
       dplyr::rename(
         Rate = dplyr::ends_with("_prop"),
         Denominator = dplyr::ends_with("_n"),
         Numerator = dplyr::all_of("total")
       )
+  } else {
+    cli::cli_abort("Unable to determine correct columns")
   }
   df |>
     dplyr::mutate(
-      Rate = round(.data$Rate, 2)
+      Rate = round(.data$Rate, 4)
     )
 }
 

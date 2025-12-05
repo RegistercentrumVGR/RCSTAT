@@ -195,8 +195,8 @@ test_that("postprocess_indicator works", {
     postprocess_indicator_prop() |>
     expect_equal(
       data.frame(
-        Denominator = 10,
-        Numerator = 20,
+        Numerator = 10,
+        Denominator = 20,
         Rate = 0.5
       )
     )
@@ -224,9 +224,9 @@ test_that("postprocess_indicator works", {
     postprocess_indicator_prop() |>
     expect_equal(
       data.frame(
-        Denominator = 10,
-        total = 20,
         Numerator = 10,
+        total = 20,
+        Denominator = 10,
         Rate = 1
       )
     )

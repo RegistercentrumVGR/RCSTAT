@@ -317,15 +317,15 @@
     Code
       res
     Output
-        PeriodReportedStartDate PeriodReportedEndDate Denominator Rate Numerator
-      1              2024-01-01            2024-12-31          10   NA        10
-      2              2024-01-01            2024-12-31         110    1       110
-      3              2024-01-01            2024-12-31         100    1       100
-      4              2024-01-01            2024-12-31         110    1       110
-      5              2024-07-01            2024-09-30          10   NA        10
-      6              2024-07-01            2024-09-30         110    1       110
-      7              2024-07-01            2024-09-30         100    1       100
-      8              2024-07-01            2024-09-30         110    1       110
+        PeriodReportedStartDate PeriodReportedEndDate Numerator Rate Denominator
+      1              2024-01-01            2024-12-31        10   NA          10
+      2              2024-01-01            2024-12-31       110    1         110
+      3              2024-01-01            2024-12-31       100    1         100
+      4              2024-01-01            2024-12-31       110    1         110
+      5              2024-07-01            2024-09-30        10   NA          10
+      6              2024-07-01            2024-09-30       110    1         110
+      7              2024-07-01            2024-09-30       100    1         100
+      8              2024-07-01            2024-09-30       110    1         110
         RegionOrganisationId        UnitName CountryName UnitHSAID      RegionName
       1                   14            <NA>       Riket      <NA> Västra Götaland
       2                   14            <NA>       Riket      <NA> Västra Götaland

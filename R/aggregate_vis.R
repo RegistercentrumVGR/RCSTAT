@@ -466,15 +466,15 @@ postprocess_indicator_prop <- function(df) {
     df <- df |>
       dplyr::rename(
         Rate = dplyr::ends_with("_prop"),
-        Denominator = dplyr::ends_with("_n"),
-        Numerator = dplyr::ends_with("_total_non_missing")
+        Numerator = dplyr::ends_with("_n"),
+        Denominator = dplyr::ends_with("_total_non_missing")
       )
   } else if ("total" %in% names(df)) {
     df <- df |>
       dplyr::rename(
         Rate = dplyr::ends_with("_prop"),
-        Denominator = dplyr::ends_with("_n"),
-        Numerator = dplyr::all_of("total")
+        Numerator = dplyr::ends_with("_n"),
+        Denominator = dplyr::all_of("total")
       )
   } else {
     cli::cli_abort("Unable to determine correct columns")

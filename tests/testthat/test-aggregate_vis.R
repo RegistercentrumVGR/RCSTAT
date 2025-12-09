@@ -551,4 +551,118 @@ test_that("aggregate_vis works", {
     ) |>
     expect_no_error()
 
+  testthat::local_mocked_bindings(
+    get_measure_config = function(...) {
+      return(
+        list(
+          org = c("Riksnivå"),
+          freq = c("År"),
+          valid_from = "2024-01-01",
+          type = "Andel",
+          version = 1,
+          status = "PUBLISHED"
+        )
+      )
+    }
+  )
+
+  df <- data.frame(
+    date = lubridate::make_date(2024, 1, 1),
+    county = "14",
+    unit = NA,
+    x = 1:100,
+    gender = 1
+  )
+
+  ind <- function(df,
+                  aggregate,
+                  group_cols,
+                  marginal_cols,
+                  obfuscate_data,
+                  add_reason_col,
+                  censored_value,
+                  abc) {
+    df <- df |>
+      dplyr::mutate(
+        urval = TRUE,
+        ind = .data$x <= abc
+      )
+
+    if (aggregate) {
+      df <- df |>
+        dplyr::filter(.data$urval) |>
+        RCStat::get_aggregate_value(
+          group_cols = group_cols,
+          marginal_cols = marginal_cols,
+          obfuscate_data = obfuscate_data,
+          add_reason_col = add_reason_col,
+          censored_value = censored_value,
+          vars = list(prop = "ind")
+        )
+    }
+    df
+  }
+
+  expect_no_error(
+    res <- aggregate_vis(
+      df = df,
+      measure_id = "11111",
+      unit_var = "unit",
+      date_var = "date",
+      county_var = "county",
+      indicator_function = ind,
+      gender_var = "gender",
+      abc = 50,
+      register_id = 100,
+      def = "meow"
+    )
+  )
+
+  expect_equal(res$Numerator, 50)
+  expect_equal(res$Rate, 0.5)
+  expect_equal(res$Denominator, 100)
+
+
+  ind <- function(df,
+                  aggregate,
+                  group_cols,
+                  marginal_cols,
+                  obfuscate_data,
+                  add_reason_col,
+                  censored_value) {
+    df <- df |>
+      dplyr::mutate(
+        urval = TRUE,
+        ind = .data$x <= 50
+      )
+
+    if (aggregate) {
+      df <- df |>
+        dplyr::filter(.data$urval) |>
+        RCStat::get_aggregate_value(
+          group_cols = group_cols,
+          marginal_cols = marginal_cols,
+          obfuscate_data = obfuscate_data,
+          add_reason_col = add_reason_col,
+          censored_value = censored_value,
+          vars = list(prop = "ind")
+        )
+    }
+    df
+  }
+
+  # Unused arguments cause no error
+  expect_no_error(
+    aggregate_vis(
+      df = df,
+      measure_id = "11111",
+      unit_var = "unit",
+      date_var = "date",
+      county_var = "county",
+      indicator_function = ind,
+      gender_var = "gender",
+      abc = 50,
+      register_id = 100
+    )
+  )
 })

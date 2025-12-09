@@ -184,6 +184,7 @@ get_measure_config <- function(measure_id) {
 #' @param register_id the register ID
 #' @param gender_var the name of the gender variable, if `NULL` the variable
 #' `SubjectKey` must be present in `df`
+#' @param ... passed to `indicator_function`
 #'
 #' @return an aggregated data.frame with VIS appropriate names and metadata
 #' @export
@@ -194,7 +195,8 @@ aggregate_vis <- function(df,
                           unit_var,
                           county_var,
                           register_id,
-                          gender_var = NULL) {
+                          gender_var = NULL,
+                          ...) {
 
   cfg <- get_measure_config(measure_id)
 
@@ -241,21 +243,34 @@ aggregate_vis <- function(df,
       gender_var
     )
 
-  res <- indicator_function(
-    df = df,
-    obfuscate_data = TRUE,
-    aggregate = TRUE,
-    marginal_cols = NULL,
-    add_reason_col = TRUE,
-    group_cols = c(
-      "PeriodReportedStartDate",
-      "PeriodReportedEndDate",
-      "unit",
-      "county",
-      "unit_type",
-      "gender"
-    ),
-    censored_value = NA
+  dots <- list(...)
+  args <- names(formals(indicator_function))
+
+  if (!"..." %in% args) {
+    dots <- dots[names(dots) %in% args]
+  }
+
+  res <- do.call(
+    what = indicator_function,
+    args = c(
+      dots,
+      list(
+        df = df,
+        obfuscate_data = TRUE,
+        aggregate = TRUE,
+        marginal_cols = NULL,
+        add_reason_col = TRUE,
+        group_cols = c(
+          "PeriodReportedStartDate",
+          "PeriodReportedEndDate",
+          "unit",
+          "county",
+          "unit_type",
+          "gender"
+        ),
+        censored_value = NA
+      )
+    )
   ) |>
     postprocess_indicator(cfg, register_id, measure_id)
 

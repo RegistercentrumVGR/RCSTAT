@@ -14,7 +14,8 @@ get_surv_value(
   obfuscate_data = FALSE,
   add_reason_col = TRUE,
   censored_value = NA,
-  censored_limit = 15
+  censored_limit = 15,
+  estimate = "survival"
 )
 }
 \arguments{
@@ -38,6 +39,8 @@ censored}
 \item{censored_value}{the value to use when observations are censored}
 
 \item{censored_limit}{lower limir for at risk before censoring}
+
+\item{estimate}{what the estimate should be, either "survival" or "event"}
 }
 \value{
 estimated survival at the requested point in time for each group

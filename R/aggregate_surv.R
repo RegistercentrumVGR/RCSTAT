@@ -11,6 +11,7 @@
 #' censored
 #' @param censored_value the value to use when observations are censored
 #' @param censored_limit lower limir for at risk before censoring
+#' @param estimate what the estimate should be, either "survival" or "event"
 #'
 #' @return estimated survival at the requested point in time for each group
 #' @export
@@ -23,7 +24,8 @@ get_surv_value <- function(df,
                            obfuscate_data = FALSE,
                            add_reason_col = TRUE,
                            censored_value = NA,
-                           censored_limit = 15) {
+                           censored_limit = 15,
+                           estimate = "survival") {
 
   checkmate::assert_data_frame(df)
   checkmate::assert_number(time, lower = 0)
@@ -37,6 +39,7 @@ get_surv_value <- function(df,
   checkmate::assert_logical(obfuscate_data, len = 1)
   checkmate::assert_logical(add_reason_col, len = 1)
   checkmate::assert_integerish(censored_limit, lower = 0, len = 1)
+  checkmate::assert_choice(estimate, c("survival", "event"))
 
   if (rlang::is_missing(marginal_cols)) {
     marginal_cols <- group_cols
@@ -140,7 +143,19 @@ get_surv_value <- function(df,
   }
 
   res <- res |>
-    dplyr::filter(.data$time <= .env$time) |>
+    dplyr::arrange(.data$time) |>
+    dplyr::group_by(dplyr::across(dplyr::any_of("strata"))) |>
+    dplyr::mutate(
+      cum_events = cumsum(.data$n.event)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::filter(
+      .data$time <= .env$time,
+      dplyr::if_any(
+        dplyr::any_of("state"),
+        ~ .x == "(s0)"
+      )
+    ) |>
     dplyr::group_by(dplyr::across(dplyr::any_of("strata"))) |>
     dplyr::mutate(total = .data$n.risk[1]) |>
     dplyr::slice_tail(n = 1) |>
@@ -168,15 +183,10 @@ get_surv_value <- function(df,
             class(df[[dplyr::cur_column()]])
           )
         )
-      ) |>
-      dplyr::group_by(dplyr::across(dplyr::all_of(group_cols)))
+      )
   }
 
-  res |>
-    dplyr::mutate(
-      cum_events = cumsum(.data$n.event)
-    ) |>
-    dplyr::ungroup() |>
+  res <- res |>
     tidyr::complete(
       dplyr::select(original_df, dplyr::any_of(group_cols)),
       fill = list(total = 0, cum_events = 0)
@@ -197,6 +207,13 @@ get_surv_value <- function(df,
       "total",
       dplyr::any_of("obfuscated_reason")
     )
+
+  if (estimate == "event") {
+    res <- res |>
+      dplyr::mutate(estimate = 1 - .data$estimate)
+  }
+
+  res
 }
 
 #' Convert an object to a specified class

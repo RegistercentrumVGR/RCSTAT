@@ -160,4 +160,45 @@ test_that("get_surv_value works", {
         "Riket", 0, 50, 50
       )
     )
+
+  df <- data.frame(
+    id = 1:10,
+    time = c(5, 6, 7, 4, 10, 12, 3, 8, 9, 11),
+    status = factor(
+      c(1, 0, 1, 2, 1, 0, 0, 1, 0, 1),
+      levels = 0:2,
+      labels = c("cens", "rev", "death")
+    )
+  )
+
+  get_surv_value(
+    df = df,
+    time = 10,
+    time_col = "time",
+    event_col = "status",
+    obfuscate_data = FALSE
+  ) |>
+    expect_equal(
+      tibble::tribble(
+        ~estimate, ~cum_events, ~total,
+        0.3457, 4, 10
+      ),
+      tolerance = 0.001
+    )
+
+  get_surv_value(
+    df = df,
+    time = 10,
+    time_col = "time",
+    event_col = "status",
+    estimate = "event",
+    obfuscate_data = FALSE
+  ) |>
+    expect_equal(
+      tibble::tribble(
+        ~estimate, ~cum_events, ~total,
+        1 - 0.3457, 4, 10
+      ),
+      tolerance = 0.001
+    )
 })

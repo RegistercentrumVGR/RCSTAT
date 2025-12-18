@@ -8,4 +8,12 @@
 \description{
 Holds functions for standard tables and general data management for registers at Registercentrum.
 }
+\section{Package options}{
+
+- `rcstat.local_plumber`: logical, default `FALSE`.
+  Controls whether [api_statistics()] should send API requests to a local
+  plumber instance.
+  Can be set globally with `options(rcstat.local_plumber = TRUE)`.
+}
+
 \keyword{internal}

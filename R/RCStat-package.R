@@ -1,3 +1,8 @@
+#' @section Package options:
+#' - `rcstat.local_plumber`: logical, default `FALSE`.
+#'   Controls whether [api_statistics()] should send API requests to a local
+#'   plumber instance.
+#'   Can be set globally with `options(rcstat.local_plumber = TRUE)`.
 #' @keywords internal
 "_PACKAGE"
 

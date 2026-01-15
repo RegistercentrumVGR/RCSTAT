@@ -529,10 +529,10 @@ test_that("prop_count works", {
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
-    ~x_n_1, ~x_n_2, ~x_n_3, ~x_prop_1, ~x_prop_2, ~x_prop_3, ~total, ~unit,
-    30, 30, 10, 0.44, 0.44, 0.12, 70, "Alla",
-    20, 20, 0, NA, NA, NA, 30, "a",
-    20, 20, 0, NA, NA, NA, 30, "b",
+    ~x_n_1, ~x_n_2, ~x_n_3, ~x_prop_1, ~x_prop_2, ~x_prop_3, ~total,  ~unit,
+    30,     30,     10,      0.44,      0.44,      0.12,     70, "Alla",
+    20,     20,      0,      0.44,      0.44,       0.1,     30,    "a",
+    20,     20,      0,      0.44,      0.44,       0.1,     30,    "b"
   )
 
   expect_equal(res, expected_res)
@@ -575,10 +575,10 @@ test_that("prop_count works", {
     tibble::as_tibble()
 
   expected_res <- tibble::tribble(
-    ~x_n_1, ~x_n_2, ~x_n_NA, ~x_prop_1, ~x_prop_2, ~x_prop_NA, ~total, ~unit,
-    30, 30, 10, 0.41, 0.47, 0.12, 70, "Alla",
-    10, 20, 0, NA, NA, NA, 30, "a",
-    10, 20, 0, NA, NA, NA, 30, "b"
+    ~x_n_1, ~x_n_2, ~x_n_NA, ~x_prop_1, ~x_prop_2, ~x_prop_NA, ~total,  ~unit,
+    30,     30,      10,      0.41,      0.47,       0.12,     70, "Alla",
+    10,     20,       0,      0.41,      0.47,        0.1,     30,    "a",
+    10,     20,       0,      0.41,      0.47,        0.1,     30,    "b"
   )
 
   expect_equal(res, expected_res)
@@ -1189,9 +1189,9 @@ test_that("add_reason_col works", {
     expect_equal(
       data.frame(
         x_n = 0,
-        x_prop = 0,
+        x_prop = 0.15,
         total = 20,
-        obfuscated_reason = "n < 5"
+        obfuscated_reason = "rounded to nearest 5%"
       )
     )
 
@@ -1252,8 +1252,8 @@ test_that("add_reason_col works", {
         total = 40,
         x = c("a", "b"),
         x_n = c(0, 40),
-        x_prop = 0,
-        x_obfuscated_reason = "n < 5"
+        x_prop = c(0.1, 0.9),
+        x_obfuscated_reason = "rounded to nearest 5%"
       )
     )
 

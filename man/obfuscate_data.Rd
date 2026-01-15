@@ -54,9 +54,9 @@ all of `count_var`, `total_var`, and `prop_var` are supplied. If only
 `total_var` is found the only obfuscated_reason can be "N < 5"}
 
 \item{liberal_obfuscation}{Whether or not to use liberal obfuscation. If
-this is true we round proportions to 5% when the numerator < 5 and
-the denominator is >= 45. We also do nothing when the numerator is < 5 and
-the denominator is >= 245.}
+this is true we round proportions to 5% when the numerator < 5.
+We also do nothing when the numerator is < 5 and
+the denominator is >= 200.}
 
 \item{censored_value}{What to replace prop_var with when it is censored.
 When working with bars it is useful to censor with 0 to not

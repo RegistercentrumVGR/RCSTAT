@@ -149,9 +149,9 @@
       add_reason_col = TRUE, group_cols = NULL, pivot_prop_count = TRUE)
     Output
       # A tibble: 3 x 5
-        total x       x_n x_prop x_obfuscated_reason  
-        <dbl> <chr> <dbl>  <dbl> <chr>                
-      1   230 0         0   0    rounded to nearest 5%
-      2   230 1       200   0.85 <NA>                 
-      3   230 2        30   0.13 <NA>                 
+        total x       x_n x_prop x_obfuscated_reason
+        <dbl> <chr> <dbl>  <dbl> <chr>              
+      1   230 0         0   0.02 <NA>               
+      2   230 1       200   0.85 <NA>               
+      3   230 2        30   0.13 <NA>               
 

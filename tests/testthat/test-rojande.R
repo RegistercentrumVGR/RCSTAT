@@ -19,7 +19,7 @@ test_that("group_proportions censors as expected", {
     ~a, ~Count, ~Total, ~Proportion,
     1,  30,     40,     0.63,
     2,  10,     40,     0.28,
-    3,  0,      40,     0
+    3,  0,      40,     0.1
   )
   # Test group_means on data.frame and data.table
   res <- group_proportions(df, group_by = "a", obfuscate = TRUE)
@@ -52,9 +52,9 @@ test_that("reason col works", {
 
   expected_res <- tibble::tribble(
     ~group, ~n, ~total, ~prop, ~obfuscated_reason,
-    "a",    0,  20,     0,     "n < 5",
-    "a",    10, 20,     0,     "n < 5",
-    "a",    10, 20,     0,     "n < 5",
+    "a",    0,  20,     0.05,     "rounded to nearest 5%",
+    "a",    10, 20,     0.31,     NA,
+    "a",    10, 20,     0.63,     NA,
     "b",    0,  10,     0,     "N < 15",
     "b",    10, 10,     0,     "N < 15",
     "c",    0,  50,     0,     "rounded to nearest 5%",
@@ -138,9 +138,9 @@ test_that("reason col works", {
     "a", 20, 50, 0.46, NA,
     "a", 20, 50, 0.46, NA,
     "a", 0, 50, 0.1, "rounded to nearest 5%",
-    "b", 20, 40, 0, "n < 5",
-    "b", 20, 40, 0, "n < 5",
-    "b", 0, 40, 0, "n < 5"
+    "b", 20, 40, 0.45, NA,
+    "b", 20, 40, 0.45, NA,
+    "b", 0, 40, 0.1, "rounded to nearest 5%"
   )
 
   expect_equal(res, expected_res)
@@ -193,8 +193,8 @@ test_that("reason col works", {
     )
 
   expected_res <- data.frame(
-    n = 0, total = 20, prop = as.double(NA), mean = 0.13,
-    obfuscated_reason = "n < 5"
+    n = 0, total = 20, prop = 0.25, mean = 0.13,
+    obfuscated_reason = "rounded to nearest 5%"
   )
 
   expect_equal(res, expected_res)
@@ -203,7 +203,7 @@ test_that("reason col works", {
 test_that("censored_value works", {
   res <- data.frame(
     n = 4,
-    total = 20
+    total = 14
   ) |>
     dplyr::mutate(prop = n / total) |>
     obfuscate_data(censored_value = 0) |>
@@ -211,14 +211,14 @@ test_that("censored_value works", {
 
   expected_res <- tibble::tribble(
     ~n, ~total, ~prop,
-    0,  20,     0
+    0,  10,     0
   )
 
   expect_equal(res, expected_res)
 
   res <- data.frame(
     n = 4,
-    total = 20
+    total = 14
   ) |>
     dplyr::mutate(prop = n / total) |>
     obfuscate_data(censored_value = NA) |>
@@ -226,7 +226,7 @@ test_that("censored_value works", {
 
   expected_res <- tibble::tribble(
     ~n, ~total, ~prop,
-    0,  20,     NA_real_
+    0,  10,     NA_real_
   )
 
   expect_equal(res, expected_res)
@@ -234,7 +234,7 @@ test_that("censored_value works", {
   res <- data.frame(
     unit = "a",
     n = c(3, 4, 10),
-    total = 17
+    total = 14
   ) |>
     dplyr::mutate(prop = n / total) |>
     dplyr::group_by(unit) |>
@@ -243,9 +243,9 @@ test_that("censored_value works", {
 
   expected_res <- tibble::tribble(
     ~unit, ~n, ~total, ~prop,
-    "a",  0,     20,    -1,
-    "a",  0,     20,    -1,
-    "a", 10,     20,    -1
+    "a",  0,     10,    -1,
+    "a",  0,     10,    -1,
+    "a", 10,     10,    -1
   )
 
   expect_equal(res, expected_res)
@@ -283,10 +283,10 @@ test_that("round_statistics_digits list works", {
 test_that("obfuscate_data works", {
   res <- tibble::tribble(
     ~unit, ~n,  ~total, ~prop,
-    "a",   4,   200,    4 / 200,
-    "a",   196, 200,    196 / 200,
-    "b",   4,   44,     4 / 44,
-    "b",   40,  44,     40 / 44
+    "a",   4,   199,    4 / 199,
+    "a",   195, 199,    196 / 199,
+    "b",   4,   14,     4 / 14,
+    "b",   10,  14,     10 / 14
   ) |>
     obfuscate_data(
       liberal_obfuscation = TRUE,
@@ -299,8 +299,8 @@ test_that("obfuscate_data works", {
     ~unit, ~n,  ~total, ~prop, ~obfuscated_reason,
     "a",   0,   200,    0,     "rounded to nearest 5%",
     "a",   200, 200,    1,     "rounded to nearest 5%",
-    "b",   0,   40,     0,     "n < 5",
-    "b",   40,  40,     0,     "n < 5"
+    "b",   0,   10,     0,     "N < 15",
+    "b",   10,  10,     0,     "N < 15"
   )
 
   expect_equal(res, expected_res)

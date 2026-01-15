@@ -35,9 +35,9 @@ round_to_y <- function(x, y = 0.05) {
 #' all of `count_var`, `total_var`, and `prop_var` are supplied. If only
 #' `total_var` is found the only obfuscated_reason can be "N < 5"
 #' @param liberal_obfuscation Whether or not to use liberal obfuscation. If
-#' this is true we round proportions to 5% when the numerator < 5 and
-#' the denominator is >= 45. We also do nothing when the numerator is < 5 and
-#' the denominator is >= 245.
+#' this is true we round proportions to 5% when the numerator < 5.
+#' We also do nothing when the numerator is < 5 and
+#' the denominator is >= 200.
 #' @param censored_value What to replace prop_var with when it is censored.
 #' When working with bars it is useful to censor with 0 to not
 #' affect order of bars but when producing a line plot 0 does not make sense.
@@ -114,17 +114,12 @@ obfuscate_data <- function(
             tidyselect::any_of(prop_var),
             ~ dplyr::case_when(
               .data[[total_var]] < 15 ~ censored_value,
-              .data[[total_var]] < 45 ~ dplyr::if_else(
-                rep(any(.data[[count_var]] < 5), dplyr::n()),
-                rep(censored_value, dplyr::n()),
-                roundc(.x, digits = 2)
-              ),
-              .data[[total_var]] < 245 ~ dplyr::if_else(
+              .data[[total_var]] < 200 ~ dplyr::if_else(
                 .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 round_to_y(.x, y = 0.05),
                 roundc(.x, digits = 2)
               ),
-              .data[[total_var]] >= 245 ~ roundc(.x, digits = 2)
+              .data[[total_var]] >= 200 ~ roundc(.x, digits = 2)
             )
           )
         )
@@ -134,7 +129,7 @@ obfuscate_data <- function(
           dplyr::across(
             tidyselect::any_of(prop_var),
             ~ dplyr::case_when(
-              .data[[total_var]] < 15 ~ 0,
+              .data[[total_var]] < 15 ~ censored_value,
               .default = dplyr::if_else(
                 rep(any(.data[[count_var]] < 5), dplyr::n()),
                 rep(censored_value, dplyr::n()),
@@ -152,17 +147,12 @@ obfuscate_data <- function(
             tidyselect::any_of(prop_var),
             ~ dplyr::case_when(
               .data[[total_var]] < 15 ~ censored_value,
-              .data[[total_var]] < 45 ~ dplyr::if_else(
-                .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
-                censored_value,
-                roundc(.x, digits = 2)
-              ),
-              .data[[total_var]] < 245 ~ dplyr::if_else(
+              .data[[total_var]] < 200 ~ dplyr::if_else(
                 .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 round_to_y(.x, y = 0.05),
                 roundc(.x, digits = 2)
               ),
-              .data[[total_var]] >= 245 ~ roundc(.x, digits = 2)
+              .data[[total_var]] >= 200 ~ roundc(.x, digits = 2)
             )
           )
         )
@@ -273,12 +263,7 @@ reason_col <- function(
       dplyr::mutate(
         obfuscated_reason = dplyr::case_when(
           .data[[total_var]] < 15 ~ "N < 15",
-          .data[[total_var]] < 45 ~ dplyr::if_else(
-            rep(any(.data[[count_var]] < 5), dplyr::n()),
-            rep("n < 5", dplyr::n()),
-            NA
-          ),
-          dplyr::between(.data[[total_var]], 45, 244) &
+          dplyr::between(.data[[total_var]], 15, 199) &
             (.data[[count_var]] < 5 | .data[[total_var]] -
                .data[[count_var]] < 5) ~ "rounded to nearest 5%"
         )
@@ -290,13 +275,7 @@ reason_col <- function(
       dplyr::mutate(
         obfuscated_reason = dplyr::case_when(
           .data[[total_var]] < 15 ~ "N < 15",
-          .data[[total_var]] < 45 ~
-            dplyr::case_when(
-              .data[[count_var]] < 5 ~ "n < 5",
-              .data[[total_var]] - .data[[count_var]] < 5 ~ "N - n < 5",
-              .default = NA
-            ),
-          dplyr::between(.data[[total_var]], 45, 244) &
+          dplyr::between(.data[[total_var]], 15, 199) &
             (.data[[count_var]] < 5 | .data[[total_var]] -
                .data[[count_var]] < 5) ~ "rounded to nearest 5%"
         )

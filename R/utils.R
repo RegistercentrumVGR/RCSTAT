@@ -435,3 +435,137 @@ pseudonymize_data <- function(df,
   }
   return(df)
 }
+
+#' Prettifies a table
+#'
+#' Renames columns, rounds means, medians, and proportions, and multiplies
+#' proportions
+#'
+#' @param df data.frame to prettify
+#' @param vars list of variable names, passed to [RCStat::decode_vars()]
+#' @param ... manual renames, passed to [dplyr::rename()] and fully supports
+#' tidy-selection of columns
+#'
+#' @return prettified data.frame
+#' @export
+prettify_table <- function(df, vars = NULL, ...) {
+
+  if (is.null(df)) return(NULL)
+
+  if (any(stringr::str_detect(names(df), "total_non_missing"))) {
+    df <- df |>
+      dplyr::select(-dplyr::any_of("total"))
+  }
+
+  dots <- rlang::enquos(...)
+  dots <- purrr::keep(
+    dots,
+    ~ rlang::is_call_simple(.x) || rlang::as_name(.x) %in% names(df)
+  )
+
+  if (length(dots) > 0) {
+    df <- dplyr::rename(df, !!!dots)
+  }
+
+  # nolint start object_usage
+  prettify_prop <- function(x) {
+    if (any(x > 1, na.rm = TRUE)) {
+      round(x, 1)
+    } else {
+      round(x * 100, 1)
+    }
+  }
+  # nolint end
+
+  df <- df |>
+    dplyr::rename(
+      !!"T\u00e4ljare" := dplyr::ends_with("_n"), # Only way to fix check warning
+      !!"N\u00e4mnare" := dplyr::any_of("total"),
+      !!"N\u00e4mnare" := dplyr::ends_with("total_non_missing"),
+      !!"Andel" := dplyr::ends_with("prop"),
+      !!"Medelv\u00e4rde" := dplyr::ends_with("mean"),
+      !!"Median" := dplyr::ends_with("median"),
+      !!"\u00C5r" := dplyr::matches("year"),
+      !!"Region" := dplyr::matches("county"),
+      !!"Enhet" := dplyr::matches(".+_Unit(ID|Code)?$")
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::matches("Andel"),
+        ~ dplyr::case_when(
+          is.na(.x) ~ "-",
+          .default = as.character(prettify_prop(.x))
+        )
+      ),
+      dplyr::across(
+        dplyr::matches("Medelv\u00e4rde"),
+        ~ dplyr::case_when(
+          is.na(.x) ~ "-",
+          .default = as.character(round(.x, 1))
+        )
+      ),
+      dplyr::across(
+        dplyr::matches("Median"),
+        ~ dplyr::case_when(
+          is.na(.x) ~ "-",
+          .default = as.character(round(.x, 1))
+        )
+      )
+    )
+
+  if (!is.null(vars)) {
+    df <- df |>
+      RCStat::decode_names(vars)
+  }
+
+  if (any(stringr::str_detect(names(df), "obfuscated_reason"))) {
+    var <- df |>
+      names() |>
+      stringr::str_extract(".*obfuscated_reason.*") |>
+      purrr::discard(is.na)
+
+    if (any(!is.na(df[[var]]) & df[[var]] != "")) {
+      df <- df |>
+        dplyr::mutate(
+          dplyr::across(
+            dplyr::any_of("Andel"),
+            ~ dplyr::case_when(
+              .x == "0" & .data[[var]] == "N < 15" ~ "-",
+              .default = .x
+            )
+          ),
+          dplyr::across(
+            dplyr::all_of(var),
+            ~ dplyr::case_when(
+              .x == "N < 15" ~ "N\u00e4mnare < 15",
+              .x == "rounded to nearest 5%" ~ "Andelen har avrundats till n\u00e4rmsta 5-tal",
+              is.na(.x) ~ "",
+              .default = .x
+            )
+          )
+        ) |>
+        dplyr::rename(
+          Censureringsorsak = dplyr::matches("obfuscated_reason")
+        )
+    } else {
+      df <- df |>
+        dplyr::select(-dplyr::any_of(var))
+    }
+
+  }
+
+  df |>
+    dplyr::relocate(
+      dplyr::any_of(
+        c(
+          "Andel",
+          "Medelv\u00e4rde",
+          "Median",
+          "T\u00e4ljare",
+          "N\u00e4mnare",
+          "Censureringsorsak"
+        )
+      ),
+      .after = dplyr::everything()
+    )
+}

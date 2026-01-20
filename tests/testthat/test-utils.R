@@ -229,3 +229,47 @@ test_that("random_password works", {
     stringr::str_length() |>
     expect_equal(10)
 })
+
+test_that("prettify_table works", {
+
+  df <- data.frame(
+    x_n = c(10, 50),
+    total = c(14, 100),
+    x_prop = c(0, 50 / 100),
+    x_mean = 0.5,
+    x_median = 0.5,
+    a_year = c(2014, 2020),
+    x_unit = 1,
+    x_unittype = 2,
+    x_county = 14,
+    x_obfuscated_reason = c("N < 15", ""),
+    x_abc = NA
+  )
+
+  expect_no_error(
+    res <- prettify_table(
+      df,
+      vars = data.frame(ColumnName = "x_abc", Description = "Wow"),
+      abc = x_unittype,
+      does_not = exist
+    )
+  )
+
+  expect_equal(
+    res,
+    data.frame(
+      År = c(2014, 2020),
+      Enhet = c(1, 1),
+      abc = c(2, 2),
+      Region = c(14, 14),
+      "Wow" = NA,
+      Andel = c("-", "50"),
+      Medelvärde = c("0.5", "0.5"),
+      Median = c("0.5", "0.5"),
+      Täljare = c(10, 50),
+      Nämnare = c(14, 100),
+      Censureringsorsak = c("Nämnare < 15", "")
+    )
+  )
+
+})

@@ -166,7 +166,6 @@ proportion_missing <- function(
 #' observation was obfuscate, passed to [obfuscate_data()]
 #'
 #' @export get_aggregate_value
-
 get_aggregate_value <- function(
     df,
     group_cols = NULL,
@@ -181,16 +180,33 @@ get_aggregate_value <- function(
     add_reason_col = FALSE) {
   #### Warnings ####
 
-  checkmate::assert_list(vars, min.len = 1, any.missing = FALSE)
+  checkmate::assert_list(vars, min.len = 1)
   checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
   checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
   checkmate::assert_subset(group_cols, names(df))
-  checkmate::assert_subset(unlist(vars), names(df), empty.ok = FALSE)
+
   checkmate::assert_subset(
     names(vars),
     c("prop", "mean", "median", "prop_count", "count"),
     empty.ok = FALSE
   )
+
+  if (!setequal("count", names(vars))) {
+    checkmate::assert_subset(
+      vars |>
+        purrr::discard_at("count") |>
+        unlist(),
+      names(df),
+      empty.ok = FALSE
+    )
+  }
+
+  checkmate::assert_subset(
+    purrr::pluck(vars, "count"),
+    names(df),
+    empty.ok = TRUE
+  )
+
   checkmate::assert_logical(pivot_prop_count, len = 1, any.missing = FALSE)
   checkmate::assert(
     checkmate::check_null(distinct_cols),
@@ -235,7 +251,7 @@ get_aggregate_value <- function(
   prop_count_var <- vars[["prop_count"]]
   count_var <- vars[["count"]]
 
-  if (!is.null(count_var) && !setequal(count_var, vars)) {
+  if ("count" %in% names(vars) && length(vars) > 1) {
     stop("count can not be supplied to vars with any other summarizing function")
   }
 

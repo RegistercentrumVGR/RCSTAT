@@ -1005,6 +1005,14 @@ test_that("get_aggregate_value works with count", {
       )
     )
 
+  get_aggregate_value(
+    df,
+    vars = list(count = NULL)
+  ) |>
+    expect_equal(
+      data.frame(total = 9)
+    )
+
 })
 
 test_that("get_aggregate_value works with marginal_cols", {

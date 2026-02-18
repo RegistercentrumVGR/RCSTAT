@@ -233,7 +233,7 @@ aggregate_vis <- function(df,
 
   df <- df |>
     dplyr::filter(
-      dplyr::if_any(dplyr::all_of(date_var)) >= as.Date(cfg$valid_from)
+      .data[[date_var]] >= as.Date(cfg$valid_from)
     ) |>
     add_groups_long(
       purrr::keep_at(cfg, c("freq", "org", "submeasures")),

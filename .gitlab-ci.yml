@@ -53,33 +53,26 @@ lint:
 
 Testthat JUnit report:
   stage: test
-  extends: .install_r_package_dev_deps
+  tags:
+    - $RUNNER_TAGS
+  parallel:
+    matrix:
+      - RUNNER_TAGS:
+        - rc-r
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_BRANCH
   script:
-    # Install libxt-dev for Cairo R-package
-    # that fails to compile otherwise
-    - apt-get install -y libxt-dev
     - >
-      Rscript -e 'pak::pkg_install(
-        c("devtools", "testthat", "covr", "DT", "htmltools", "Cairo@1.6-2"),
-        dependencies = TRUE)'
-    - echo "Lint package"
-    - >
-      Rscript -e 'testthat::test_local(
-        reporter = testthat::JunitReporter$new(
-          file = "../../junit_result.xml"))'
-    - Rscript -e 'pak::pkg_install("local::.")'
-    - Rscript -e "covr::gitlab(quiet = FALSE)"
+      RScript.exe -e "testthat::test_local(
+        reporter = testthat::LocationReporter[['new']]())"
+    - RScript.exe -e "covr::gitlab(file = 'coverage/index.html',quiet = FALSE)"
   coverage: '/Coverage: \d+\.\d+/'
   artifacts:
     paths:
-      - public
-    reports:
-      junit: junit_result.xml
+      - coverage
 
 Check package:
   stage: test

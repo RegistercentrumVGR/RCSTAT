@@ -480,6 +480,7 @@ prettify_table <- function(df, vars = NULL, ...) {
   df <- df |>
     dplyr::rename(
       !!"T\u00e4ljare" := dplyr::ends_with("_n"), # Only way to fix check warning
+      !!"T\u00e4ljare" := dplyr::any_of("n"),
       !!"N\u00e4mnare" := dplyr::any_of("total"),
       !!"N\u00e4mnare" := dplyr::ends_with("total_non_missing"),
       !!"Andel" := dplyr::ends_with("prop"),
@@ -487,7 +488,11 @@ prettify_table <- function(df, vars = NULL, ...) {
       !!"Median" := dplyr::ends_with("median"),
       !!"\u00C5r" := dplyr::matches("year"),
       !!"Region" := dplyr::matches("county"),
-      !!"Enhet" := dplyr::matches(".+_Unit(ID|Code)?$")
+      !!"Enhet" := dplyr::matches(".+_Unit(ID|Code)?$"),
+      !!"Kvantil 5" := dplyr::matches("quant_5$"),
+      !!"Kvantil 25" := dplyr::matches("quant_25$"),
+      !!"Kvantil 75" := dplyr::matches("quant_75$"),
+      !!"Kvantil 95" := dplyr::matches("quant_95$")
     ) |>
     dplyr::mutate(
       dplyr::across(

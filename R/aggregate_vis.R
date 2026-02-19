@@ -297,7 +297,12 @@ add_groups_long <- function(df,
                             gender_var) {
 
   df <- df |>
-    dplyr::mutate(dplyr::across(unit_var, as.character))
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::all_of(unit_var),
+        as.character
+      )
+    )
 
   out <- dplyr::bind_rows(
     purrr::map(

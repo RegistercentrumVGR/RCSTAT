@@ -316,10 +316,38 @@ get_aggregate_value <- function(
 
   median_list <- list(
     median = function(x) stats::median(x, na.rm = TRUE),
-    quant_5 = function(x) stats::quantile(x, probs = 0.05, na.rm = TRUE),
-    quant_25 = function(x) stats::quantile(x, probs = 0.25, na.rm = TRUE),
-    quant_75 = function(x) stats::quantile(x, probs = 0.75, na.rm = TRUE),
-    quant_95 = function(x) stats::quantile(x, probs = 0.95, na.rm = TRUE)
+    quant_5 = function(x) {
+      stats::quantile(
+        x,
+        probs = 0.05,
+        na.rm = TRUE,
+        names = FALSE
+      )
+    },
+    quant_25 = function(x) {
+      stats::quantile(
+        x,
+        probs = 0.25,
+        na.rm = TRUE,
+        names = FALSE
+      )
+    },
+    quant_75 = function(x) {
+      stats::quantile(
+        x,
+        probs = 0.75,
+        na.rm = TRUE,
+        names = FALSE
+      )
+    },
+    quant_95 = function(x) {
+      stats::quantile(
+        x,
+        probs = 0.95,
+        na.rm = TRUE,
+        names = FALSE
+      )
+    }
   )
 
 

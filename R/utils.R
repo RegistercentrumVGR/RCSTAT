@@ -485,6 +485,7 @@ prettify_table <- function(df, vars = NULL, ...) {
       !!"N\u00e4mnare" := dplyr::ends_with("total_non_missing"),
       !!"Andel" := dplyr::ends_with("prop"),
       !!"Medelv\u00e4rde" := dplyr::ends_with("mean"),
+      !!"Standardavvikelse" := dplyr::ends_with("std"),
       !!"Median" := dplyr::ends_with("median"),
       !!"\u00C5r" := dplyr::matches("year"),
       !!"Region" := dplyr::matches("county"),
@@ -503,14 +504,7 @@ prettify_table <- function(df, vars = NULL, ...) {
         )
       ),
       dplyr::across(
-        dplyr::matches("Medelv\u00e4rde"),
-        ~ dplyr::case_when(
-          is.na(.x) ~ "-",
-          .default = as.character(round(.x, 1))
-        )
-      ),
-      dplyr::across(
-        dplyr::matches("Median"),
+        dplyr::matches("Medelv\u00e4rde|Standardavvikelse|Median"),
         ~ dplyr::case_when(
           is.na(.x) ~ "-",
           .default = as.character(round(.x, 1))
@@ -565,6 +559,7 @@ prettify_table <- function(df, vars = NULL, ...) {
         c(
           "Andel",
           "Medelv\u00e4rde",
+          "Standardavvikelse",
           "Median",
           "T\u00e4ljare",
           "N\u00e4mnare",

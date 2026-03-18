@@ -12,6 +12,13 @@ test_that("api_statistics works", {
 
   testthat::local_mocked_bindings(
     GET = function(...) {
+      args <- list(...)
+
+      headers <- purrr::keep(args, \(x) inherits(x, "request")) |>
+        purrr::pluck(1, "headers")
+
+      message(paste0(names(headers), " ", headers, collapse = ", "))
+
       structure(
         list(
           url = "https://api.example.com/data",
@@ -32,6 +39,28 @@ test_that("api_statistics works", {
       tibble::tibble(x = 1:3)
     )
 
+  withr::with_options(
+    list(rcstat.local_plumber = TRUE),
+    expect_message(
+      api_statistics("", ""),
+      "x-data-scope 1, x-unit 0, x-role 900, x-registerid 100"
+    )
+  )
+
+  withr::with_options(
+    list(
+      rcstat.local_plumber = TRUE,
+      rcstat.local_scope = 3,
+      rcstat.local_unit = 1000,
+      rcstat.local_role = 9001,
+      rcstat.local_register = -1
+    ),
+    expect_message(
+      api_statistics("", ""),
+      "x-data-scope 3, x-unit 1000, x-role 9001, x-registerid -1"
+    )
+  )
+
 })
 
 test_that("api_url works", {
@@ -47,7 +76,7 @@ test_that("api_url works", {
   api_url("ndr", "get_unit_labels", api_url = "local")  |>
     expect_equal(
       paste0(
-        "https://localhost:8530",
+        "http://127.0.0.1:8530",
         "/ndr/get_unit_labels?apikey=MpuYxfbtp5I="
       )
     )
@@ -57,7 +86,7 @@ test_that("api_url works", {
     api_url("ndr", "get_unit_labels")  |>
       expect_equal(
         paste0(
-          "https://localhost:8530",
+          "http://127.0.0.1:8530",
           "/ndr/get_unit_labels?apikey=MpuYxfbtp5I="
         )
       )

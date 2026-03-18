@@ -39,7 +39,8 @@ api_statistics(
 \item{api_url}{Should be `"prod"` for calling the production Stratum API or
 `"local"` to call a local instance of `rcplumber`. All other values will
 interpreted as the prefix for the URL of the API call. Can also be controlled
-by the option `rcstat.local_plumber`}
+by the option `rcstat.local_plumber`. See details for information about how
+to control headers.}
 
 \item{verbose}{print query sent}
 
@@ -47,7 +48,10 @@ by the option `rcstat.local_plumber`}
 tibble::as_tibble. Note that this does not work when the data is a list.}
 }
 \description{
-Get data from statistics API
+If you are calling a local plumber instance we will set the necessary
+headers. By default, scope is 1, unit is 0, role is 900, and register is 100.
+You can control these values with the options `rcstat.local_scope`,
+`rcstat.local_unit`, `rcstat.local_role`, `rcstat.local_register`.
 }
 \section{Functions}{
 \itemize{

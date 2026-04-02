@@ -504,7 +504,7 @@ prettify_table <- function(df, vars = NULL, ...) {
         )
       ),
       dplyr::across(
-        dplyr::matches("Medelv\u00e4rde|Standardavvikelse|Median"),
+        dplyr::where(is.numeric),
         ~ dplyr::case_when(
           is.na(.x) ~ "-",
           .default = as.character(round(.x, 1))
@@ -553,7 +553,7 @@ prettify_table <- function(df, vars = NULL, ...) {
 
   }
 
-  df |>
+  df <- df |>
     dplyr::relocate(
       dplyr::any_of(
         c(
@@ -561,6 +561,10 @@ prettify_table <- function(df, vars = NULL, ...) {
           "Medelv\u00e4rde",
           "Standardavvikelse",
           "Median",
+          "Kvantil 5",
+          "Kvantil 25",
+          "Kvantil 75",
+          "Kvantil 95",
           "T\u00e4ljare",
           "N\u00e4mnare",
           "Censureringsorsak"
@@ -568,4 +572,11 @@ prettify_table <- function(df, vars = NULL, ...) {
       ),
       .after = dplyr::everything()
     )
+
+  if ("N\u00e4mnare" %in% names(df) && !"Andel" %in% names(df)) {
+    df <- df |>
+      dplyr::rename("Antal" = "N\u00e4mnare")
+  }
+
+  df
 }

@@ -259,17 +259,17 @@ test_that("prettify_table works", {
   expect_equal(
     res,
     data.frame(
-      År = c(2014, 2020),
-      Enhet = c(1, 1),
-      abc = c(2, 2),
-      Region = c(14, 14),
+      År = c("2014", "2020"),
+      Enhet = "1",
+      abc = "2",
+      Region = "14",
       "Wow" = NA,
       Andel = c("-", "50"),
       Medelvärde = c("0.5", "0.5"),
       Standardavvikelse = "1",
       Median = c("0.5", "0.5"),
-      Täljare = c(10, 50),
-      Nämnare = c(14, 100),
+      Täljare = c("10", "50"),
+      Nämnare = c("14", "100"),
       Censureringsorsak = c("Nämnare < 15", "")
     )
   )

@@ -275,7 +275,22 @@ zip_dir_with_pass <- function(
   )
 }
 
+zip_dir <- function(
+    directory = "output",
+    file = "output",
+    overwrite = TRUE) {
 
+  filenames <- dir(directory, full.names = TRUE)
+
+  if (overwrite && file.exists(paste0(file, ".zip"))) {
+    file.remove(paste0(file, ".zip"))
+  }
+
+  utils::zip(
+    zipfile = paste0(file, ".zip"),
+    files = filenames
+  )
+}
 
 #' Saves data.frames as .csv files and creates and saves the corresponding
 #' metadata files. Can also zip the outputs with a random password which is
@@ -288,6 +303,7 @@ zip_dir_with_pass <- function(
 #' @param zip Whether or not to zip the output directory after saving the files
 #' @param output_dir The output directory in which to save the files
 #' @param zip_file_name The name of the created zip file without file extension
+#' @param zip_with_pass Should the zip-file be password protected
 #' @export sos_metadata
 #'
 #' @examples
@@ -304,7 +320,8 @@ sos_metadata <- function(dfs = list(),
                          separator = ",",
                          zip = TRUE,
                          output_dir = "Output",
-                         zip_file_name = "output") {
+                         zip_file_name = "output",
+                         zip_with_pass = FALSE) {
   encoding <- "UTF-8"
 
   if (length(file_names) != length(dfs)) {
@@ -378,7 +395,11 @@ sos_metadata <- function(dfs = list(),
   )
 
   if (zip) {
-    zip_dir_with_pass(directory = output_dir, file = zip_file_name)
+    if (zip_with_pass) {
+      zip_dir_with_pass(directory = output_dir, file = zip_file_name)
+    } else {
+      zip_dir(directory = output_dir, file = zip_file_name)
+    }
 
     if (!file.exists(paste0("./", zip_file_name, ".zip"))) {
       message("Zip failed, try (re-)installing RTools")

@@ -12,7 +12,8 @@ sos_metadata(
   separator = ",",
   zip = TRUE,
   output_dir = "Output",
-  zip_file_name = "output"
+  zip_file_name = "output",
+  zip_with_pass = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ sos_metadata(
 \item{output_dir}{The output directory in which to save the files}
 
 \item{zip_file_name}{The name of the created zip file without file extension}
+
+\item{zip_with_pass}{Should the zip-file be password protected}
 }
 \description{
 Saves data.frames as .csv files and creates and saves the corresponding

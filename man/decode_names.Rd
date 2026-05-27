@@ -4,12 +4,15 @@
 \alias{decode_names}
 \title{Decode variabel names}
 \usage{
-decode_names(df, labels = NULL)
+decode_names(df, labels = NULL, differentiate_duplicates = FALSE)
 }
 \arguments{
 \item{df}{data.frame}
 
-\item{labels}{data frame containing column names}
+\item{labels}{data frame containing column}
+
+\item{differentiate_duplicates}{should duplicate descriptions be
+differentiated by indicating what the original variable was called}
 }
 \value{
 data frame with description as column names

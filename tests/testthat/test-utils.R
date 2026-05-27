@@ -274,4 +274,21 @@ test_that("prettify_table works", {
     )
   )
 
+  data.frame(
+    year = 2010,
+    ind_x_last_year_prop = 0.5,
+    ind_x_last_year_n = 5,
+    total = 10
+  ) |>
+    prettify_table() |>
+    names() |>
+    expect_equal(
+      c(
+        "År",
+        "Andel",
+        "Täljare",
+        "Nämnare"
+      )
+    )
+
 })

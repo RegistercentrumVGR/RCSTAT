@@ -134,13 +134,15 @@ var_to_char <- function(x, labels, name = NULL, missing_labels_na = TRUE) {
 #' @name decode_names
 #'
 #' @param df data.frame
-#' @param labels data frame containing column names
+#' @param labels data frame containing column
+#' @param differentiate_duplicates should duplicate descriptions be
+#' differentiated by indicating what the original variable was called
 #'
 #' @return data frame with description as column names
 #' @export
-decode_names <- function(
-    df,
-    labels = NULL) {
+decode_names <- function(df,
+                         labels = NULL,
+                         differentiate_duplicates = FALSE) {
   checkmate::assert_subset(
     c("ColumnName", "Description"),
     colnames(labels)
@@ -169,14 +171,21 @@ decode_names <- function(
       !is.na(.data$Description),
       !(.data$Description == ""),
       !(.data$Description == " ")
-    ) |>
-    dplyr::mutate(Description = dplyr::if_else(
-      duplicated(.data$Description) | duplicated(.data$Description,
-        fromLast = TRUE
-      ),
-      paste0(.data$Description, " (", .data$ColumnName, ")"),
-      .data$Description
-    ))
+    )
+
+  if (differentiate_duplicates) {
+    labels <- labels  |>
+      dplyr::mutate(
+        Description = dplyr::if_else(
+          duplicated(.data$Description) | duplicated(
+            .data$Description,
+            fromLast = TRUE
+          ),
+          paste0(.data$Description, " (", .data$ColumnName, ")"),
+          .data$Description
+        )
+      )
+  }
 
   df <- df |>
     dplyr::rename_with(
@@ -446,10 +455,14 @@ get_sos_vl <- function(
                          temp,
                          mode = "wb",
                          quiet = TRUE)
-    df <- readxl::read_excel(temp, sheet = ifelse(register == "barn_och_unga",
-      2,
-      1
-    ))
+    df <- readxl::read_excel(
+      temp,
+      sheet = ifelse(
+        register == "barn_och_unga",
+        2,
+        1
+      )
+    )
     unlink(temp)
 
     # Create final data
@@ -461,7 +474,8 @@ get_sos_vl <- function(
       ), "^(\\w+)\\s*=")) |>
       tidyr::separate_rows("vm", sep = "[,;]|(?=\\s+\\w+\\s*=)") |>
       dplyr::filter(grepl("=", .data$vm)) |>
-      tidyr::separate(.data$vm,
+      tidyr::separate(
+        .data$vm,
         into = c("code", "label"),
         sep = "=",
         fill = "right"
@@ -500,7 +514,8 @@ get_sos_vl <- function(
       ), "^(\\w+)\\s*=")) |>
       tidyr::separate_rows(.data$vm, sep = "[,;]|(?=\\s+\\w+\\s*=)") |>
       dplyr::filter(grepl("=", .data$vm)) |>
-      tidyr::separate(.data$vm,
+      tidyr::separate(
+        .data$vm,
         into = c("code", "label"),
         sep = "=",
         fill = "right"

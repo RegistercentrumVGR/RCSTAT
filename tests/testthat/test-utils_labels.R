@@ -208,7 +208,7 @@ test_that("decode names works", {
       "Enhet"
     )
   )
-  df_decoded <- decode_names(df, labels)
+  df_decoded <- decode_names(df, labels, differentiate_duplicates = TRUE)
 
   expect_setequal(
     colnames(df_decoded),
@@ -248,7 +248,7 @@ test_that("decode names works", {
       "Enhet"
     )
   )
-  df_decoded <- decode_names(df, labels)
+  df_decoded <- decode_names(df, labels, differentiate_duplicates = TRUE)
 
   expect_setequal(
     colnames(df_decoded),
@@ -262,6 +262,12 @@ test_that("decode names works", {
     )
   )
 
+  data.frame(
+    RC_Unit = 1
+  ) |>
+    decode_names(labels, differentiate_duplicates = FALSE) |>
+    names() |>
+    expect_equal("Enhet")
 
 })
 

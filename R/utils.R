@@ -508,13 +508,15 @@ prettify_table <- function(df, vars = NULL, ...) {
       !!"Medelv\u00e4rde" := dplyr::ends_with("mean"),
       !!"Standardavvikelse" := dplyr::ends_with("std"),
       !!"Median" := dplyr::ends_with("median"),
-      !!"\u00C5r" := dplyr::matches("year"),
       !!"Region" := dplyr::matches("county"),
       !!"Enhet" := dplyr::matches(".+_Unit(ID|Code)?$"),
       !!"Kvantil 5" := dplyr::matches("quant_5$"),
       !!"Kvantil 25" := dplyr::matches("quant_25$"),
       !!"Kvantil 75" := dplyr::matches("quant_75$"),
       !!"Kvantil 95" := dplyr::matches("quant_95$")
+    ) |>
+    dplyr::rename(
+      !!"\u00C5r" := dplyr::matches("year")
     ) |>
     dplyr::mutate(
       dplyr::across(

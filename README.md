@@ -12,6 +12,7 @@
 The goal of RCStat is to ...
 
 ## Installation
+
 You can install the development version of RCStat like so:
 
 ``` r
@@ -26,4 +27,3 @@ This is a basic example which shows you how to solve a common problem:
 library(RCStat)
 ## basic example code
 ```
-

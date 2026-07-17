@@ -179,8 +179,8 @@ valid_pnr <- function(pnr, handle_invalid = TRUE) {
 #' rand_pass <- random_password(c("R", "N"), 10)
 #' }
 random_password <- function(
-    char_types = c("R", "N", "!"),
-    password_length = 15) {
+  char_types = c("R", "N", "!"),
+  password_length = 15) {
 
   checkmate::assert_subset(
     char_types,
@@ -247,11 +247,11 @@ random_password <- function(
 #' zip_dir_with_pass()
 #' }
 zip_dir_with_pass <- function(
-    directory = "output",
-    pass = random_password(),
-    file = "output",
-    overwrite = TRUE,
-    sink_password = TRUE) {
+  directory = "output",
+  pass = random_password(),
+  file = "output",
+  overwrite = TRUE,
+  sink_password = TRUE) {
 
   checkmate::assert_string(pass, pattern = "^[a-zA-Z0-9!@#$.+%&/()?]+$")
 
@@ -276,9 +276,9 @@ zip_dir_with_pass <- function(
 }
 
 zip_dir <- function(
-    directory = "output",
-    file = "output",
-    overwrite = TRUE) {
+  directory = "output",
+  file = "output",
+  overwrite = TRUE) {
 
   filenames <- dir(directory, full.names = TRUE)
 

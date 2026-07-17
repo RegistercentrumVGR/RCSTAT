@@ -7,10 +7,10 @@
 #'
 #' @export rolling_mean
 rolling_mean <- function(
-    x,
-    n,
-    align = c("left", "center", "right")[3],
-    na_rm = FALSE) {
+  x,
+  n,
+  align = c("left", "center", "right")[3],
+  na_rm = FALSE) {
   if (na_rm == TRUE) {
     missing_ind <- which(is.na(x))
     x[is.na(x)] <- 0

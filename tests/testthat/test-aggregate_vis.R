@@ -52,15 +52,34 @@ test_that("add_groups_long works", {
     )
   )
 
-  add_groups_long(
+  res <- add_groups_long(
     df,
     cfg,
     "date",
     "unit_var",
     "county_var",
     "gender_var"
-  ) |>
-    expect_snapshot()
+  )
+
+  expect_setequal(
+    res$unit_type,
+    c("unit", "country", "county")
+  )
+
+  expect_setequal(
+    res$gender,
+    c("all", "1")
+  )
+
+  expect_setequal(
+    res$PeriodReportedStartDate,
+    lubridate::ymd(c("2024-01-01", "2024-07-01", "2024-09-01"))
+  )
+
+  expect_setequal(
+    res$PeriodReportedEndDate,
+    lubridate::ymd(c("2024-09-30", "2024-12-31"))
+  )
 
   add_groups_long(
     df,

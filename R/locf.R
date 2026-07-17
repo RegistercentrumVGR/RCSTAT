@@ -11,11 +11,11 @@
 #' @export locf
 #'
 locf <- function(
-    df,
-    vars,
-    groupby = "id",
-    orderby = "date",
-    slice = FALSE) {
+  df,
+  vars,
+  groupby = "id",
+  orderby = "date",
+  slice = FALSE) {
   # TODO: Assert that groupby and order by
   # are character vectors and names which
   # are present in df.
@@ -78,14 +78,14 @@ locf <- function(
 #' }
 #'
 locfdt <- function(
-    dt,
-    vars,
-    groupby = "id",
-    orderby = "date",
-    slice = FALSE,
-    return_tibble = FALSE,
-    window_size = NULL,
-    window_type = NULL) {
+  dt,
+  vars,
+  groupby = "id",
+  orderby = "date",
+  slice = FALSE,
+  return_tibble = FALSE,
+  window_size = NULL,
+  window_type = NULL) {
   # Check inputs
   checkmate::assert_choice(
     x = window_type,

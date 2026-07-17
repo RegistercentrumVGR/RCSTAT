@@ -10,9 +10,9 @@
 #'
 #' @export group_proportions
 group_proportions <- function(
-    data,
-    group_by,
-    obfuscate = TRUE) {
+  data,
+  group_by,
+  obfuscate = TRUE) {
   res <- data |>
     dplyr::group_by(dplyr::pick(tidyselect::all_of(group_by))) |>
     dplyr::summarise(
@@ -50,11 +50,11 @@ group_proportions <- function(
 #' @param ... Arguments passed to obfuscate
 #' @export group_means
 group_means <- function(
-    data,
-    group_by,
-    vars = NULL,
-    obfuscate = TRUE,
-    ...) {
+  data,
+  group_by,
+  vars = NULL,
+  obfuscate = TRUE,
+  ...) {
   if (is.null(vars)) {
     vars <- setdiff(names(data), group_by)
   }
@@ -105,11 +105,11 @@ group_means <- function(
 #' @param ... Arguments passed to obfuscate
 #' @export proportion_missing
 proportion_missing <- function(
-    data,
-    group_by,
-    vars = NULL,
-    obfuscate = TRUE,
-    ...) {
+  data,
+  group_by,
+  vars = NULL,
+  obfuscate = TRUE,
+  ...) {
   if (is.null(vars)) {
     vars <- setdiff(names(data), group_by)
   }
@@ -167,17 +167,17 @@ proportion_missing <- function(
 #'
 #' @export get_aggregate_value
 get_aggregate_value <- function(
-    df,
-    group_cols = NULL,
-    vars = NULL,
-    include_missing = TRUE,
-    obfuscate_data = FALSE,
-    censored_value = 0,
-    pivot_prop_count = FALSE,
-    distinct_cols = NULL,
-    arrange_by = NULL,
-    marginal_cols,
-    add_reason_col = FALSE) {
+  df,
+  group_cols = NULL,
+  vars = NULL,
+  include_missing = TRUE,
+  obfuscate_data = FALSE,
+  censored_value = 0,
+  pivot_prop_count = FALSE,
+  distinct_cols = NULL,
+  arrange_by = NULL,
+  marginal_cols,
+  add_reason_col = FALSE) {
   #### Warnings ####
 
   checkmate::assert_list(vars, min.len = 1)

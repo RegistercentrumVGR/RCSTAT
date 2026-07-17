@@ -27,8 +27,168 @@ get_surv_value <- function(df,
                            censored_limit = 15,
                            estimate = "survival") {
 
-  checkmate::assert_data_frame(df)
   checkmate::assert_number(time, lower = 0)
+  checkmate::assert_choice(estimate, c("survival", "event"))
+
+  fit <- fit_surv(
+    df = df,
+    time_col = time_col,
+    event_col = event_col,
+    group_cols = group_cols,
+    marginal_cols = marginal_cols,
+    obfuscate_data = obfuscate_data,
+    add_reason_col = add_reason_col,
+    censored_value = censored_value,
+    censored_limit = censored_limit
+  )
+
+  if (is.null(fit)) {
+    return(
+      tibble::tibble(
+        estimate = NA,
+        total = 0,
+        cum_events = 0
+      )
+    )
+  }
+
+  res <- fit$res |>
+    dplyr::filter(.data$time <= .env$time) |>
+    dplyr::group_by(dplyr::across(dplyr::any_of("strata"))) |>
+    dplyr::mutate(total = .data$n.risk[1]) |>
+    dplyr::slice_tail(n = 1) |>
+    dplyr::ungroup() |>
+    unnest_strata(group_cols, fit$model_df)
+
+  res <- if (is.null(group_cols)) {
+    if (nrow(res) == 0) {
+      tibble::tibble(estimate = NA, total = 0, cum_events = 0)
+    } else {
+      res
+    }
+  } else {
+    res |>
+      tidyr::complete(
+        dplyr::select(fit$original_df, dplyr::any_of(group_cols)),
+        fill = list(total = 0, cum_events = 0)
+      )
+  }
+
+  res <- res |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::any_of("obfuscated_reason"),
+        ~ dplyr::case_when(
+          is.na(.x) & .data$total == 0 ~ "N < 15",
+          .default = .x
+        )
+      )
+    ) |>
+    dplyr::select(
+      dplyr::all_of(group_cols),
+      "estimate",
+      "cum_events",
+      "total",
+      dplyr::any_of("obfuscated_reason")
+    )
+
+  if (estimate == "event") {
+    res <- res |>
+      dplyr::mutate(estimate = 1 - .data$estimate)
+  }
+
+  res
+}
+
+#' Gets the estimated survival curve, suitable for plotting
+#'
+#' Like [get_surv_value()], but returns the full survival curve (one row
+#' per event/censoring time, per group) instead of the estimate at a
+#' single point in time.
+#'
+#' @inheritParams get_surv_value
+#'
+#' @return estimated survival curve for each group
+#' @export
+get_surv_curve <- function(df,
+                           time_col = "time",
+                           event_col = "status",
+                           group_cols = NULL,
+                           marginal_cols,
+                           obfuscate_data = FALSE,
+                           add_reason_col = TRUE,
+                           censored_value = NA,
+                           censored_limit = 15,
+                           estimate = "survival") {
+
+  checkmate::assert_choice(estimate, c("survival", "event"))
+
+  fit <- fit_surv(
+    df = df,
+    time_col = time_col,
+    event_col = event_col,
+    group_cols = group_cols,
+    marginal_cols = marginal_cols,
+    obfuscate_data = obfuscate_data,
+    add_reason_col = add_reason_col,
+    censored_value = censored_value,
+    censored_limit = censored_limit
+  )
+
+  if (is.null(fit)) {
+    return(
+      tibble::tibble(
+        time = numeric(0),
+        estimate = numeric(0),
+        n.risk = numeric(0),
+        cum_events = numeric(0)
+      )
+    )
+  }
+
+  res <- fit$res |>
+    unnest_strata(group_cols, fit$model_df) |>
+    dplyr::select(
+      dplyr::all_of(group_cols),
+      "time",
+      "estimate",
+      "n.risk",
+      "cum_events",
+      dplyr::any_of("obfuscated_reason")
+    )
+
+  if (estimate == "event") {
+    res <- res |>
+      dplyr::mutate(estimate = 1 - .data$estimate)
+  }
+
+  res
+}
+
+#' Fit a survival curve and tidy the result
+#'
+#' Shared implementation for [get_surv_value()] and [get_surv_curve()].
+#' Fits `survival::survfit()`, tidies the result, optionally obfuscates it,
+#' and computes cumulative events per group across all event/censoring
+#' times (i.e. the full curve, unfiltered by time).
+#'
+#' @inheritParams get_surv_value
+#'
+#' @return a list with the tidied `res` (one row per group per
+#' event/censoring time) and the `original_df` used to complete missing
+#' groups, or `NULL` if `df` has no rows once missing observations are
+#' removed
+fit_surv <- function(df,
+                     time_col = "time",
+                     event_col = "status",
+                     group_cols = NULL,
+                     marginal_cols,
+                     obfuscate_data = FALSE,
+                     add_reason_col = TRUE,
+                     censored_value = NA,
+                     censored_limit = 15) {
+
+  checkmate::assert_data_frame(df)
   checkmate::assert_string(time_col)
   checkmate::assert_string(event_col)
   checkmate::assert_character(group_cols, null.ok = TRUE)
@@ -39,7 +199,6 @@ get_surv_value <- function(df,
   checkmate::assert_logical(obfuscate_data, len = 1)
   checkmate::assert_logical(add_reason_col, len = 1)
   checkmate::assert_integerish(censored_limit, lower = 0, len = 1)
-  checkmate::assert_choice(estimate, c("survival", "event"))
 
   if (rlang::is_missing(marginal_cols)) {
     marginal_cols <- group_cols
@@ -83,13 +242,7 @@ get_surv_value <- function(df,
   }
 
   if (nrow(df) == 0) {
-    return(
-      tibble::tibble(
-        estimate = NA,
-        total = 0,
-        cum_events = 0
-      )
-    )
+    return(NULL)
   }
 
   rhs <- ifelse(
@@ -129,9 +282,9 @@ get_surv_value <- function(df,
     }
   )
 
-  fit <- survival::survfit(fml, data = df)
+  surv_fit <- survival::survfit(fml, data = df)
 
-  res <- broom::tidy(fit)
+  res <- broom::tidy(surv_fit)
 
   if (obfuscate_data) {
     res <- obfuscate_surv(
@@ -148,72 +301,64 @@ get_surv_value <- function(df,
     dplyr::mutate(
       cum_events = cumsum(.data$n.event)
     ) |>
-    dplyr::ungroup() |>
-    dplyr::filter(
-      .data$time <= .env$time,
-      dplyr::if_any(
-        dplyr::any_of("state"),
-        ~ .x == "(s0)"
-      )
-    ) |>
-    dplyr::group_by(dplyr::across(dplyr::any_of("strata"))) |>
-    dplyr::mutate(total = .data$n.risk[1]) |>
-    dplyr::slice_tail(n = 1) |>
     dplyr::ungroup()
 
-  if (!is.null(group_cols)) {
+  if ("state" %in% names(res)) {
     res <- res |>
-      tidyr::separate_wider_delim("strata", delim = ",", names_sep = "_") |>
-      dplyr::mutate(
-        dplyr::across(
-          dplyr::matches("^strata_\\d+"),
-          ~ stringr::str_extract(.x, "^.+=(.+)$", 1),
-          .names = "
-          {group_cols[as.numeric(stringr::str_extract(.col, '\\\\d+'))]}
-          "
-        ),
-        dplyr::across(
-          dplyr::all_of(group_cols),
-          stringr::str_squish
-        ),
-        dplyr::across(
-          dplyr::all_of(group_cols),
-          ~ convert(
-            .x,
-            class(df[[dplyr::cur_column()]])
-          )
-        )
-      )
+      dplyr::filter(.data$state == "(s0)")
   }
 
-  res <- res |>
-    tidyr::complete(
-      dplyr::select(original_df, dplyr::any_of(group_cols)),
-      fill = list(total = 0, cum_events = 0)
-    ) |>
+  list(res = res, original_df = original_df, model_df = df)
+}
+
+#' Split the `strata` column of a tidied survfit into `group_cols`
+#'
+#' Shared implementation for [get_surv_value()] and [get_surv_curve()],
+#' used after any grouping/filtering that depends on the raw `strata`
+#' column has already happened.
+#'
+#' @param res tidied, filtered `survival::survfit()` result with a `strata`
+#' column
+#' @param group_cols the columns to group by
+#' @param model_df the data used to fit the survival curve (used to recover
+#' the original class of each group column)
+#'
+#' @return `res` with `strata` split into one column per entry of
+#' `group_cols`
+unnest_strata <- function(res, group_cols, model_df) {
+  if (is.null(group_cols)) {
+    return(res)
+  }
+
+  if (nrow(res) == 0) {
+    for (col in group_cols) {
+      res[[col]] <- convert(character(0), class(model_df[[col]]))
+    }
+    return(res)
+  }
+
+  res |>
+    tidyr::separate_wider_delim("strata", delim = ",", names_sep = "_") |>
     dplyr::mutate(
       dplyr::across(
-        dplyr::any_of("obfuscated_reason"),
-        ~ dplyr::case_when(
-          is.na(.x) & .data$total == 0 ~ "N < 15",
-          .default = .x
+        dplyr::matches("^strata_\\d+"),
+        ~ stringr::str_extract(.x, "^.+=(.+)$", 1),
+        .names = "
+        {group_cols[as.numeric(stringr::str_extract(.col, '\\\\d+'))]}
+        "
+      ),
+      dplyr::across(
+        dplyr::all_of(group_cols),
+        stringr::str_squish
+      ),
+      dplyr::across(
+        dplyr::all_of(group_cols),
+        ~ convert(
+          .x,
+          class(model_df[[dplyr::cur_column()]])
         )
       )
-    ) |>
-    dplyr::select(
-      dplyr::all_of(group_cols),
-      "estimate",
-      "cum_events",
-      "total",
-      dplyr::any_of("obfuscated_reason")
     )
-
-  if (estimate == "event") {
-    res <- res |>
-      dplyr::mutate(estimate = 1 - .data$estimate)
-  }
-
-  res
 }
 
 #' Convert an object to a specified class

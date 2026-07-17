@@ -228,15 +228,15 @@ decode_names <- function(df,
 #' }
 #'
 decode_data <- function(
-    data,
-    labels = NULL,
-    droplevels = TRUE,
-    add_cols = FALSE,
-    suffix = "_label",
-    as_character = FALSE,
-    missing_labels_na = TRUE,
-    decode_names = FALSE,
-    variable_names = NULL) {
+  data,
+  labels = NULL,
+  droplevels = TRUE,
+  add_cols = FALSE,
+  suffix = "_label",
+  as_character = FALSE,
+  missing_labels_na = TRUE,
+  decode_names = FALSE,
+  variable_names = NULL) {
 
   checkmate::assert_data_frame(labels)
 
@@ -371,7 +371,7 @@ decode_data <- function(
 #' @param register Register at socialstyrelsen
 #' @export
 get_sos_vl <- function(
-    register = NULL) {
+  register = NULL) {
   checkmate::assert_choice(
     register,
     c(

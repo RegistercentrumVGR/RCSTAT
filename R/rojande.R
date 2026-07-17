@@ -51,20 +51,20 @@ round_to_y <- function(x, y = 0.05) {
 #' @example man/examples/rojande.R
 #'
 obfuscate_data <- function(
-    data,
-    total_var = "total",
-    count_var = "n",
-    prop_var = "prop",
-    group_var = NULL,
-    statistics_vars = NULL,
-    other_count_vars = NULL,
-    round_statistics_vars = FALSE,
-    round_statistics_digits = 2,
-    add_reason_col = FALSE,
-    liberal_obfuscation = TRUE,
-    censored_value = 0,
-    inform = TRUE,
-    prop_scale = 1) {
+  data,
+  total_var = "total",
+  count_var = "n",
+  prop_var = "prop",
+  group_var = NULL,
+  statistics_vars = NULL,
+  other_count_vars = NULL,
+  round_statistics_vars = FALSE,
+  round_statistics_digits = 2,
+  add_reason_col = FALSE,
+  liberal_obfuscation = TRUE,
+  censored_value = 0,
+  inform = TRUE,
+  prop_scale = 1) {
   checkmate::assert_choice(prop_scale, c(1, 100))
 
   if (!is.null(group_var)) {
@@ -248,12 +248,12 @@ obfuscate_data <- function(
 #' @param statistics_vars Columns containing statistics such as mean, sd, etc.
 
 reason_col <- function(
-    data,
-    liberal_obfuscation = TRUE,
-    count_var = "n",
-    total_var = "total",
-    prop_var = "prop",
-    statistics_vars = NULL) {
+  data,
+  liberal_obfuscation = TRUE,
+  count_var = "n",
+  total_var = "total",
+  prop_var = "prop",
+  statistics_vars = NULL) {
   n_group_vars <- length(dplyr::group_vars(data))
 
   all_vars <- all(c(count_var, total_var, prop_var) %in% colnames(data))

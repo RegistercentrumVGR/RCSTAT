@@ -98,15 +98,14 @@ local_plumber <- function(api_url) {
 #' to control headers.
 #'
 #' @export
-api_statistics <- function(
-    register,
-    fun,
-    arguments = list(),
-    api_key = "MpuYxfbtp5I=",
-    dev = FALSE,
-    verbose = FALSE,
-    return_tibble = TRUE,
-    api_url = "prod") {
+api_statistics <- function(register,
+                           fun,
+                           arguments = list(),
+                           api_key = "MpuYxfbtp5I=",
+                           dev = FALSE,
+                           verbose = FALSE,
+                           return_tibble = TRUE,
+                           api_url = "prod") {
 
   checkmate::assert_string(api_url)
 

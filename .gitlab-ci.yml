@@ -3,6 +3,14 @@ include:
   - project: 'registercentrum/pipelines/r-package-ci'
     file: '/r-package-dind.yml'
 
+stages:
+  - lint
+  - dockerbuild
+  - test
+  - build
+  - release
+  - deploy
+
 deploy:
   stage: deploy
   tags:
@@ -15,3 +23,14 @@ deploy:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script: .\PsScripts\deploy.ps1
+
+build package:
+  stage: build
+  image: "$CI_REGISTRY_IMAGE/$CI_PROJECT_NAME:$CI_COMMIT_SHA"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - R CMD build . --no-build-vignettes --no-manual
+  artifacts:
+    paths:
+      - "*_*.tar.gz"

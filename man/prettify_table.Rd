@@ -19,5 +19,6 @@ prettified data.frame
 }
 \description{
 Renames columns, rounds means, medians, and proportions, and multiplies
-proportions
+proportions. Also handles output from [get_surv_value()] and
+[get_surv_curve()] (`time`, `estimate`, `n.risk`, `cum_events`)
 }

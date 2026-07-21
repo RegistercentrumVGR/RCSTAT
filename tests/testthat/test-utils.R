@@ -292,3 +292,39 @@ test_that("prettify_table works", {
     )
 
 })
+
+test_that("prettify_table handles survival columns", {
+
+  data.frame(
+    time = c(10, 20),
+    estimate = c(0.873, 0.5),
+    n.risk = c(50, 40),
+    cum_events = c(1, 3)
+  ) |>
+    prettify_table() |>
+    expect_equal(
+      data.frame(
+        Tid = c("10", "20"),
+        Skattning = c("87.3", "50"),
+        "Antal i riskmängd" = c("50", "40"),
+        "Kumulativa händelser" = c("1", "3"),
+        check.names = FALSE
+      )
+    )
+
+  data.frame(
+    estimate = c(0.6, NA),
+    cum_events = c(2, 5),
+    total = c(20, 10)
+  ) |>
+    prettify_table() |>
+    expect_equal(
+      data.frame(
+        Skattning = c("60", "-"),
+        "Kumulativa händelser" = c("2", "5"),
+        Nämnare = c("20", "10"),
+        check.names = FALSE
+      )
+    )
+
+})

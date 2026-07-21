@@ -460,7 +460,8 @@ pseudonymize_data <- function(df,
 #' Prettifies a table
 #'
 #' Renames columns, rounds means, medians, and proportions, and multiplies
-#' proportions
+#' proportions. Also handles output from [get_surv_value()] and
+#' [get_surv_curve()] (`time`, `estimate`, `n.risk`, `cum_events`)
 #'
 #' @param df data.frame to prettify
 #' @param vars list of variable names, passed to [RCStat::decode_vars()]
@@ -513,14 +514,18 @@ prettify_table <- function(df, vars = NULL, ...) {
       !!"Kvantil 5" := dplyr::matches("quant_5$"),
       !!"Kvantil 25" := dplyr::matches("quant_25$"),
       !!"Kvantil 75" := dplyr::matches("quant_75$"),
-      !!"Kvantil 95" := dplyr::matches("quant_95$")
+      !!"Kvantil 95" := dplyr::matches("quant_95$"),
+      !!"Skattning" := dplyr::any_of("estimate"),
+      !!"Antal i riskm\u00E4ngd" := dplyr::any_of("n.risk"),
+      !!"Kumulativa h\u00E4ndelser" := dplyr::any_of("cum_events"),
+      !!"Tid" := dplyr::any_of("time")
     ) |>
     dplyr::rename(
       !!"\u00C5r" := dplyr::matches("year")
     ) |>
     dplyr::mutate(
       dplyr::across(
-        dplyr::matches("Andel"),
+        dplyr::matches("Andel|Skattning"),
         ~ dplyr::case_when(
           is.na(.x) ~ "-",
           .default = as.character(prettify_prop(.x))
@@ -550,7 +555,7 @@ prettify_table <- function(df, vars = NULL, ...) {
       df <- df |>
         dplyr::mutate(
           dplyr::across(
-            dplyr::any_of("Andel"),
+            dplyr::any_of(c("Andel", "Skattning")),
             ~ dplyr::case_when(
               .x == "0" & .data[[var]] == "N < 15" ~ "-",
               .default = .x
@@ -588,6 +593,9 @@ prettify_table <- function(df, vars = NULL, ...) {
           "Kvantil 25",
           "Kvantil 75",
           "Kvantil 95",
+          "Skattning",
+          "Antal i riskm\u00e4ngd",
+          "Kumulativa h\u00e4ndelser",
           "T\u00e4ljare",
           "N\u00e4mnare",
           "Censureringsorsak"
@@ -596,7 +604,10 @@ prettify_table <- function(df, vars = NULL, ...) {
       .after = dplyr::everything()
     )
 
-  if ("N\u00e4mnare" %in% names(df) && !"Andel" %in% names(df)) {
+  if (
+    "N\u00e4mnare" %in% names(df) &&
+      !any(c("Andel", "Skattning") %in% names(df))
+  ) {
     df <- df |>
       dplyr::rename("Antal" = "N\u00e4mnare")
   }

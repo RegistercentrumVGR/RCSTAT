@@ -4,12 +4,14 @@
 \alias{prettify_table}
 \title{Prettifies a table}
 \usage{
-prettify_table(df, vars = NULL, ...)
+prettify_table(df, vars = NULL, remove_vars = NULL, ...)
 }
 \arguments{
 \item{df}{data.frame to prettify}
 
 \item{vars}{list of variable names, passed to [RCStat::decode_vars()]}
+
+\item{remove_vars}{vector of variable names to remove from the table}
 
 \item{...}{manual renames, passed to [dplyr::rename()] and fully supports
 tidy-selection of columns}

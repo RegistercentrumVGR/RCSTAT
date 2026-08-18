@@ -11,7 +11,8 @@ prettify_table(df, vars = NULL, remove_vars = NULL, ...)
 
 \item{vars}{list of variable names, passed to [RCStat::decode_vars()]}
 
-\item{remove_vars}{vector of variable names to remove from the table}
+\item{remove_vars}{vector of variable names to remove from the table, can
+either be the name of the variable before or after its been prettified}
 
 \item{...}{manual renames, passed to [dplyr::rename()] and fully supports
 tidy-selection of columns}

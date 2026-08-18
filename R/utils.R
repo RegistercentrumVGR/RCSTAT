@@ -465,7 +465,8 @@ pseudonymize_data <- function(df,
 #'
 #' @param df data.frame to prettify
 #' @param vars list of variable names, passed to [RCStat::decode_vars()]
-#' @param remove_vars vector of variable names to remove from the table
+#' @param remove_vars vector of variable names to remove from the table, can
+#' either be the name of the variable before or after its been prettified
 #' @param ... manual renames, passed to [dplyr::rename()] and fully supports
 #' tidy-selection of columns
 #'
@@ -616,6 +617,11 @@ prettify_table <- function(df, vars = NULL, remove_vars = NULL, ...) {
   ) {
     df <- df |>
       dplyr::rename("Antal" = "N\u00e4mnare")
+  }
+
+  if (!is.null(remove_vars)) {
+    df <- df |>
+      dplyr::select(-dplyr::any_of(remove_vars))
   }
 
   df

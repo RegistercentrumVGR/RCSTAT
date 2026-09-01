@@ -19,6 +19,24 @@ test_that("get_surv_value works", {
     time = 1,
     time_col = "time",
     event = "event",
+    include_ci = TRUE
+  ) |>
+    expect_equal(
+      tibble::tibble(
+        estimate = 0.5,
+        conf.low = 0.125,
+        conf.high = 1,
+        cum_events = 1,
+        total = 2
+      ),
+      tolerance = 0.001
+    )
+
+  get_surv_value(
+    df = df,
+    time = 1,
+    time_col = "time",
+    event = "event",
     censored_value = -1,
     obfuscate_data = TRUE
   ) |>
@@ -307,6 +325,30 @@ test_that("get_surv_curve works", {
         n.risk = numeric(0),
         cum_events = numeric(0)
       )
+    )
+
+  get_surv_curve(
+    df = df,
+    time_col = "time",
+    event_col = "status",
+    include_ci = TRUE
+  ) |>
+    dplyr::mutate(dplyr::across(c("n.risk", "cum_events"), as.numeric)) |>
+    expect_equal(
+      tibble::tribble(
+        ~time, ~estimate, ~conf.low, ~conf.high, ~n.risk, ~cum_events,
+        3, 1, 1, 1, 10, 0,
+        4, 0.889, 0.706, 1, 9, 0,
+        5, 0.778, 0.549, 1, 8, 1,
+        6, 0.778, 0.549, 1, 7, 2,
+        7, 0.648, 0.393, 1, 6, 2,
+        8, 0.519, 0.267, 1, 5, 3,
+        9, 0.519, 0.267, 1, 4, 4,
+        10, 0.346, 0.122, 0.978, 3, 4,
+        11, 0.173, 0.031, 0.978, 2, 5,
+        12, 0.173, 0.031, 0.978, 1, 6
+      ),
+      tolerance = 0.01
     )
 })
 

@@ -12,6 +12,8 @@
 #' @param censored_value the value to use when observations are censored
 #' @param censored_limit lower limir for at risk before censoring
 #' @param estimate what the estimate should be, either "survival" or "event"
+#' @param include_ci should confidence intervals be included in the final
+#' data.frame
 #'
 #' @return estimated survival at the requested point in time for each group
 #' @export
@@ -25,7 +27,8 @@ get_surv_value <- function(df,
                            add_reason_col = TRUE,
                            censored_value = NA,
                            censored_limit = 15,
-                           estimate = "survival") {
+                           estimate = "survival",
+                           include_ci = FALSE) {
 
   checkmate::assert_number(time, lower = 0)
   checkmate::assert_choice(estimate, c("survival", "event"))
@@ -74,6 +77,12 @@ get_surv_value <- function(df,
       )
   }
 
+  if (include_ci) {
+    ci <- c("conf.low", "conf.high")
+  } else {
+    ci <- NULL
+  }
+
   res <- res |>
     dplyr::mutate(
       dplyr::across(
@@ -87,6 +96,7 @@ get_surv_value <- function(df,
     dplyr::select(
       dplyr::all_of(group_cols),
       "estimate",
+      dplyr::any_of(ci),
       "cum_events",
       "total",
       dplyr::any_of("obfuscated_reason")
@@ -119,7 +129,8 @@ get_surv_curve <- function(df,
                            add_reason_col = TRUE,
                            censored_value = NA,
                            censored_limit = 15,
-                           estimate = "survival") {
+                           estimate = "survival",
+                           include_ci = FALSE) {
 
   checkmate::assert_choice(estimate, c("survival", "event"))
 
@@ -146,12 +157,19 @@ get_surv_curve <- function(df,
     )
   }
 
+  if (include_ci) {
+    ci <- c("conf.low", "conf.high")
+  } else {
+    ci <- NULL
+  }
+
   res <- fit$res |>
     unnest_strata(group_cols, fit$model_df) |>
     dplyr::select(
       dplyr::all_of(group_cols),
       "time",
       "estimate",
+      dplyr::any_of(ci),
       "n.risk",
       "cum_events",
       dplyr::any_of("obfuscated_reason")

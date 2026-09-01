@@ -14,7 +14,8 @@ get_surv_curve(
   add_reason_col = TRUE,
   censored_value = NA,
   censored_limit = 15,
-  estimate = "survival"
+  estimate = "survival",
+  include_ci = FALSE
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ censored}
 \item{censored_limit}{lower limir for at risk before censoring}
 
 \item{estimate}{what the estimate should be, either "survival" or "event"}
+
+\item{include_ci}{should confidence intervals be included in the final
+data.frame}
 }
 \value{
 estimated survival curve for each group

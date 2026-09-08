@@ -154,9 +154,9 @@ proportion_missing <- function(
 #' @param censored_value What value to replace censored values, used as argument in obfuscate_data
 #' @param pivot_prop_count whether to pivot the resulting data.frame into long format
 #' @param distinct_cols a set of columns that are used in
-#' [dplyr::distinct_by()]. Should be disjoint from `group_cols` to prevent
+#' [dplyr::distinct()]. Should be disjoint from `group_cols` to prevent
 #' misinterpretation of results.
-#' @param arrange_by a column used in [dplyr::arrange_by()] before calling
+#' @param arrange_by a column used in [dplyr::arrange()] before calling
 #' [dplyr::distinct()] with the variables in `distinct_cols`. The variable is
 #' arranged in descending order.
 #' @param marginal_cols a subset of `group_cols` for which to marginally

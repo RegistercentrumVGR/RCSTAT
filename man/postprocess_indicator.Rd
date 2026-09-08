@@ -37,13 +37,13 @@ postprocess_indicator_mean(df)
 \arguments{
 \item{df}{an aggregated indicator}
 
-\item{cfg}{the measure config, the result of [get_measure_config()]}
+\item{cfg}{the measure config, the result of \code{\link[=get_measure_config]{get_measure_config()}}}
 
 \item{register_id}{the register ID}
 
-\item{measure_id}{the MeasureID passed to [aggregate_vis]}
+\item{measure_id}{the MeasureID passed to \link{aggregate_vis}}
 
-\item{submeasures}{the submeasures key from [get_measure_config]}
+\item{submeasures}{the submeasures key from \link{get_measure_config}}
 }
 \value{
 renamed data.frame

@@ -37,14 +37,14 @@ censored}
 \item{censored_limit}{lower limir for at risk before censoring}
 }
 \value{
-a list with the tidied `res` (one row per group per
-event/censoring time) and the `original_df` used to complete missing
-groups, or `NULL` if `df` has no rows once missing observations are
+a list with the tidied \code{res} (one row per group per
+event/censoring time) and the \code{original_df} used to complete missing
+groups, or \code{NULL} if \code{df} has no rows once missing observations are
 removed
 }
 \description{
-Shared implementation for [get_surv_value()] and [get_surv_curve()].
-Fits `survival::survfit()`, tidies the result, optionally obfuscates it,
+Shared implementation for \code{\link[=get_surv_value]{get_surv_value()}} and \code{\link[=get_surv_curve]{get_surv_curve()}}.
+Fits \code{survival::survfit()}, tidies the result, optionally obfuscates it,
 and computes cumulative events per group across all event/censoring
 times (i.e. the full curve, unfiltered by time).
 }

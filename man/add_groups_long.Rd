@@ -18,7 +18,7 @@ add_groups_long_gender(df, submeasures, gender_var)
 \arguments{
 \item{df}{a data.frame}
 
-\item{cfg}{the measure config, the result of [get_measure_config()]}
+\item{cfg}{the measure config, the result of \code{\link[=get_measure_config]{get_measure_config()}}}
 
 \item{date_var}{the name of the date variable}
 
@@ -30,7 +30,7 @@ add_groups_long_gender(df, submeasures, gender_var)
 
 \item{type}{the type of date or organizational level to be added}
 
-\item{submeasures}{the submeasures key from [get_measure_config]}
+\item{submeasures}{the submeasures key from \link{get_measure_config}}
 }
 \value{
 a data.frame with extra rows added

@@ -2,7 +2,7 @@
 % Please edit documentation in R/tbl_statistics.R
 \name{get_group_combinations}
 \alias{get_group_combinations}
-\title{Get a list of all combinations of columns defined in `group_cols`}
+\title{Get a list of all combinations of columns defined in \code{group_cols}}
 \usage{
 get_group_combinations(group_cols, marginal_cols)
 }

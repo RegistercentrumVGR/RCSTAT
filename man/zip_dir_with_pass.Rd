@@ -13,11 +13,11 @@ zip_dir_with_pass(
 )
 }
 \arguments{
-\item{directory}{directory to zip. Defaults to `output`}
+\item{directory}{directory to zip. Defaults to \code{output}}
 
-\item{pass}{password to use. Defaults to `[random_password()]`. May only
-contain `a–z`, `A–Z`, `0–9`, and `!`, `@`, `#`, `$`, `.`, `+`, `%`, `&`, `/`,
-`(`, `)`, `?`.}
+\item{pass}{password to use. Defaults to \verb{[random_password()]}. May only
+contain \verb{a–z}, \verb{A–Z}, \verb{0–9}, and \code{!}, \code{@}, \verb{#}, \code{$}, \code{.}, \code{+}, \verb{\%}, \code{&}, \code{/},
+\code{(}, \verb{)}, \verb{?}.}
 
 \item{file}{name of zip-file}
 

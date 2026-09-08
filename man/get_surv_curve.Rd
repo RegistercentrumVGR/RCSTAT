@@ -47,7 +47,7 @@ data.frame}
 estimated survival curve for each group
 }
 \description{
-Like [get_surv_value()], but returns the full survival curve (one row
+Like \code{\link[=get_surv_value]{get_surv_value()}}, but returns the full survival curve (one row
 per event/censoring time, per group) instead of the estimate at a
 single point in time.
 }

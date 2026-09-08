@@ -10,18 +10,20 @@ Holds functions for standard tables and general data management for registers at
 }
 \section{Package options}{
 
-- `rcstat.local_plumber`: logical, default `FALSE`.
-  Controls whether [api_statistics()] should send API requests to a local
-  plumber instance.
-  Can be set globally with `options(rcstat.local_plumber = TRUE)`.
-- `rcstat.local_scope`: integer, default 1.
-   Controls the scope of the API call.
-- `rcstat.local_unit`: integer, default 0.
-   Controls what unit you are authenticated for.
-- `rcstat.local_role`: integer, default 1.
-   Controls the role you are authenticates as.
-- `rcstat.local_register`: integer, default 1.
-   Controls the register you are authenticated for.
+\itemize{
+\item \code{rcstat.local_plumber}: logical, default \code{FALSE}.
+Controls whether \code{\link[=api_statistics]{api_statistics()}} should send API requests to a local
+plumber instance.
+Can be set globally with \code{options(rcstat.local_plumber = TRUE)}.
+\item \code{rcstat.local_scope}: integer, default 1.
+Controls the scope of the API call.
+\item \code{rcstat.local_unit}: integer, default 0.
+Controls what unit you are authenticated for.
+\item \code{rcstat.local_role}: integer, default 1.
+Controls the role you are authenticates as.
+\item \code{rcstat.local_register}: integer, default 1.
+Controls the register you are authenticated for.
+}
 }
 
 \keyword{internal}

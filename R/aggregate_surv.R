@@ -104,7 +104,17 @@ get_surv_value <- function(df,
 
   if (estimate == "event") {
     res <- res |>
-      dplyr::mutate(estimate = 1 - .data$estimate)
+      dplyr::mutate(
+        dplyr::across(dplyr::any_of("conf.low"), ~ 1 - .x),
+        dplyr::across(dplyr::any_of("conf.high"), ~ 1 - .x),
+        estimate = 1 - .data$estimate
+      )
+
+    if (all(c("conf.low", "conf.high") %in% names(res))) {
+      res <- res |>
+        dplyr::rename(conf.low = "conf.high", conf.high = "conf.low") |>
+        dplyr::relocate("conf.low", .before = "conf.high")
+    }
   }
 
   res
@@ -177,7 +187,17 @@ get_surv_curve <- function(df,
 
   if (estimate == "event") {
     res <- res |>
-      dplyr::mutate(estimate = 1 - .data$estimate)
+      dplyr::mutate(
+        dplyr::across(dplyr::any_of("conf.low"), ~ 1 - .x),
+        dplyr::across(dplyr::any_of("conf.high"), ~ 1 - .x),
+        estimate = 1 - .data$estimate
+      )
+
+    if (all(c("conf.low", "conf.high") %in% names(res))) {
+      res <- res |>
+        dplyr::rename(conf.low = "conf.high", conf.high = "conf.low") |>
+        dplyr::relocate("conf.low", .before = "conf.high")
+    }
   }
 
   res

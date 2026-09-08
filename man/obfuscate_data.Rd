@@ -50,11 +50,11 @@ to round to.}
 
 \item{add_reason_col}{Whether or not to add a column called obfuscated_reason
 indicating why a row was obfuscated with either "n < 5" or "N < 15" if
-all of `count_var`, `total_var`, and `prop_var` are supplied. If only
-`total_var` is found the only obfuscated_reason can be "N < 5"}
+all of \code{count_var}, \code{total_var}, and \code{prop_var} are supplied. If only
+\code{total_var} is found the only obfuscated_reason can be "N < 5"}
 
 \item{liberal_obfuscation}{Whether or not to use liberal obfuscation. If
-this is true we round proportions to 5% when the numerator < 5.
+this is true we round proportions to 5\% when the numerator < 5.
 We also do nothing when the numerator is < 5 and
 the denominator is >= 200.}
 
@@ -63,7 +63,7 @@ When working with bars it is useful to censor with 0 to not
 affect order of bars but when producing a line plot 0 does not make sense.}
 
 \item{inform}{Whether or not to print information about the current group
-vars when `group_var` is `NULL`}
+vars when \code{group_var} is \code{NULL}}
 
 \item{prop_scale}{Argument indicating what scale the prop_var is. Either 1
 or 100}

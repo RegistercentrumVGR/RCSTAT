@@ -21,10 +21,10 @@ when decoding.}
 \item{name}{name of input variable (optional). Used in the warning message
 only to print the name of variable with missing labels.}
 
-\item{droplevels}{If `TRUE`, factor levels not present in data will be
+\item{droplevels}{If \code{TRUE}, factor levels not present in data will be
 excluded.}
 
-\item{missing_labels_na}{If `TRUE` values with no label will be set to `NA`}
+\item{missing_labels_na}{If \code{TRUE} values with no label will be set to \code{NA}}
 }
 \value{
 Factor

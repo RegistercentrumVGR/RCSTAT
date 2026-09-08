@@ -32,10 +32,10 @@ aggregating the indicator}
 
 \item{register_id}{the register ID}
 
-\item{gender_var}{the name of the gender variable, if `NULL` the variable
-`SubjectKey` must be present in `df`}
+\item{gender_var}{the name of the gender variable, if \code{NULL} the variable
+\code{SubjectKey} must be present in \code{df}}
 
-\item{...}{passed to `indicator_function`}
+\item{...}{passed to \code{indicator_function}}
 }
 \value{
 an aggregated data.frame with VIS appropriate names and metadata
@@ -51,12 +51,12 @@ Kvalitetsindikatorkatalog API ensuring the indicators are always up-to-date.
 Note that only the reported periods and organizational levels as well as
 historic indicator validity is dynamically applied. The actual definition
 of the indicator can change in the config and should be then changed in
-`indicator_function` to reflect this.
+\code{indicator_function} to reflect this.
 
 It's important to note that all relevant filtering on, for example, gender,
-and care type has to be performed before passing `df` to this function.
+and care type has to be performed before passing \code{df} to this function.
 
-The `indicator_function` has to accept the following arguments `group_cols`,
-`obfuscate_data`, `aggregate`, `marginal_cols` and is almost surely defined
-in the [rcdm::rcdm] package.
+The \code{indicator_function} has to accept the following arguments \code{group_cols},
+\code{obfuscate_data}, \code{aggregate}, \code{marginal_cols} and is almost surely defined
+in the \link[rcdm:rcdm-package]{rcdm::rcdm} package.
 }

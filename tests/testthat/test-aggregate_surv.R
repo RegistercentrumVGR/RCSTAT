@@ -220,6 +220,39 @@ test_that("get_surv_value works", {
       tolerance = 0.001
     )
 
+  # CIs should also be flipped (inverted and swapped) when estimate = "event"
+  surv_ci <- get_surv_value(
+    df = df,
+    time = 10,
+    time_col = "time",
+    event_col = "status",
+    estimate = "survival",
+    include_ci = TRUE,
+    obfuscate_data = FALSE
+  )
+
+  event_ci <- get_surv_value(
+    df = df,
+    time = 10,
+    time_col = "time",
+    event_col = "status",
+    estimate = "event",
+    include_ci = TRUE,
+    obfuscate_data = FALSE
+  )
+
+  event_ci |>
+    expect_equal(
+      tibble::tibble(
+        estimate = 1 - surv_ci$estimate,
+        conf.low = 1 - surv_ci$conf.high,
+        conf.high = 1 - surv_ci$conf.low,
+        cum_events = surv_ci$cum_events,
+        total = surv_ci$total
+      )
+    )
+
+
   # time before the first event/censoring time, no group_cols
   df <- data.frame(time = c(1, 100), event = c(1, 0))
 
@@ -349,6 +382,37 @@ test_that("get_surv_curve works", {
         12, 0.173, 0.031, 0.978, 1, 6
       ),
       tolerance = 0.01
+    )
+
+  # CIs should also be flipped (inverted and swapped) when estimate = "event"
+  surv_curve_ci <- get_surv_curve(
+    df = df,
+    time_col = "time",
+    event_col = "status",
+    include_ci = TRUE
+  ) |>
+    dplyr::mutate(dplyr::across(c("n.risk", "cum_events"), as.numeric))
+
+  event_curve_ci <- get_surv_curve(
+    df = df,
+    time_col = "time",
+    event_col = "status",
+    estimate = "event",
+    include_ci = TRUE
+  ) |>
+    dplyr::mutate(dplyr::across(c("n.risk", "cum_events"), as.numeric))
+
+  event_curve_ci |>
+    expect_equal(
+      surv_curve_ci |>
+        dplyr::mutate(
+          estimate = 1 - .data$estimate,
+          new_conf.low = 1 - .data$conf.high,
+          new_conf.high = 1 - .data$conf.low
+        ) |>
+        dplyr::select(-"conf.low", -"conf.high") |>
+        dplyr::rename(conf.low = "new_conf.low", conf.high = "new_conf.high") |>
+        dplyr::relocate("conf.low", "conf.high", .after = "estimate")
     )
 })
 

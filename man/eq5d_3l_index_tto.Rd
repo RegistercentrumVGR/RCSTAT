@@ -25,7 +25,7 @@ eq5d_3l_index_tto(2, 1, 3, 1, 1) # 0.724
 eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3))
 }
 \references{
-[Burström et al. 2014, TTO Model 4, Table 3](https://dx.doi.org/10.1007%2Fs11136-013-0496-4)
+\href{https://dx.doi.org/10.1007\%2Fs11136-013-0496-4}{Burström et al. 2014, TTO Model 4, Table 3}
 }
 \seealso{
 Other eq5d: 

@@ -8,7 +8,7 @@ get_organization_level(measure_config)
 }
 \arguments{
 \item{measure_config}{the measure config from which to extract the measure
-organizational levels, the result of [search_measure_id()]}
+organizational levels, the result of \code{\link[=search_measure_id]{search_measure_id()}}}
 }
 \value{
 vector of measure organizational levels

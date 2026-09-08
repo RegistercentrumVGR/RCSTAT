@@ -35,19 +35,19 @@ get_aggregate_value(
 \item{pivot_prop_count}{whether to pivot the resulting data.frame into long format}
 
 \item{distinct_cols}{a set of columns that are used in
-[dplyr::distinct_by()]. Should be disjoint from `group_cols` to prevent
+\code{\link[dplyr:distinct]{dplyr::distinct()}}. Should be disjoint from \code{group_cols} to prevent
 misinterpretation of results.}
 
-\item{arrange_by}{a column used in [dplyr::arrange_by()] before calling
-[dplyr::distinct()] with the variables in `distinct_cols`. The variable is
+\item{arrange_by}{a column used in \code{\link[dplyr:arrange]{dplyr::arrange()}} before calling
+\code{\link[dplyr:distinct]{dplyr::distinct()}} with the variables in \code{distinct_cols}. The variable is
 arranged in descending order.}
 
-\item{marginal_cols}{a subset of `group_cols` for which to marginally
-summarize. If not supplied all grouping columns will be used. Use `NULL`
+\item{marginal_cols}{a subset of \code{group_cols} for which to marginally
+summarize. If not supplied all grouping columns will be used. Use \code{NULL}
 to not add any marginals.}
 
 \item{add_reason_col}{whether or not to add a variable describing why an
-observation was obfuscate, passed to [obfuscate_data()]}
+observation was obfuscate, passed to \code{\link[=obfuscate_data]{obfuscate_data()}}}
 }
 \description{
 Create aggregate data across all combinations, including totals.

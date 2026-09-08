@@ -2,7 +2,7 @@
 % Please edit documentation in R/aggregate_vis.R
 \name{add_gender}
 \alias{add_gender}
-\title{Adds a variable called `gender` to a data.frame}
+\title{Adds a variable called \code{gender} to a data.frame}
 \usage{
 add_gender(df, gender_var)
 }
@@ -12,8 +12,8 @@ add_gender(df, gender_var)
 \item{gender_var}{the optional name of the gender variable}
 }
 \value{
-a data.frame with the variable `gender`
+a data.frame with the variable \code{gender}
 }
 \description{
-Adds a variable called `gender` to a data.frame
+Adds a variable called \code{gender} to a data.frame
 }

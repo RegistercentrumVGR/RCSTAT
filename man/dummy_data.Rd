@@ -5,14 +5,16 @@
 \alias{dummy_data}
 \title{Dummy data for use in tests and examples}
 \format{
-## `dummy_data`
+\subsection{\code{dummy_data}}{
+
 A data frame with 10000 rows and 9 columns:
 \describe{
-  \item{id}{Country name}
-  \item{adate,bdate}{Date type variables (YYYY-MM-DD)}
-  \item{a,b,c}{Integer type variables}
-  \item{x,z}{Normally distributed random numbers (`rnorm(n,0,1)`)}
-  \item{y}{exponentially distributed random numbers (`rexp(n, rate = 2)`)}
+\item{id}{Country name}
+\item{adate,bdate}{Date type variables (YYYY-MM-DD)}
+\item{a,b,c}{Integer type variables}
+\item{x,z}{Normally distributed random numbers (\code{rnorm(n,0,1)})}
+\item{y}{exponentially distributed random numbers (\code{rexp(n, rate = 2)})}
+}
 }
 }
 \usage{

@@ -8,7 +8,7 @@ get_measuring_frequency(measure_config)
 }
 \arguments{
 \item{measure_config}{the measure config from which to extract the measure
-frequencies, the result of [search_measure_id()]}
+frequencies, the result of \code{\link[=search_measure_id]{search_measure_id()}}}
 }
 \value{
 vector of measure frequencies

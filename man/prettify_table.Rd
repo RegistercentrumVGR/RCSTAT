@@ -4,24 +4,31 @@
 \alias{prettify_table}
 \title{Prettifies a table}
 \usage{
-prettify_table(df, vars = NULL, remove_vars = NULL, ...)
+prettify_table(df, vars = NULL, remove_vars = NULL, ..., tableone = FALSE)
 }
 \arguments{
 \item{df}{data.frame to prettify}
 
-\item{vars}{list of variable names, passed to [RCStat::decode_vars()]}
+\item{vars}{a data.frame with \code{ColumnName} and \code{Description} columns,
+passed to \code{\link[=decode_names]{decode_names()}} (or, if \code{tableone = TRUE}, to
+\code{\link[=prettify_table_one]{prettify_table_one()}})}
 
 \item{remove_vars}{vector of variable names to remove from the table, can
 either be the name of the variable before or after its been prettified}
 
-\item{...}{manual renames, passed to [dplyr::rename()] and fully supports
-tidy-selection of columns}
+\item{...}{manual renames, passed to \code{\link[dplyr:rename]{dplyr::rename()}} and fully supports
+tidy-selection of columns. Ignored if \code{tableone = TRUE}, in which case
+\code{...} is instead passed to \code{\link[=prettify_table_one]{prettify_table_one()}}}
+
+\item{tableone}{if \code{TRUE}, routes the call to \code{\link[=prettify_table_one]{prettify_table_one()}}
+instead, allowing \code{prettify_table()} to remain a single entry point for
+prettifying both regular tables and the output of \code{\link[=table_one]{table_one()}}}
 }
 \value{
 prettified data.frame
 }
 \description{
 Renames columns, rounds means, medians, and proportions, and multiplies
-proportions. Also handles output from [get_surv_value()] and
-[get_surv_curve()] (`time`, `estimate`, `n.risk`, `cum_events`)
+proportions. Also handles output from \code{\link[=get_surv_value]{get_surv_value()}} and
+\code{\link[=get_surv_curve]{get_surv_curve()}} (\code{time}, \code{estimate}, \code{n.risk}, \code{cum_events})
 }

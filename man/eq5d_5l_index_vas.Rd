@@ -21,7 +21,7 @@ eq5d_5l_index_vas(3, 4, 5, 4, 3) # 30.5
 eq5d_5l_index_vas(rep(3, 10), rep(4, 10), rep(5, 10), rep(4, 10), rep(3, 10))
 }
 \references{
-[Burström, model 5 VAS](https://link.springer.com/article/10.1007/s40273-020-00905-7/tables/9)
+\href{https://link.springer.com/article/10.1007/s40273-020-00905-7/tables/9}{Burström, model 5 VAS}
 }
 \seealso{
 Other eq5d: 

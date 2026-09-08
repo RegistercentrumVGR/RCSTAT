@@ -23,7 +23,7 @@ NA values}
 \item{censored_value}{the value to replace censored proportions with}
 
 \item{add_reason_col}{whether or not to add a variable describing why an
-observation was obfuscate, passed to [obfuscate_data()]}
+observation was obfuscate, passed to \code{\link[=obfuscate_data]{obfuscate_data()}}}
 }
 \description{
 Summarise a vector into columns of counts for each occurrence and each counts

@@ -293,6 +293,28 @@ test_that("prettify_table works", {
 
 })
 
+test_that("prettify_table routes to prettify_table_one when tableone = TRUE", {
+  df <- tibble::tribble(
+    ~variable, ~category, ~value,
+    "sex",     "Female",  "3 (50.0%)",
+    "sex",     "Male",    "3 (50.0%)"
+  )
+
+  expect_equal(
+    prettify_table(df, tableone = TRUE),
+    prettify_table_one(df)
+  )
+
+  expect_equal(
+    prettify_table(
+      df,
+      vars = data.frame(ColumnName = "sex", Description = "Kön"),
+      tableone = TRUE
+    ),
+    prettify_table_one(df, vars = data.frame(ColumnName = "sex", Description = "Kön"))
+  )
+})
+
 test_that("prettify_table handles survival columns", {
 
   data.frame(

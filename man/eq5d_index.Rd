@@ -8,15 +8,15 @@ eq5d_index(..., levels, type, old = FALSE, split = ",")
 }
 \arguments{
 \item{...}{arguments passed to underlying methods.
-Either `mobility,selfcare,usual,pain,anxiety`
-to [eq5d_3l_index_tto()] or [eq5d_5l_index_tto()]
-or `x` to [eq5d_3l_index_tto_old()]}
+Either \verb{mobility,selfcare,usual,pain,anxiety}
+to \code{\link[=eq5d_3l_index_tto]{eq5d_3l_index_tto()}} or \code{\link[=eq5d_5l_index_tto]{eq5d_5l_index_tto()}}
+or \code{x} to \code{\link[=eq5d_3l_index_tto_old]{eq5d_3l_index_tto_old()}}}
 
 \item{levels}{numeric: 3 or 5 for the number of levels used}
 
 \item{type}{character: "TTO" or "VAS"}
 
-\item{old}{logic: should [eq5d_3l_index_tto_old()] be used?}
+\item{old}{logic: should \code{\link[=eq5d_3l_index_tto_old]{eq5d_3l_index_tto_old()}} be used?}
 
 \item{split}{
     character vector (or object which can be coerced to such)

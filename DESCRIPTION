@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.4.4
+Version: 1.5.0
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 
@@ -20,6 +20,7 @@ Suggests:
     broom,
     survival
 Config/testthat/edition: 3
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
     checkmate,
@@ -41,6 +42,7 @@ Imports:
     writexl,
     curl,
     stringi,
-    memoise
-LinkingTo: 
+    memoise,
+    forcats
+LinkingTo:
     Rcpp

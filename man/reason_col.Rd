@@ -23,7 +23,7 @@ reason_col(
 \item{total_var}{The column containing the denominator}
 
 \item{prop_var}{The column containing the proportion as determined by
-`count_var` and `total_var`}
+\code{count_var} and \code{total_var}}
 
 \item{statistics_vars}{Columns containing statistics such as mean, sd, etc.}
 }

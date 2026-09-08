@@ -36,10 +36,10 @@ api_statistics(
 
 \item{dev}{if newr should be used}
 
-\item{api_url}{Should be `"prod"` for calling the production Stratum API or
-`"local"` to call a local instance of `rcplumber`. All other values will
+\item{api_url}{Should be \code{"prod"} for calling the production Stratum API or
+\code{"local"} to call a local instance of \code{rcplumber}. All other values will
 interpreted as the prefix for the URL of the API call. Can also be controlled
-by the option `rcstat.local_plumber`. See details for information about how
+by the option \code{rcstat.local_plumber}. See details for information about how
 to control headers.}
 
 \item{verbose}{print query sent}
@@ -50,8 +50,8 @@ tibble::as_tibble. Note that this does not work when the data is a list.}
 \description{
 If you are calling a local plumber instance we will set the necessary
 headers. By default, scope is 1, unit is 0, role is 900, and register is 100.
-You can control these values with the options `rcstat.local_scope`,
-`rcstat.local_unit`, `rcstat.local_role`, `rcstat.local_register`.
+You can control these values with the options \code{rcstat.local_scope},
+\code{rcstat.local_unit}, \code{rcstat.local_role}, \code{rcstat.local_register}.
 }
 \section{Functions}{
 \itemize{

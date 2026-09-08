@@ -7,7 +7,7 @@
 search_submeasures(id)
 }
 \arguments{
-\item{id}{the key `id` as returned by [search_measure_id], separate from a
+\item{id}{the key \code{id} as returned by \link{search_measure_id}, separate from a
 MeasureID}
 }
 \value{

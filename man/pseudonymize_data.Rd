@@ -27,7 +27,7 @@ pseudonymize_data(
 \item{key_file_dir}{the directory in which to save the key}
 }
 \value{
-the data.frame passed to `df` with a pseudonymized variable added
+the data.frame passed to \code{df} with a pseudonymized variable added
 }
 \description{
 Pseudonymizes a data.frame

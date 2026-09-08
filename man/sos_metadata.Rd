@@ -20,9 +20,9 @@ sos_metadata(
 \item{dfs}{A list of data.frames to export}
 
 \item{file_names}{A list of the names to use when saving each data.frame in
-`dfs` without file extension}
+\code{dfs} without file extension}
 
-\item{separator}{The separator to use when saving the `dts`}
+\item{separator}{The separator to use when saving the \code{dts}}
 
 \item{zip}{Whether or not to zip the output directory after saving the files}
 

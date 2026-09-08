@@ -464,15 +464,27 @@ pseudonymize_data <- function(df,
 #' [get_surv_curve()] (`time`, `estimate`, `n.risk`, `cum_events`)
 #'
 #' @param df data.frame to prettify
-#' @param vars list of variable names, passed to [RCStat::decode_vars()]
+#' @param vars a data.frame with `ColumnName` and `Description` columns,
+#' passed to [RCStat::decode_names()] (or, if `tableone = TRUE`, to
+#' [RCStat::prettify_table_one()])
 #' @param remove_vars vector of variable names to remove from the table, can
 #' either be the name of the variable before or after its been prettified
 #' @param ... manual renames, passed to [dplyr::rename()] and fully supports
-#' tidy-selection of columns
+#' tidy-selection of columns. Ignored if `tableone = TRUE`, in which case
+#' `...` is instead passed to [prettify_table_one()]
+#' @param tableone if `TRUE`, routes the call to [prettify_table_one()]
+#' instead, allowing `prettify_table()` to remain a single entry point for
+#' prettifying both regular tables and the output of [table_one()]
 #'
 #' @return prettified data.frame
 #' @export
-prettify_table <- function(df, vars = NULL, remove_vars = NULL, ...) {
+prettify_table <- function(df, vars = NULL, remove_vars = NULL, ..., tableone = FALSE) {
+
+  checkmate::assert_logical(tableone, len = 1, any.missing = FALSE)
+
+  if (tableone) {
+    return(prettify_table_one(df, vars = vars, ...))
+  }
 
   if (is.null(df)) return(NULL)
 

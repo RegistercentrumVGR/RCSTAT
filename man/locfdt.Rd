@@ -24,16 +24,16 @@ locfdt(
 
 \item{orderby}{Variable to sort on}
 
-\item{slice}{If `TRUE` will select the last row in each group of `groupby`}
+\item{slice}{If \code{TRUE} will select the last row in each group of \code{groupby}}
 
 \item{return_tibble}{whether to return a data.table or a tibble}
 
 \item{window_size}{The maximum time the last observation can be
-carried forward. If `n_months` is `NULL` LOCF will be carried out
+carried forward. If \code{n_months} is \code{NULL} LOCF will be carried out
 on all observations like normal.}
 
-\item{window_type}{`years`, `months` or `days`, deafult is `days`.
-With `months` and `years` the `window_size` is simply multiplied by a
+\item{window_type}{\code{years}, \code{months} or \code{days}, deafult is \code{days}.
+With \code{months} and \code{years} the \code{window_size} is simply multiplied by a
 factor of 31 or 365.25 respectively.}
 }
 \value{
@@ -44,7 +44,7 @@ DT Last Observation Carried Forward with
 }
 \details{
 Returns data.frame with LOCF imputation using
-data.table. Faster than `RCStat::locf` for large
+data.table. Faster than \code{RCStat::locf} for large
 datasets, especially when imputing on multiple variables
 }
 \examples{

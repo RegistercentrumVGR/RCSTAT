@@ -2,12 +2,12 @@
 % Please edit documentation in R/aggregate_surv.R
 \name{unnest_strata}
 \alias{unnest_strata}
-\title{Split the `strata` column of a tidied survfit into `group_cols`}
+\title{Split the \code{strata} column of a tidied survfit into \code{group_cols}}
 \usage{
 unnest_strata(res, group_cols, model_df)
 }
 \arguments{
-\item{res}{tidied, filtered `survival::survfit()` result with a `strata`
+\item{res}{tidied, filtered \code{survival::survfit()} result with a \code{strata}
 column}
 
 \item{group_cols}{the columns to group by}
@@ -16,11 +16,11 @@ column}
 the original class of each group column)}
 }
 \value{
-`res` with `strata` split into one column per entry of
-`group_cols`
+\code{res} with \code{strata} split into one column per entry of
+\code{group_cols}
 }
 \description{
-Shared implementation for [get_surv_value()] and [get_surv_curve()],
-used after any grouping/filtering that depends on the raw `strata`
+Shared implementation for \code{\link[=get_surv_value]{get_surv_value()}} and \code{\link[=get_surv_curve]{get_surv_curve()}},
+used after any grouping/filtering that depends on the raw \code{strata}
 column has already happened.
 }

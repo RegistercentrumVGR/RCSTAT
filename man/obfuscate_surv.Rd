@@ -2,7 +2,7 @@
 % Please edit documentation in R/aggregate_surv.R
 \name{obfuscate_surv}
 \alias{obfuscate_surv}
-\title{Obfuscate result from [get_surv_value()]}
+\title{Obfuscate result from \code{\link[=get_surv_value]{get_surv_value()}}}
 \usage{
 obfuscate_surv(
   df,
@@ -24,5 +24,5 @@ obfuscate_surv(
 data.frame
 }
 \description{
-Obfuscate result from [get_surv_value()]
+Obfuscate result from \code{\link[=get_surv_value]{get_surv_value()}}
 }

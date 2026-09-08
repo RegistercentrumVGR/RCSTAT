@@ -8,7 +8,7 @@ get_submeasures(measure_config)
 }
 \arguments{
 \item{measure_config}{the measure config from which to extract the
-submeasures, the result of [search_measure_id()]}
+submeasures, the result of \code{\link[=search_measure_id]{search_measure_id()}}}
 }
 \value{
 list of gender codes and submeasure IDs

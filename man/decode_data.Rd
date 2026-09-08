@@ -21,26 +21,26 @@ decode_data(
 
 \item{labels}{Value labels for the same register}
 
-\item{droplevels}{If `TRUE`, factor levels not present in data will be
-excluded. If `FALSE` no levels are dropped. If character
+\item{droplevels}{If \code{TRUE}, factor levels not present in data will be
+excluded. If \code{FALSE} no levels are dropped. If character
 then the specified variables will have its levels dropped.}
 
 \item{add_cols}{Add additional columns with the labels}
 
 \item{suffix}{suffix to add to added columns}
 
-\item{as_character}{If `TRUE` variables
-will be set to characters. If `FALSE` variables will be factors.}
+\item{as_character}{If \code{TRUE} variables
+will be set to characters. If \code{FALSE} variables will be factors.}
 
-\item{missing_labels_na}{If `TRUE` values with no label will be set to `NA`}
+\item{missing_labels_na}{If \code{TRUE} values with no label will be set to \code{NA}}
 
-\item{decode_names}{If `TRUE` column names will be decode aswel}
+\item{decode_names}{If \code{TRUE} column names will be decode aswel}
 
 \item{variable_names}{Names for columns}
 }
 \value{
 data.frame with character values instead
-        of numerical values.
+of numerical values.
 }
 \description{
 Returns data with descriptive data points

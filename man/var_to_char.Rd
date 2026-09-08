@@ -14,7 +14,7 @@ decoding/translating.}
 
 \item{name}{name of input variable (optional)}
 
-\item{missing_labels_na}{If `TRUE` values with no label will be set to `NA`}
+\item{missing_labels_na}{If \code{TRUE} values with no label will be set to \code{NA}}
 }
 \value{
 character vector

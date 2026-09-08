@@ -31,7 +31,7 @@ eq5d_3l_index_tto_old(c("2,2,2,2,3", NA, "2,2,2,3,3", "2,2,2,2,2"))
 eq5d_3l_index_tto_old(c("22223", NA, "22233", "22222"), split = "")
 }
 \seealso{
-[eq5d_3l_index_tto()]
+\code{\link[=eq5d_3l_index_tto]{eq5d_3l_index_tto()}}
 
 Other eq5d: 
 \code{\link{eq5d_3l_index_tto}()},

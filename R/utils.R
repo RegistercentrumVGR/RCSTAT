@@ -475,12 +475,27 @@ pseudonymize_data <- function(df,
 #' @param tableone if `TRUE`, routes the call to [prettify_table_one()]
 #' instead, allowing `prettify_table()` to remain a single entry point for
 #' prettifying both regular tables and the output of [table_one()]
+#' @param prop_vars other variables that should be treated as proportions, i.e.
+#' be multiplied by 100 and rounded to 1 decimal, should be variable names
+#' **before** any decoding
 #'
 #' @return prettified data.frame
 #' @export
-prettify_table <- function(df, vars = NULL, remove_vars = NULL, ..., tableone = FALSE) {
+prettify_table <- function(df,
+                           vars = NULL,
+                           remove_vars = NULL,
+                           ...,
+                           tableone = FALSE,
+                           prop_vars = NULL) {
 
   checkmate::assert_logical(tableone, len = 1, any.missing = FALSE)
+  is_subset <- checkmate::test_subset(prop_vars, names(df))
+
+  if (!is_subset) {
+    cli::cli_alert_warning(
+      "{.field {setdiff(prop_vars, names(df))}} not found in names of {.arg df}"
+    )
+  }
 
   if (tableone) {
     return(prettify_table_one(df, vars = vars, ...))
@@ -518,6 +533,8 @@ prettify_table <- function(df, vars = NULL, remove_vars = NULL, ..., tableone = 
   }
   # nolint end
 
+  all_prop_vars <- c("Andel", "Skattning", prop_vars)
+
   df <- df |>
     dplyr::rename(
       !!"T\u00e4ljare" := dplyr::ends_with("_n"), # Only way to fix check warning
@@ -544,7 +561,7 @@ prettify_table <- function(df, vars = NULL, remove_vars = NULL, ..., tableone = 
     ) |>
     dplyr::mutate(
       dplyr::across(
-        dplyr::matches("Andel|Skattning"),
+        dplyr::any_of(all_prop_vars),
         ~ dplyr::case_when(
           is.na(.x) ~ "-",
           .default = as.character(prettify_prop(.x))
@@ -574,7 +591,7 @@ prettify_table <- function(df, vars = NULL, remove_vars = NULL, ..., tableone = 
       df <- df |>
         dplyr::mutate(
           dplyr::across(
-            dplyr::any_of(c("Andel", "Skattning")),
+            dplyr::any_of(all_prop_vars),
             ~ dplyr::case_when(
               .x == "0" & .data[[var]] == "N < 15" ~ "-",
               .default = .x
@@ -613,6 +630,7 @@ prettify_table <- function(df, vars = NULL, remove_vars = NULL, ..., tableone = 
           "Kvantil 75",
           "Kvantil 95",
           "Skattning",
+          prop_vars,
           "Antal i riskm\u00e4ngd",
           "Kumulativa h\u00e4ndelser",
           "T\u00e4ljare",

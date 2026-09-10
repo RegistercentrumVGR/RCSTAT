@@ -4,7 +4,14 @@
 \alias{prettify_table}
 \title{Prettifies a table}
 \usage{
-prettify_table(df, vars = NULL, remove_vars = NULL, ..., tableone = FALSE)
+prettify_table(
+  df,
+  vars = NULL,
+  remove_vars = NULL,
+  ...,
+  tableone = FALSE,
+  prop_vars = NULL
+)
 }
 \arguments{
 \item{df}{data.frame to prettify}
@@ -23,6 +30,10 @@ tidy-selection of columns. Ignored if \code{tableone = TRUE}, in which case
 \item{tableone}{if \code{TRUE}, routes the call to \code{\link[=prettify_table_one]{prettify_table_one()}}
 instead, allowing \code{prettify_table()} to remain a single entry point for
 prettifying both regular tables and the output of \code{\link[=table_one]{table_one()}}}
+
+\item{prop_vars}{other variables that should be treated as proportions, i.e.
+be multiplied by 100 and rounded to 1 decimal, should be variable names
+\strong{before} any decoding}
 }
 \value{
 prettified data.frame

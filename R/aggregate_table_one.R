@@ -31,7 +31,8 @@
 #' summarize, passed to [get_aggregate_value()]
 #' @param value_labels an optional data.frame with `ColumnName`, `ValueCode`,
 #' and `ValueName` columns (the same shape used by [decode_data()]), used to
-#' decode categorical variables in `vars` before summarizing. Classification
+#' decode categorical variables in `vars` before summarizing, and to decode
+#' `group_cols` before they are pivoted into column names. Classification
 #' of variables into binary/categorical/numeric always runs on the raw,
 #' undecoded data first, so decoding a binary variable's value labels never
 #' changes its classification. If `NULL` (the default), categorical values
@@ -78,10 +79,12 @@ table_one <- function(df,
   checkmate::assert_subset(median_vars, numeric_vars)
   mean_vars <- setdiff(numeric_vars, median_vars)
 
-  if (!is.null(value_labels) && length(categorical_vars) > 0) {
+  decode_cols <- c(categorical_vars, group_cols)
+
+  if (!is.null(value_labels) && length(decode_cols) > 0) {
     df <- df |>
       decode_data(
-        labels = value_labels[value_labels$ColumnName %in% categorical_vars, ],
+        labels = value_labels[value_labels$ColumnName %in% decode_cols, ],
         missing_labels_na = FALSE
       )
   }

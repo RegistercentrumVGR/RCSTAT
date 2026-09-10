@@ -291,6 +291,58 @@ test_that("prettify_table works", {
       )
     )
 
+  data.frame(
+    x_prop = 0.513,
+    this_is_also_something = 0.123,
+    this_is_a_third_guy = 0.789111,
+    n.risk = -1
+  ) |>
+    prettify_table(prop_vars = c("this_is_also_something",
+                                 "this_is_a_third_guy")) |>
+    expect_equal(
+      tibble::tibble(
+        Andel = "51.3",
+        this_is_also_something = "12.3",
+        this_is_a_third_guy = "78.9",
+        "Antal i riskmängd" = "-1"
+      ) |>
+        as.data.frame()
+    )
+
+  data.frame(
+    x_prop = 0.513,
+    this_is_also_something = 0.123,
+    this_is_a_third_guy = 0.789111,
+    n.risk = -1
+  ) |>
+    prettify_table(
+      prop_vars = c("this_is_also_something",
+                    "third_guy_pretty"),
+      third_guy_pretty = this_is_a_third_guy
+    ) |>
+    expect_equal(
+      tibble::tibble(
+        Andel = "51.3",
+        this_is_also_something = "12.3",
+        third_guy_pretty = "78.9",
+        "Antal i riskmängd" = "-1"
+      ) |>
+        as.data.frame()
+    )
+
+  expect_snapshot(
+    data.frame(
+      x_prop = 0.513,
+      this_is_also_something = 0.123,
+      this_is_a_third_guy = 0.789111,
+      n.risk = -1
+    ) |>
+      prettify_table(
+        prop_vars = c("this_is_also_something",
+                      "does_not_exist")
+      )
+  )
+
 })
 
 test_that("prettify_table routes to prettify_table_one when tableone = TRUE", {

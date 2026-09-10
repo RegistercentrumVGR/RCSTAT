@@ -60,6 +60,35 @@ test_that("table_one pivots wide with one column per group_cols combination", {
   expect_equal(tibble::as_tibble(res), expected_res)
 })
 
+test_that("table_one decodes group_cols using value_labels before pivoting", {
+  df <- tibble::tribble(
+    ~grp, ~sex,     ~age,
+    "1",  "Male",   50,
+    "1",  "Male",   60,
+    "1",  "Female", 70,
+    "2",  "Female", 40,
+    "2",  "Female", 80,
+    "2",  "Male",   30
+  )
+
+  value_labels <- data.frame(
+    ColumnName = c("grp", "grp"),
+    ValueCode = c("1", "2"),
+    ValueName = c("North", "South")
+  )
+
+  res <- table_one(
+    df,
+    vars = c("sex", "age"),
+    include_missing = TRUE,
+    obfuscate_data = FALSE,
+    group_cols = "grp",
+    value_labels = value_labels
+  )
+
+  expect_setequal(names(res), c("variable", "category", "Alla", "North", "South"))
+})
+
 test_that("table_one summarizes median_vars as median (5%-95%)", {
   df <- tibble::tibble(los = c(1, 2, 3, 4, 5))
 

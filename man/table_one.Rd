@@ -43,7 +43,8 @@ summarize, passed to \code{\link[=get_aggregate_value]{get_aggregate_value()}}}
 
 \item{value_labels}{an optional data.frame with \code{ColumnName}, \code{ValueCode},
 and \code{ValueName} columns (the same shape used by \code{\link[=decode_data]{decode_data()}}), used to
-decode categorical variables in \code{vars} before summarizing. Classification
+decode categorical variables in \code{vars} before summarizing, and to decode
+\code{group_cols} before they are pivoted into column names. Classification
 of variables into binary/categorical/numeric always runs on the raw,
 undecoded data first, so decoding a binary variable's value labels never
 changes its classification. If \code{NULL} (the default), categorical values

@@ -16,7 +16,9 @@ get_aggregate_value(
   distinct_cols = NULL,
   arrange_by = NULL,
   marginal_cols,
-  add_reason_col = FALSE
+  add_reason_col = FALSE,
+  ci = FALSE,
+  alpha = 0.05
 )
 }
 \arguments{
@@ -48,6 +50,17 @@ to not add any marginals.}
 
 \item{add_reason_col}{whether or not to add a variable describing why an
 observation was obfuscate, passed to \code{\link[=obfuscate_data]{obfuscate_data()}}}
+
+\item{ci}{whether to add a Wilson score confidence interval
+(\verb{\{var\}_ci_lower_\{level\}}/\verb{\{var\}_ci_upper_\{level\}}, where \code{{level}} is
+the confidence level as a percentage, e.g. \code{alpha = 0.05} produces
+\verb{_ci_lower_95}/\verb{_ci_upper_95}) for \code{prop} variables in \code{vars}. The level
+is baked into the column name so consumers (e.g. \code{\link[=prettify_table]{prettify_table()}})
+can read it back out without \code{alpha} being threaded through separately.
+Not supported for \code{mean}, \code{median}, \code{prop_count}, or \code{count}.}
+
+\item{alpha}{alpha level used for the confidence interval when \code{ci} is
+\code{TRUE}}
 }
 \description{
 Create aggregate data across all combinations, including totals.

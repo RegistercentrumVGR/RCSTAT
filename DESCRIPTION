@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.5.1
+Version: 1.6.0
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 
@@ -43,6 +43,7 @@ Imports:
     curl,
     stringi,
     memoise,
-    forcats
+    forcats,
+    lifecycle
 LinkingTo:
     Rcpp

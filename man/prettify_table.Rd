@@ -41,5 +41,10 @@ prettified data.frame
 \description{
 Renames columns, rounds means, medians, and proportions, and multiplies
 proportions. Also handles output from \code{\link[=get_surv_value]{get_surv_value()}} and
-\code{\link[=get_surv_curve]{get_surv_curve()}} (\code{time}, \code{estimate}, \code{n.risk}, \code{cum_events})
+\code{\link[=get_surv_curve]{get_surv_curve()}} (\code{time}, \code{estimate}, \code{n.risk}, \code{cum_events}), and
+confidence interval columns from \code{\link[=get_aggregate_value]{get_aggregate_value()}}'s \code{ci = TRUE}
+(\verb{\{var\}_ci_lower_\{level\}}/\verb{\{var\}_ci_upper_\{level\}}), which get collapsed
+into a single \code{"Konfidensintervall ({level}\%)"} range column - the
+confidence level is read out of the column name, not passed in
+separately.
 }

@@ -164,6 +164,15 @@ proportion_missing <- function(
 #' to not add any marginals.
 #' @param add_reason_col whether or not to add a variable describing why an
 #' observation was obfuscate, passed to [obfuscate_data()]
+#' @param ci whether to add a Wilson score confidence interval
+#' (`{var}_ci_lower_{level}`/`{var}_ci_upper_{level}`, where `{level}` is
+#' the confidence level as a percentage, e.g. `alpha = 0.05` produces
+#' `_ci_lower_95`/`_ci_upper_95`) for `prop` variables in `vars`. The level
+#' is baked into the column name so consumers (e.g. [prettify_table()])
+#' can read it back out without `alpha` being threaded through separately.
+#' Not supported for `mean`, `median`, `prop_count`, or `count`.
+#' @param alpha alpha level used for the confidence interval when `ci` is
+#' `TRUE`
 #'
 #' @export get_aggregate_value
 get_aggregate_value <- function(
@@ -177,12 +186,16 @@ get_aggregate_value <- function(
   distinct_cols = NULL,
   arrange_by = NULL,
   marginal_cols,
-  add_reason_col = FALSE) {
+  add_reason_col = FALSE,
+  ci = FALSE,
+  alpha = 0.05) {
   #### Warnings ####
 
   checkmate::assert_list(vars, min.len = 1)
   checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
   checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
+  checkmate::assert_logical(ci, len = 1, any.missing = FALSE)
+  checkmate::assert_number(alpha, lower = 0, upper = 1)
   checkmate::assert_subset(group_cols, names(df))
 
   checkmate::assert_subset(
@@ -307,6 +320,27 @@ get_aggregate_value <- function(
     prop = function(x) sum(x, na.rm = TRUE) / dplyr::n()
   )
 
+  if (ci) {
+    ci_level <- ci_level_suffix(alpha)
+    ci_lower_name <- paste0("ci_lower_", ci_level)
+    ci_upper_name <- paste0("ci_upper_", ci_level)
+
+    prop_list[[ci_lower_name]] <- function(x) {
+      wilson_ci_p(sum(x, na.rm = TRUE) / dplyr::n(), dplyr::n(), alpha = alpha)$lower
+    }
+    prop_list[[ci_upper_name]] <- function(x) {
+      wilson_ci_p(sum(x, na.rm = TRUE) / dplyr::n(), dplyr::n(), alpha = alpha)$upper
+    }
+
+    prop_missing_list[[ci_lower_name]] <- function(x) {
+      n_non_missing <- sum(!is.na(x))
+      wilson_ci_p(sum(x, na.rm = TRUE) / n_non_missing, n_non_missing, alpha = alpha)$lower
+    }
+    prop_missing_list[[ci_upper_name]] <- function(x) {
+      n_non_missing <- sum(!is.na(x))
+      wilson_ci_p(sum(x, na.rm = TRUE) / n_non_missing, n_non_missing, alpha = alpha)$upper
+    }
+  }
 
   mean_list <- list(
     mean = function(x) mean(x, na.rm = TRUE),
@@ -437,6 +471,7 @@ get_aggregate_value <- function(
             total_var = "total",
             count_var = paste0(var, "_n"),
             prop_var = paste0(var, "_prop"),
+            statistics_vars = if (ci) paste0(var, "_", c(ci_lower_name, ci_upper_name)) else NULL,
             censored_value = censored_value,
             add_reason_col = add_reason_col
           )
@@ -489,6 +524,7 @@ get_aggregate_value <- function(
             total_var = paste0(var, "_total_non_missing"),
             count_var = paste0(var, "_n"),
             prop_var = paste0(var, "_prop"),
+            statistics_vars = if (ci) paste0(var, "_", c(ci_lower_name, ci_upper_name)) else NULL,
             censored_value = censored_value,
             other_count_vars = c("total", paste0(var, "_total_missing")),
             add_reason_col = add_reason_col

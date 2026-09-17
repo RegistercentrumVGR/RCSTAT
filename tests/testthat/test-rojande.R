@@ -9,6 +9,25 @@ test_that("rounded_ci_p works", {
   expected_res <- list(lower = c(0.28, 0.32), upper = c(0.72, 0.67))
 })
 
+test_that("wilson_ci_p works", {
+  p_hat <- 0.5
+  n <- 20
+  expected_res <- list(lower = 0.3, upper = 0.7)
+  expect_equal(wilson_ci_p(p_hat, n), expected_res)
+
+  p_hat <- c(0.5, 0.5)
+  n <- c(20, 30)
+  expected_res <- list(lower = c(0.3, 0.33), upper = c(0.7, 0.67))
+  expect_equal(wilson_ci_p(p_hat, n), expected_res)
+})
+
+test_that("ci_level_suffix formats the confidence level from alpha", {
+  expect_equal(ci_level_suffix(0.05), "95")
+  expect_equal(ci_level_suffix(0.10), "90")
+  expect_equal(ci_level_suffix(0.01), "99")
+  expect_equal(ci_level_suffix(0.025), "97_5")
+})
+
 test_that("group_proportions censors as expected", {
   # Make some data for tests
   df <- tibble::tibble(

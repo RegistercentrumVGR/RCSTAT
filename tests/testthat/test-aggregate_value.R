@@ -1278,5 +1278,157 @@ test_that("add_reason_col works", {
     pivot_prop_count = TRUE
   ) |>
     expect_snapshot()
+})
+
+test_that("get_aggregate_value ci = TRUE adds a Wilson score confidence interval", {
+  df <- tibble::tribble(
+    ~County, ~unit, ~y,
+    "a", 1, 1,
+    "a", 1, 0,
+    "b", 2, 1,
+    "b", 2, 0,
+    "b", 2, 0,
+    "c", 3, 1
+  )
+
+  res <- get_aggregate_value(
+    df,
+    group_cols = c("County", "unit"),
+    vars = list(prop = "y"),
+    ci = TRUE
+  ) |>
+    tibble::as_tibble()
+
+  expected_res <- tibble::tribble(
+    ~y_n, ~y_prop, ~y_ci_lower_95, ~y_ci_upper_95, ~total, ~County, ~unit,
+    3, 0.5, 0.19, 0.81, 6L, "Riket", "Alla",
+    1, 0.5, 0.09, 0.91, 2L, "a", "Alla",
+    1, 1 / 3, 0.06, 0.79, 3L, "b", "Alla",
+    1, 1, 0.21, 1, 1L, "c", "Alla",
+    1, 0.5, 0.09, 0.91, 2L, "Riket", "1",
+    1, 1 / 3, 0.06, 0.79, 3L, "Riket", "2",
+    1, 1, 0.21, 1, 1L, "Riket", "3",
+    1, 0.5, 0.09, 0.91, 2L, "a", "1",
+    1, 1 / 3, 0.06, 0.79, 3L, "b", "2",
+    1, 1, 0.21, 1, 1L, "c", "3"
+  )
+
+  expect_equal(res, expected_res)
+
+  # ci defaults to FALSE: no CI columns added, output unchanged
+  df <- data.frame(ind = c(rep(1, 10), rep(0, 10)))
+
+  res <- get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop = "ind")
+  )
+
+  expect_false(any(grepl("_ci_", names(res))))
+
+  # ci = TRUE with the default include_missing = TRUE
+  res <- get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop = "ind"),
+    ci = TRUE
+  )
+
+  expected_res <- data.frame(
+    ind_n = 10,
+    ind_prop = 0.5,
+    ind_ci_lower_95 = 0.3,
+    ind_ci_upper_95 = 0.7,
+    total = 20L
+  )
+
+  expect_equal(res, expected_res)
+
+  # alpha controls the interval width, and is baked into the column name
+  # as the confidence level (1 - alpha) so it can be read back out without
+  # threading alpha through separately (e.g. in prettify_table())
+  res <- get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop = "ind"),
+    ci = TRUE,
+    alpha = 0.10
+  )
+
+  expect_equal(res$ind_ci_lower_90, 0.33)
+  expect_equal(res$ind_ci_upper_90, 0.67)
+
+  # respects include_missing = FALSE, using the non-missing denominator
+  df <- data.frame(ind = c(1, 1, 0, NA, NA))
+
+  res <- get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop = "ind"),
+    include_missing = FALSE,
+    ci = TRUE
+  )
+
+  expected_res <- data.frame(
+    ind_total_non_missing = 3,
+    ind_total_missing = 2,
+    ind_n = 2,
+    ind_prop = 2 / 3,
+    ind_ci_lower_95 = 0.21,
+    ind_ci_upper_95 = 0.94,
+    total = 5L
+  )
+
+  expect_equal(res, expected_res)
+
+  # obfuscate_data censors the CI the same way it censors prop, below the
+  # total < 15 disclosure threshold
+  df <- data.frame(ind = c(rep(1, 3), rep(0, 3)))
+
+  res <- get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop = "ind"),
+    ci = TRUE,
+    obfuscate_data = TRUE
+  )
+
+  expect_equal(res$ind_prop, 0)
+  expect_true(is.na(res$ind_ci_lower_95))
+  expect_true(is.na(res$ind_ci_upper_95))
+
+  # ...but passes the CI through unchanged once the denominator clears the
+  # disclosure threshold
+  df <- data.frame(ind = c(rep(1, 10), rep(0, 10)))
+
+  res <- get_aggregate_value(
+    df,
+    group_cols = NULL,
+    vars = list(prop = "ind"),
+    ci = TRUE,
+    obfuscate_data = TRUE
+  )
+
+  expect_equal(res$ind_ci_lower_95, 0.3)
+  expect_equal(res$ind_ci_upper_95, 0.7)
+
+  expect_error(
+    get_aggregate_value(
+      df,
+      group_cols = NULL,
+      vars = list(prop = "ind"),
+      ci = "yes"
+    )
+  )
+
+  expect_error(
+    get_aggregate_value(
+      df,
+      group_cols = NULL,
+      vars = list(prop = "ind"),
+      ci = TRUE,
+      alpha = 1.5
+    )
+  )
 
 })

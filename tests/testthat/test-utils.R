@@ -345,6 +345,54 @@ test_that("prettify_table works", {
 
 })
 
+test_that("prettify_table handles confidence interval columns", {
+
+  data.frame(
+    x_prop = 0.5,
+    x_n = 10,
+    total = 20,
+    x_ci_lower_95 = 0.3,
+    x_ci_upper_95 = 0.7
+  ) |>
+    prettify_table() |>
+    expect_equal(
+      data.frame(
+        Andel = "50",
+        Täljare = "10",
+        Nämnare = "20",
+        "Konfidensintervall (95%)" = "[30% - 70%]",
+        check.names = FALSE
+      )
+    )
+
+  # the confidence level is read out of the suffix, not hardcoded
+  data.frame(
+    x_prop = 0.5,
+    x_ci_lower_90 = 0.33,
+    x_ci_upper_90 = 0.67
+  ) |>
+    prettify_table() |>
+    names() |>
+    expect_equal(c("Andel", "Konfidensintervall (90%)"))
+
+  # a missing CI (e.g. obfuscated below the disclosure threshold) renders
+  # as "-" instead of "NA% - NA%"
+  data.frame(
+    x_prop = 0,
+    x_ci_lower_95 = NA,
+    x_ci_upper_95 = NA
+  ) |>
+    prettify_table() |>
+    expect_equal(
+      data.frame(
+        Andel = "0",
+        "Konfidensintervall (95%)" = "-",
+        check.names = FALSE
+      )
+    )
+
+})
+
 test_that("prettify_table routes to prettify_table_one when tableone = TRUE", {
   df <- tibble::tribble(
     ~variable, ~category, ~value,

@@ -461,7 +461,12 @@ pseudonymize_data <- function(df,
 #'
 #' Renames columns, rounds means, medians, and proportions, and multiplies
 #' proportions. Also handles output from [get_surv_value()] and
-#' [get_surv_curve()] (`time`, `estimate`, `n.risk`, `cum_events`)
+#' [get_surv_curve()] (`time`, `estimate`, `n.risk`, `cum_events`), and
+#' confidence interval columns from [get_aggregate_value()]'s `ci = TRUE`
+#' (`{var}_ci_lower_{level}`/`{var}_ci_upper_{level}`), which get collapsed
+#' into a single `"Konfidensintervall ({level}%)"` range column - the
+#' confidence level is read out of the column name, not passed in
+#' separately.
 #'
 #' @param df data.frame to prettify
 #' @param vars a data.frame with `ColumnName` and `Description` columns,
@@ -532,6 +537,37 @@ prettify_table <- function(df,
     }
   }
   # nolint end
+
+  # Confidence interval columns from get_aggregate_value(ci = TRUE) carry
+  # their confidence level in the name itself (`{var}_ci_lower_{level}`/
+  # `{var}_ci_upper_{level}`), so the level doesn't need to be passed in
+  # separately here - it's read back out of the column name.
+  ci_pairs <- names(df) |>
+    stringr::str_subset("_ci_lower_[0-9_]+$")
+
+  for (lower_col in ci_pairs) {
+    level <- stringr::str_match(lower_col, "_ci_lower_([0-9_]+)$")[, 2]
+    upper_col <- stringr::str_replace(lower_col, "_ci_lower_", "_ci_upper_")
+
+    if (!upper_col %in% names(df)) next
+
+    level_label <- stringr::str_replace(level, "_", ".")
+    ci_col <- paste0("Konfidensintervall (", level_label, "%)")
+
+    df <- df |>
+      dplyr::mutate(
+        !!ci_col := dplyr::case_when(
+          is.na(.data[[lower_col]]) | is.na(.data[[upper_col]]) ~ "-",
+          .default = paste0(
+            "[",
+            prettify_prop(.data[[lower_col]]), "% - ",
+            prettify_prop(.data[[upper_col]]), "%",
+            "]"
+          )
+        )
+      ) |>
+      dplyr::select(-dplyr::all_of(c(lower_col, upper_col)))
+  }
 
   all_prop_vars <- c("Andel", "Skattning", prop_vars)
 
@@ -634,10 +670,11 @@ prettify_table <- function(df,
           "Antal i riskm\u00e4ngd",
           "Kumulativa h\u00e4ndelser",
           "T\u00e4ljare",
-          "N\u00e4mnare",
-          "Censureringsorsak"
+          "N\u00e4mnare"
         )
       ),
+      dplyr::matches("^Konfidensintervall"),
+      dplyr::any_of("Censureringsorsak"),
       .after = dplyr::everything()
     )
 

@@ -340,8 +340,52 @@ reason_col <- function(
 #'
 #' @export
 rounded_ci_p <- function(p_hat, n, alpha = 0.05) {
+  lifecycle::deprecate_warn(when = "1.6.0", what = "rounded_ci_p()")
   z <- stats::qnorm(1 - alpha / 2)
   width <- roundc(z * sqrt((p_hat * (1 - p_hat)) / n), digits = 2)
   p_hat <- roundc(p_hat, digits = 2)
   list(lower = pmax(0, p_hat - width), upper = pmin(1, p_hat + width))
+}
+
+#' Get rounded Wilson score confidence interval for a proportion
+#'
+#' Uses the Wilson score interval rather than the normal (Wald)
+#' approximation used by [rounded_ci_p()], since Wald coverage is
+#' unreliable at the small denominators common in this data (small n or p
+#' close to 0/1).
+#'
+#' @param p_hat estimate of proportion
+#' @param n sample size
+#' @param alpha alpha level
+#'
+#' @export
+wilson_ci_p <- function(p_hat, n, alpha = 0.05) {
+  z <- stats::qnorm(1 - alpha / 2)
+  denom <- 1 + z^2 / n
+  center <- (p_hat + z^2 / (2 * n)) / denom
+  half_width <- (z / denom) * sqrt((p_hat * (1 - p_hat)) / n + z^2 / (4 * n^2))
+  list(
+    lower = pmax(0, roundc(center - half_width, digits = 2)),
+    upper = pmin(1, roundc(center + half_width, digits = 2))
+  )
+}
+
+#' Format a confidence level for use in a column-name suffix
+#'
+#' Converts `alpha` to the confidence level it corresponds to (e.g. `0.05`
+#' becomes `95`) and formats it as a name-safe string. Used to name
+#' confidence interval columns (`{var}_ci_lower_{level}`/
+#' `{var}_ci_upper_{level}`, see [get_aggregate_value()]) so the confidence
+#' level travels with the column name instead of needing `alpha` threaded
+#' through as a separate argument wherever those columns are consumed (e.g.
+#' [prettify_table()]).
+#'
+#' @param alpha alpha level
+#'
+#' @return a name-safe character string, e.g. `"95"` or `"97_5"`
+#' @noRd
+ci_level_suffix <- function(alpha) {
+  level <- round((1 - alpha) * 100, 1)
+  level <- if (level == round(level)) round(level) else level
+  gsub("\\.", "_", as.character(level))
 }

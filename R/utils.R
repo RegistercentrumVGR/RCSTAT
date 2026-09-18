@@ -178,9 +178,8 @@ valid_pnr <- function(pnr, handle_invalid = TRUE) {
 #' @examples \dontrun{
 #' rand_pass <- random_password(c("R", "N"), 10)
 #' }
-random_password <- function(
-  char_types = c("R", "N", "!"),
-  password_length = 15) {
+random_password <- function(char_types = c("R", "N", "!"),
+                            password_length = 15) {
 
   checkmate::assert_subset(
     char_types,
@@ -246,12 +245,11 @@ random_password <- function(
 #' @examples \dontrun{
 #' zip_dir_with_pass()
 #' }
-zip_dir_with_pass <- function(
-  directory = "output",
-  pass = random_password(),
-  file = "output",
-  overwrite = TRUE,
-  sink_password = TRUE) {
+zip_dir_with_pass <- function(directory = "output",
+                              pass = random_password(),
+                              file = "output",
+                              overwrite = TRUE,
+                              sink_password = TRUE) {
 
   checkmate::assert_string(pass, pattern = "^[a-zA-Z0-9!@#$.+%&/()?]+$")
 
@@ -275,10 +273,9 @@ zip_dir_with_pass <- function(
   )
 }
 
-zip_dir <- function(
-  directory = "output",
-  file = "output",
-  overwrite = TRUE) {
+zip_dir <- function(directory = "output",
+                    file = "output",
+                    overwrite = TRUE) {
 
   filenames <- dir(directory, full.names = TRUE)
 
@@ -678,10 +675,8 @@ prettify_table <- function(df,
       .after = dplyr::everything()
     )
 
-  if (
-    "N\u00e4mnare" %in% names(df) &&
-      !any(c("Andel", "Skattning") %in% names(df))
-  ) {
+  if ("N\u00e4mnare" %in% names(df)
+      && !any(c("Andel", "Skattning") %in% names(df))) {
     df <- df |>
       dplyr::rename("Antal" = "N\u00e4mnare")
   }
@@ -692,4 +687,32 @@ prettify_table <- function(df,
   }
 
   df
+}
+
+#' @describeIn round_half_up deprecated Rcpp implementation
+roundc <- function(x, digits = 0) {
+  lifecycle::deprecate_warn(
+    when = "1.6.1",
+    what = "RCStat::roundc()",
+    with = "RCStat::round_half_up()"
+  )
+  round_half_up(x, digits)
+}
+
+#' Rounds numbers with halves being rounded up
+#'
+#' @param x vector of values
+#' @param digits number of decimals to show after rounding
+#'
+#' @returns vector of rounded values
+#' @export
+round_half_up <- function(x, digits = 0) {
+  checkmate::assert_numeric(x)
+  checkmate::assert_int(digits)
+  posneg <- sign(x)
+  z <- abs(x) * 10^digits
+  z <- z + 0.5 + sqrt(.Machine$double.eps)
+  z <- trunc(z)
+  z <- z / 10^digits
+  z * posneg
 }

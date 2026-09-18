@@ -43,7 +43,7 @@ used to calculate proportions. These are simply rounded to nearest 10}
 \item{round_statistics_vars}{Whether or not to round statistics_vars}
 
 \item{round_statistics_digits}{The number of digits statistics_vars are
-rounded to. Passed to RCStat::roundc. Should be an integer or a list.
+rounded to. Passed to \link{round_half_up}. Should be an integer or a list.
 If it is a list it should a named list where each name is a column in
 statistics_vars. The corresponding value in the list is the number of digits
 to round to.}

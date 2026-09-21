@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.6.0
+Version: 1.6.1
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 
@@ -31,7 +31,6 @@ Imports:
     jsonlite,
     lubridate,
     purrr,
-    Rcpp,
     readxl,
     rlang,
     stats,
@@ -45,5 +44,3 @@ Imports:
     memoise,
     forcats,
     lifecycle
-LinkingTo:
-    Rcpp

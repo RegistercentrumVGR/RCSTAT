@@ -8,7 +8,7 @@
 #' @examples
 #' round_to_y(x = 0.12, y = 0.05)
 round_to_y <- function(x, y = 0.05) {
-  return(roundc(x / y) * y)
+  return(round_half_up(x / y) * y)
 }
 
 #' Make data non-revealing
@@ -26,7 +26,7 @@ round_to_y <- function(x, y = 0.05) {
 #' used to calculate proportions. These are simply rounded to nearest 10
 #' @param round_statistics_vars Whether or not to round statistics_vars
 #' @param round_statistics_digits The number of digits statistics_vars are
-#' rounded to. Passed to RCStat::roundc. Should be an integer or a list.
+#' rounded to. Passed to [RCStat::round_half_up]. Should be an integer or a list.
 #' If it is a list it should a named list where each name is a column in
 #' statistics_vars. The corresponding value in the list is the number of digits
 #' to round to.
@@ -117,9 +117,9 @@ obfuscate_data <- function(
               .data[[total_var]] < 200 ~ dplyr::if_else(
                 .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 round_to_y(.x, y = 0.05),
-                roundc(.x, digits = 2)
+                round_half_up(.x, digits = 2)
               ),
-              .data[[total_var]] >= 200 ~ roundc(.x, digits = 2)
+              .data[[total_var]] >= 200 ~ round_half_up(.x, digits = 2)
             )
           )
         )
@@ -133,7 +133,7 @@ obfuscate_data <- function(
               .default = dplyr::if_else(
                 rep(any(.data[[count_var]] < 5), dplyr::n()),
                 rep(censored_value, dplyr::n()),
-                roundc(.x, digits = 2)
+                round_half_up(.x, digits = 2)
               )
             )
           )
@@ -150,9 +150,9 @@ obfuscate_data <- function(
               .data[[total_var]] < 200 ~ dplyr::if_else(
                 .data[[count_var]] < 5 | .data[[total_var]] - .data[[count_var]] < 5,
                 round_to_y(.x, y = 0.05),
-                roundc(.x, digits = 2)
+                round_half_up(.x, digits = 2)
               ),
-              .data[[total_var]] >= 200 ~ roundc(.x, digits = 2)
+              .data[[total_var]] >= 200 ~ round_half_up(.x, digits = 2)
             )
           )
         )
@@ -165,7 +165,7 @@ obfuscate_data <- function(
               .data[[total_var]] < 15 ~ censored_value,
               .data[[count_var]] < 5 ~ censored_value,
               .data[[total_var]] - .data[[count_var]] < 5 ~ censored_value,
-              .default = roundc(.x, digits = 2)
+              .default = round_half_up(.x, digits = 2)
             )
           )
         )
@@ -176,7 +176,7 @@ obfuscate_data <- function(
     dplyr::mutate(
       dplyr::across(
         tidyselect::any_of(c(count_var, total_var, other_count_vars)),
-        ~ roundc(.x, -1)
+        ~ round_half_up(.x, -1)
       )
     )
 
@@ -207,14 +207,14 @@ obfuscate_data <- function(
         dplyr::mutate(
           dplyr::across(
             tidyselect::any_of(statistics_vars),
-            ~ roundc(.x, digits = round_statistics_digits)
+            ~ round_half_up(.x, digits = round_statistics_digits)
           )
         )
     } else {
       for (stat_var in statistics_vars) {
         data <- data |>
           dplyr::mutate(
-            !!stat_var := roundc(
+            !!stat_var := round_half_up(
               .data[[stat_var]],
               digits = round_statistics_digits[[stat_var]]
             )
@@ -342,8 +342,8 @@ reason_col <- function(
 rounded_ci_p <- function(p_hat, n, alpha = 0.05) {
   lifecycle::deprecate_warn(when = "1.6.0", what = "rounded_ci_p()")
   z <- stats::qnorm(1 - alpha / 2)
-  width <- roundc(z * sqrt((p_hat * (1 - p_hat)) / n), digits = 2)
-  p_hat <- roundc(p_hat, digits = 2)
+  width <- round_half_up(z * sqrt((p_hat * (1 - p_hat)) / n), digits = 2)
+  p_hat <- round_half_up(p_hat, digits = 2)
   list(lower = pmax(0, p_hat - width), upper = pmin(1, p_hat + width))
 }
 
@@ -365,8 +365,8 @@ wilson_ci_p <- function(p_hat, n, alpha = 0.05) {
   center <- (p_hat + z^2 / (2 * n)) / denom
   half_width <- (z / denom) * sqrt((p_hat * (1 - p_hat)) / n + z^2 / (4 * n^2))
   list(
-    lower = pmax(0, roundc(center - half_width, digits = 2)),
-    upper = pmin(1, roundc(center + half_width, digits = 2))
+    lower = pmax(0, round_half_up(center - half_width, digits = 2)),
+    upper = pmin(1, round_half_up(center + half_width, digits = 2))
   )
 }
 

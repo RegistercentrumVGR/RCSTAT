@@ -690,6 +690,7 @@ prettify_table <- function(df,
 }
 
 #' @describeIn round_half_up deprecated Rcpp implementation
+#' @export
 roundc <- function(x, digits = 0) {
   lifecycle::deprecate_warn(
     when = "1.6.1",

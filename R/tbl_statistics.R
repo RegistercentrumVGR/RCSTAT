@@ -9,10 +9,9 @@
 #' @param obfuscate If data should be non-revealing
 #'
 #' @export group_proportions
-group_proportions <- function(
-  data,
-  group_by,
-  obfuscate = TRUE) {
+group_proportions <- function(data,
+                              group_by,
+                              obfuscate = TRUE) {
   res <- data |>
     dplyr::group_by(dplyr::pick(tidyselect::all_of(group_by))) |>
     dplyr::summarise(
@@ -49,12 +48,12 @@ group_proportions <- function(
 #' @param obfuscate If data should be non-revealing
 #' @param ... Arguments passed to obfuscate
 #' @export group_means
-group_means <- function(
-  data,
-  group_by,
-  vars = NULL,
-  obfuscate = TRUE,
-  ...) {
+group_means <- function(data,
+                        group_by,
+                        vars = NULL,
+                        obfuscate = TRUE,
+                        ...) {
+
   if (is.null(vars)) {
     vars <- setdiff(names(data), group_by)
   }
@@ -104,12 +103,12 @@ group_means <- function(
 #' @param obfuscate If data should be non-revealing
 #' @param ... Arguments passed to obfuscate
 #' @export proportion_missing
-proportion_missing <- function(
-  data,
-  group_by,
-  vars = NULL,
-  obfuscate = TRUE,
-  ...) {
+proportion_missing <- function(data,
+                               group_by,
+                               vars = NULL,
+                               obfuscate = TRUE,
+                               ...) {
+
   if (is.null(vars)) {
     vars <- setdiff(names(data), group_by)
   }
@@ -151,8 +150,10 @@ proportion_missing <- function(
 #' @param vars Variables to be used to calculate the proportion from.
 #' @param include_missing If missing values should be included in the total
 #' @param obfuscate_data If data should be obfuscated
-#' @param censored_value What value to replace censored values, used as argument in obfuscate_data
-#' @param pivot_prop_count whether to pivot the resulting data.frame into long format
+#' @param censored_value What value to replace censored values, used as
+#' argument in obfuscate_data
+#' @param pivot_prop_count whether to pivot the resulting data.frame into
+#' long format
 #' @param distinct_cols a set of columns that are used in
 #' [dplyr::distinct()]. Should be disjoint from `group_cols` to prevent
 #' misinterpretation of results.
@@ -175,20 +176,19 @@ proportion_missing <- function(
 #' `TRUE`
 #'
 #' @export get_aggregate_value
-get_aggregate_value <- function(
-  df,
-  group_cols = NULL,
-  vars = NULL,
-  include_missing = TRUE,
-  obfuscate_data = FALSE,
-  censored_value = 0,
-  pivot_prop_count = FALSE,
-  distinct_cols = NULL,
-  arrange_by = NULL,
-  marginal_cols,
-  add_reason_col = FALSE,
-  ci = FALSE,
-  alpha = 0.05) {
+get_aggregate_value <- function(df,
+                                group_cols = NULL,
+                                vars = NULL,
+                                include_missing = TRUE,
+                                obfuscate_data = FALSE,
+                                censored_value = 0,
+                                pivot_prop_count = FALSE,
+                                distinct_cols = NULL,
+                                arrange_by = NULL,
+                                marginal_cols,
+                                add_reason_col = FALSE,
+                                ci = FALSE,
+                                alpha = 0.05) {
   #### Warnings ####
 
   checkmate::assert_list(vars, min.len = 1)
@@ -255,7 +255,9 @@ get_aggregate_value <- function(
   }
 
   if (nrow(df) == 0) {
-    rlang::warn("You are trying to aggregate a data.frame that contains 0 rows")
+    rlang::warn(
+      "You are trying to aggregate a data.frame that contains 0 rows"
+    )
   }
 
   prop_var <- vars[["prop"]]
@@ -265,7 +267,9 @@ get_aggregate_value <- function(
   count_var <- vars[["count"]]
 
   if ("count" %in% names(vars) && length(vars) > 1) {
-    stop("count can not be supplied to vars with any other summarizing function")
+    stop(
+      "count can not be supplied to vars with any other summarizing function"
+    )
   }
 
   group_cols <- c(count_var, group_cols)
@@ -303,6 +307,28 @@ get_aggregate_value <- function(
   # Get all the combinations of the variables
   group_var_combinations <- get_group_combinations(group_cols, marginal_cols)
 
+  # Compute prop_count aggregates for every combination up front, from a
+  # single finest-grain count rolled up by summation, instead of
+  # re-tabulating raw data once per combination (see rollup_prop_count()).
+  prop_count_results <- NULL
+  if (!is.null(prop_count_var)) {
+    checkmate::assert_disjunct(
+      group_cols,
+      c("n", "category", "total", "prop"),
+      .var.name = "group_cols"
+    )
+    prop_count_results <- rollup_prop_count(
+      df = df,
+      group_cols = group_cols,
+      group_var_combinations = group_var_combinations,
+      prop_count_var = prop_count_var,
+      include_missing = include_missing,
+      obfuscate_data = obfuscate_data,
+      censored_value = censored_value,
+      add_reason_col = add_reason_col
+    )
+  }
+
 
   #### Calculation ####
   # Get the variables and the corresponding statistic that is to be reported
@@ -326,19 +352,27 @@ get_aggregate_value <- function(
     ci_upper_name <- paste0("ci_upper_", ci_level)
 
     prop_list[[ci_lower_name]] <- function(x) {
-      wilson_ci_p(sum(x, na.rm = TRUE) / dplyr::n(), dplyr::n(), alpha = alpha)$lower
+      wilson_ci_p(
+        sum(x, na.rm = TRUE) / dplyr::n(), dplyr::n(), alpha = alpha
+      )$lower
     }
     prop_list[[ci_upper_name]] <- function(x) {
-      wilson_ci_p(sum(x, na.rm = TRUE) / dplyr::n(), dplyr::n(), alpha = alpha)$upper
+      wilson_ci_p(
+        sum(x, na.rm = TRUE) / dplyr::n(), dplyr::n(), alpha = alpha
+      )$upper
     }
 
     prop_missing_list[[ci_lower_name]] <- function(x) {
       n_non_missing <- sum(!is.na(x))
-      wilson_ci_p(sum(x, na.rm = TRUE) / n_non_missing, n_non_missing, alpha = alpha)$lower
+      wilson_ci_p(
+        sum(x, na.rm = TRUE) / n_non_missing, n_non_missing, alpha = alpha
+      )$lower
     }
     prop_missing_list[[ci_upper_name]] <- function(x) {
       n_non_missing <- sum(!is.na(x))
-      wilson_ci_p(sum(x, na.rm = TRUE) / n_non_missing, n_non_missing, alpha = alpha)$upper
+      wilson_ci_p(
+        sum(x, na.rm = TRUE) / n_non_missing, n_non_missing, alpha = alpha
+      )$upper
     }
   }
 
@@ -396,7 +430,8 @@ get_aggregate_value <- function(
 
 
   # Perform the calculation
-  for (comb in group_var_combinations) {
+  for (i in seq_along(group_var_combinations)) {
+    comb <- group_var_combinations[[i]]
     all_cols <- setdiff(group_cols, comb)
 
     temp <- df |>
@@ -429,20 +464,22 @@ get_aggregate_value <- function(
           .cols = tidyselect::all_of(median_var),
           .fns = median_list
         ),
-        dplyr::across(
-          .cols = tidyselect::all_of(prop_count_var),
-          .fns = ~ count_prop_wide(
-            .x,
-            include_missing = include_missing,
-            obfuscate_data = obfuscate_data,
-            censored_value = censored_value,
-            add_reason_col = add_reason_col
-          ),
-          .unpack = !is.null(prop_count_var)
-        ),
         total = dplyr::n(),
         .groups = "drop"
       )
+
+    if (!is.null(prop_count_results)) {
+      temp <- if (length(comb) == 0) {
+        dplyr::bind_cols(temp, prop_count_results[[i]])
+      } else {
+        dplyr::left_join(temp, prop_count_results[[i]], by = comb)
+      }
+      # Match the old count_prop_wide-in-summarise() column order, where
+      # `total = dplyr::n()` was always the last computed column.
+      temp <- dplyr::relocate(
+        temp, dplyr::all_of("total"), .after = dplyr::last_col()
+      )
+    }
 
 
     for (cols in all_cols) {
@@ -471,7 +508,11 @@ get_aggregate_value <- function(
             total_var = "total",
             count_var = paste0(var, "_n"),
             prop_var = paste0(var, "_prop"),
-            statistics_vars = if (ci) paste0(var, "_", c(ci_lower_name, ci_upper_name)) else NULL,
+            statistics_vars = if (ci) {
+              paste0(var, "_", c(ci_lower_name, ci_upper_name))
+            } else {
+              NULL
+            },
             censored_value = censored_value,
             add_reason_col = add_reason_col
           )
@@ -524,7 +565,11 @@ get_aggregate_value <- function(
             total_var = paste0(var, "_total_non_missing"),
             count_var = paste0(var, "_n"),
             prop_var = paste0(var, "_prop"),
-            statistics_vars = if (ci) paste0(var, "_", c(ci_lower_name, ci_upper_name)) else NULL,
+            statistics_vars = if (ci) {
+              paste0(var, "_", c(ci_lower_name, ci_upper_name))
+            } else {
+              NULL
+            },
             censored_value = censored_value,
             other_count_vars = c("total", paste0(var, "_total_missing")),
             add_reason_col = add_reason_col
@@ -587,7 +632,9 @@ get_aggregate_value <- function(
                " aggregation variables are specified")
       )
 
-    } else if ("prop_count" %in% names(vars) && length(vars[["prop_count"]]) > 1) {
+    } else if (
+      "prop_count" %in% names(vars) && length(vars[["prop_count"]]) > 1
+    ) {
 
       warning(
         paste0("pivot_prop_count is not supported when multiple",
@@ -605,81 +652,257 @@ get_aggregate_value <- function(
   return(out)
 }
 
-#' Summarise count into wide format
+#' Build a finest-grain, long-format count table for one prop_count variable
 #'
-#' Summarise a vector into columns of counts for each occurrence and each counts
-#' associated proportion
+#' @param df the data.frame, already coerced so `var` is a factor
+#' @param group_cols all columns get_aggregate_value() groups by
+#' @param var the single prop_count column to tabulate
+#' @param include_missing whether NA values of `var` count as a category
 #'
-#' @param x A vector, numeric or character
-#' @param include_missing logical indicating whether or not to include
-#' NA values
-#' @param obfuscate_data logical indicating whether or not to obfuscate data
-#' @param censored_value the value to replace censored proportions with
-#' @param add_reason_col whether or not to add a variable describing why an
-#' observation was obfuscate, passed to [obfuscate_data()]
-count_prop_wide <- function(x,
-                            include_missing = FALSE,
-                            obfuscate_data,
-                            censored_value,
-                            add_reason_col) {
-  checkmate::assert_logical(include_missing, len = 1, any.missing = FALSE)
-  checkmate::assert_vector(x)
-  checkmate::assert(
-    checkmate::check_numeric(x),
-    checkmate::check_character(x),
-    checkmate::check_factor(x),
-    combine = "or"
-  )
-  checkmate::assert_logical(obfuscate_data, len = 1, any.missing = FALSE)
-  checkmate::assert_logical(add_reason_col, len = 1, any.missing = FALSE)
+#' @return a long-format tibble with `group_cols`, `category`, and `n`
+build_finest_prop_count <- function(df, group_cols, var, include_missing) {
+  category_levels <- levels(df[[var]])
+  is_na_val <- is.na(df[[var]])
+  add_na_category <- include_missing && any(is_na_val)
 
-  use_na <- ifelse(include_missing, "ifany", "no")
+  raw <- df |>
+    dplyr::mutate(
+      category = if (add_na_category) {
+        dplyr::if_else(is_na_val, "NA", as.character(.data[[var]]))
+      } else {
+        as.character(.data[[var]])
+      }
+    ) |>
+    dplyr::select(dplyr::all_of(group_cols), "category")
 
-  tbl <- table(x, useNA = use_na)
-
-  if (nrow(tbl) == 0) {
-    return(NA)
+  if (!include_missing) {
+    raw <- raw[!is_na_val, , drop = FALSE]
   }
 
-  res <- data.frame(tbl) |>
-    dplyr::rename(
-      n = "Freq"
-    ) |>
-    dplyr::mutate(
-      total = sum(.data[["n"]]),
-      prop = .data[["n"]] / .data[["total"]]
+  full_category_levels <- if (add_na_category) {
+    c(category_levels, "NA")
+  } else {
+    category_levels
+  }
+
+  group_tuples <- df |>
+    dplyr::distinct(dplyr::across(dplyr::all_of(group_cols)))
+
+  counts <- raw |>
+    dplyr::count(
+      dplyr::across(dplyr::all_of(group_cols)), .data[["category"]], name = "n"
     )
 
+  finest <- group_tuples |>
+    tidyr::crossing(category = full_category_levels) |>
+    dplyr::left_join(counts, by = c(group_cols, "category")) |>
+    dplyr::mutate(
+      n = dplyr::coalesce(.data[["n"]], 0L),
+      # Factor keeps category in full_category_levels order (NA last) through
+      # group_by()/summarise() downstream, instead of locale-dependent sorting.
+      category = factor(.data[["category"]], levels = full_category_levels)
+    )
+
+  if (!add_na_category) {
+    return(finest)
+  }
+
+  # A tuple has NA iff counts (already aggregated from raw) has an "NA"
+  # category row for it, so this doesn't need its own pass over df.
+  has_na_by_tuple <- counts |>
+    dplyr::filter(.data[["category"]] == "NA") |>
+    dplyr::select(dplyr::all_of(group_cols)) |>
+    dplyr::mutate(.has_na = TRUE)
+
+  finest |>
+    dplyr::left_join(has_na_by_tuple, by = group_cols) |>
+    dplyr::mutate(
+      .has_na = dplyr::coalesce(.data[[".has_na"]], FALSE),
+      n = dplyr::if_else(
+        .data[["category"]] == "NA" & !.data[[".has_na"]],
+        NA,
+        .data[["n"]]
+      )
+    ) |>
+    dplyr::select(-".has_na")
+}
+
+#' Roll finest-grain prop_count counts up to one group_cols combination
+#'
+#' @param finest_counts output of [build_finest_prop_count()]
+#' @param comb the subset of columns to group by for this combination
+#' @param var_name the prop_count column name, used to prefix output columns
+#' @param include_missing whether NA values of the tabulated var count as
+#' a category
+#' @param obfuscate_data whether counts should be obfuscated
+#' @param censored_value the value to replace censored counts with
+#' @param add_reason_col whether to add an obfuscation-reason column
+#'
+#' @return a wide tibble keyed by `comb`'s columns
+rollup_prop_count_one <- function(finest_counts,
+                                  comb,
+                                  var_name,
+                                  include_missing,
+                                  obfuscate_data,
+                                  censored_value,
+                                  add_reason_col) {
+
+  comb_counts <- finest_counts |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(c(comb, "category")))) |>
+    dplyr::summarise(
+      n = if (any(!is.na(.data[["n"]]))) {
+        sum(.data[["n"]], na.rm = TRUE)
+      } else {
+        NA
+      },
+      .groups = "drop_last"
+    ) |>
+    dplyr::mutate(
+      total = sum(.data[["n"]], na.rm = TRUE),
+      prop = .data[["n"]] / .data[["total"]]
+    ) |>
+    dplyr::ungroup()
+
+  if (length(comb) == 0 && nrow(comb_counts) == 0) {
+    category_levels <- levels(finest_counts[["category"]])
+    comb_counts <- tibble::tibble(
+      category = factor(category_levels, levels = category_levels),
+      n = 0,
+      total = 0,
+      prop = NaN
+    )
+  }
+
   if (obfuscate_data) {
-    res <- res |>
-      dplyr::mutate(dummy = "a") |>
+    comb_counts <- comb_counts |>
       obfuscate_data(
         total_var = "total",
         count_var = "n",
         prop_var = "prop",
         censored_value = censored_value,
         liberal_obfuscation = TRUE,
-        group_var = "dummy",
+        group_var = comb,
         add_reason_col = add_reason_col
       ) |>
-      dplyr::ungroup() |>
-      dplyr::select(-"dummy")
+      dplyr::ungroup()
   }
 
-  res <- res |>
+  if (include_missing) {
+    comb_counts <- dplyr::select(comb_counts, -dplyr::all_of("total"))
+    extra_id_col <- NULL
+  } else {
+    comb_counts <- dplyr::rename(comb_counts, total_non_missing = "total")
+    extra_id_col <- "total_non_missing"
+  }
+
+  wide <- comb_counts |>
     tidyr::pivot_wider(
-      names_from = "x",
+      id_cols = dplyr::all_of(c(comb, extra_id_col)),
+      names_from = "category",
       values_from = dplyr::any_of(c("n", "prop", "obfuscated_reason"))
     )
 
-  if (include_missing) {
-    res <- dplyr::select(res, -tidyselect::all_of("total"))
+  dplyr::rename_with(
+    wide,
+    \(x) if (length(x) == 0) x else paste0(var_name, "_", x),
+    .cols = -dplyr::all_of(comb)
+  )
+}
+
+#' Produce a proper tabulation when the `var_name` of interest is degenerate,
+#' i.e. contains no relevant rows, either truly containing 0 rows or having
+#' only NA values when `include_missing` is `FALSE`
+#'
+#' @param df the data.frame
+#' @param comb the subset of columns to key rows by for this combination
+#' @param var_name the prop_count column name, used as-is (no prefix)
+#'
+#' @return a tibble with one column named `var_name` (all `NA`), one row
+#' per distinct `comb` tuple present in `df` (or exactly one row if `comb`
+#' is empty, matching [dplyr::group_by()]'s zero-columns convention)
+degenerate_prop_count_wide <- function(df, comb, var_name) {
+  if (length(comb) == 0) {
+    tibble::tibble(!!var_name := NA)
   } else {
-    res <- dplyr::rename(res, "total_non_missing" = "total")
+    df |>
+      dplyr::distinct(dplyr::across(dplyr::all_of(comb))) |>
+      dplyr::mutate(!!var_name := NA)
   }
+}
 
+#' Compute prop_count aggregates for every group_cols combination
+#'
+#' @param df the data.frame, already coerced so `prop_count_var` columns
+#' are factors
+#' @param group_cols all columns get_aggregate_value() groups by
+#' @param group_var_combinations list of column-subsets, as returned by
+#' [get_group_combinations()]
+#' @param prop_count_var one or more column names to tabulate
+#' @param include_missing whether NA values of `prop_count_var` count as
+#' a category
+#' @param obfuscate_data whether counts should be obfuscated
+#' @param censored_value the value to replace censored counts with
+#' @param add_reason_col whether to add an obfuscation-reason column
+#' @return a list, same length/order as `group_var_combinations`, of wide
+#' tibbles keyed by that combination's columns
+rollup_prop_count <- function(df,
+                              group_cols,
+                              group_var_combinations,
+                              prop_count_var,
+                              include_missing = TRUE,
+                              obfuscate_data = FALSE,
+                              censored_value = 0,
+                              add_reason_col = FALSE) {
 
-  return(res)
+  is_degenerate <- purrr::map_lgl(
+    prop_count_var,
+    \(var) {
+      no_levels <- length(levels(df[[var]])) == 0
+      no_na_fallback <- !(include_missing && any(is.na(df[[var]])))
+      no_levels && no_na_fallback
+    }
+  )
+  names(is_degenerate) <- prop_count_var
+
+  finest_by_var <- purrr::map(
+    prop_count_var[!is_degenerate],
+    \(var) build_finest_prop_count(df, group_cols, var, include_missing)
+  )
+  names(finest_by_var) <- prop_count_var[!is_degenerate]
+
+  purrr::map(
+    group_var_combinations,
+    \(comb) {
+      wide_by_var <- purrr::map(
+        prop_count_var,
+        \(var) {
+          if (is_degenerate[[var]]) {
+            degenerate_prop_count_wide(df, comb, var)
+          } else {
+            rollup_prop_count_one(
+              finest_by_var[[var]],
+              comb = comb,
+              var_name = var,
+              include_missing = include_missing,
+              obfuscate_data = obfuscate_data,
+              censored_value = censored_value,
+              add_reason_col = add_reason_col
+            )
+          }
+        }
+      )
+      purrr::reduce(
+        wide_by_var,
+        \(a, b) {
+          if (length(comb) == 0) {
+            dplyr::bind_cols(a, b)
+          } else {
+            dplyr::full_join(a, b, by = comb)
+          }
+        }
+      )
+    }
+  )
 }
 
 #' Pivots the result of a single prop_count from [get_aggregate_value()]
@@ -715,9 +938,8 @@ pivot_prop_count <- function(df, category_name = "kategori") {
 get_group_combinations <- function(group_cols, marginal_cols) {
 
   if (!is.null(group_cols)) {
-    group_var_combinations <- do.call(
-      c,
-      lapply(
+    group_var_combinations <- purrr::list_flatten(
+      purrr::map(
         seq_along(group_cols) - 1,
         utils::combn,
         x = group_cols,
@@ -732,7 +954,7 @@ get_group_combinations <- function(group_cols, marginal_cols) {
 
   always_group_by <- setdiff(group_cols, marginal_cols)
   group_var_combinations <- unique(
-    lapply(
+    purrr::map(
       group_var_combinations,
       \(x) unique(c(always_group_by, x))
     )

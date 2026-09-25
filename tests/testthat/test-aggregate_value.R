@@ -1178,6 +1178,30 @@ test_that("get_aggregate_value works with no group_cols", {
       )
     )
 
+  # prop_count with no group_cols and NA values: the "NA" category must be
+  # broadcast without a join on zero common columns (regression test).
+  df <- data.frame(
+    category = c(1:5, NA)
+  )
+
+  res <- get_aggregate_value(
+    df = df,
+    group_cols = NULL,
+    vars = list(prop_count = "category"),
+    include_missing = TRUE,
+    pivot_prop_count = TRUE
+  ) |>
+    tibble::as_tibble()
+
+  expected <- tibble::tibble(
+    total = rep(6L, 6),
+    category = c("1", "2", "3", "4", "5", "NA"),
+    category_n = rep(1L, 6),
+    category_prop = rep(1 / 6, 6)
+  )
+
+  expect_equal(res, expected)
+
 })
 
 test_that("add_reason_col works", {

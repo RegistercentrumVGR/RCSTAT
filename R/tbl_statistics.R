@@ -714,8 +714,15 @@ build_finest_prop_count <- function(df, group_cols, var, include_missing) {
     dplyr::select(dplyr::all_of(group_cols)) |>
     dplyr::mutate(.has_na = TRUE)
 
+  finest <- if (length(group_cols) == 0) {
+    # No grouping columns: a single scalar flag applies to every row, and
+    # dplyr::left_join() cannot join on zero common columns.
+    dplyr::mutate(finest, .has_na = nrow(has_na_by_tuple) > 0)
+  } else {
+    dplyr::left_join(finest, has_na_by_tuple, by = group_cols)
+  }
+
   finest |>
-    dplyr::left_join(has_na_by_tuple, by = group_cols) |>
     dplyr::mutate(
       .has_na = dplyr::coalesce(.data[[".has_na"]], FALSE),
       n = dplyr::if_else(

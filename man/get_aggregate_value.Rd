@@ -32,9 +32,11 @@ get_aggregate_value(
 
 \item{obfuscate_data}{If data should be obfuscated}
 
-\item{censored_value}{What value to replace censored values, used as argument in obfuscate_data}
+\item{censored_value}{What value to replace censored values, used as
+argument in obfuscate_data}
 
-\item{pivot_prop_count}{whether to pivot the resulting data.frame into long format}
+\item{pivot_prop_count}{whether to pivot the resulting data.frame into
+long format}
 
 \item{distinct_cols}{a set of columns that are used in
 \code{\link[dplyr:distinct]{dplyr::distinct()}}. Should be disjoint from \code{group_cols} to prevent

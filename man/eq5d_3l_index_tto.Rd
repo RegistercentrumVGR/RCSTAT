@@ -28,10 +28,10 @@ eq5d_3l_index_tto(rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3), rep(1, 3))
 \href{https://dx.doi.org/10.1007\%2Fs11136-013-0496-4}{Burström et al. 2014, TTO Model 4, Table 3}
 }
 \seealso{
-Other eq5d: 
-\code{\link{eq5d_3l_index_tto_old}()},
-\code{\link{eq5d_5l_index_tto}()},
-\code{\link{eq5d_5l_index_vas}()},
-\code{\link{eq5d_index}()}
+Other eq5d:
+\code{\link[=eq5d_3l_index_tto_old]{eq5d_3l_index_tto_old()}},
+\code{\link[=eq5d_5l_index_tto]{eq5d_5l_index_tto()}},
+\code{\link[=eq5d_5l_index_vas]{eq5d_5l_index_vas()}},
+\code{\link[=eq5d_index]{eq5d_index()}}
 }
 \concept{eq5d}

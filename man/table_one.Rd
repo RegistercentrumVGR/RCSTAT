@@ -66,7 +66,7 @@ Variables are classified automatically:
 \code{NA}), are treated as binary and summarized as N (\%) on a single row.
 \item Remaining \code{character}/\code{factor} columns are treated as categorical and
 summarized as N (\%) with one row per category. Categories are lumped
-with \code{\link[forcats:fct_lump]{forcats::fct_lump_n()}} when there are more than \code{max_categories}
+with \code{\link[forcats:fct_lump_n]{forcats::fct_lump_n()}} when there are more than \code{max_categories}
 of them.
 \item Remaining numeric columns are treated as continuous and summarized as
 mean (SD), unless listed in \code{median_vars}, in which case they are

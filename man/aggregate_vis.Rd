@@ -58,5 +58,5 @@ and care type has to be performed before passing \code{df} to this function.
 
 The \code{indicator_function} has to accept the following arguments \code{group_cols},
 \code{obfuscate_data}, \code{aggregate}, \code{marginal_cols} and is almost surely defined
-in the \link[rcdm:rcdm-package]{rcdm::rcdm} package.
+in the \link[rcdm:rcdm]{rcdm::rcdm} package.
 }

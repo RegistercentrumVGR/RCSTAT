@@ -19,3 +19,4 @@ deploy.ps1
 ^.devcontainer$
 ^Dockerfile$
 ^.markdownlintignore$
+^lintr_cache$

@@ -11,3 +11,5 @@ public/
 docs
 
 dev
+
+lintr_cache/*

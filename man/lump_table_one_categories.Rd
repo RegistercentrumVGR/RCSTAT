@@ -14,7 +14,7 @@ lump_table_one_categories(x, max_categories, name, other_level = "Other")
 \item{name}{the name of the variable, used in the warning message}
 
 \item{other_level}{value of the level used for "other" values, passed to
-\code{\link[forcats:fct_lump]{forcats::fct_lump_n()}}}
+\code{\link[forcats:fct_lump_n]{forcats::fct_lump_n()}}}
 }
 \value{
 \code{x} as a factor, with the smallest categories lumped into

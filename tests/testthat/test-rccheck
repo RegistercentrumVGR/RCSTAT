@@ -1,0 +1,217 @@
+test_that("rccheck() runs all steps in order by default", {
+  calls <- character()
+
+  local_mocked_bindings(
+    document = function(...) {
+      calls <<- c(calls, "document")
+    },
+    test = function(...) {
+      calls <<- c(calls, "test")
+    },
+    check = function(...) {
+      calls <<- c(calls, "check")
+    },
+    .package = "devtools"
+  )
+
+  local_mocked_bindings(
+    lint_package = function(...) {
+      calls <<- c(calls, "lint")
+    },
+    .package = "lintr"
+  )
+
+  rccheck()
+
+  expect_identical(
+    calls,
+    c("document", "lint", "test", "check")
+  )
+})
+
+
+test_that("rccheck() runs only selected steps", {
+  calls <- character()
+
+  local_mocked_bindings(
+    document = function(...) {
+      calls <<- c(calls, "document")
+    },
+    test = function(...) {
+      calls <<- c(calls, "test")
+    },
+    check = function(...) {
+      calls <<- c(calls, "check")
+    },
+    .package = "devtools"
+  )
+
+  local_mocked_bindings(
+    lint_package = function(...) {
+      calls <<- c(calls, "lint")
+    },
+    .package = "lintr"
+  )
+
+  rccheck(
+    steps = c("test", "check")
+  )
+
+  expect_identical(
+    calls,
+    c("test", "check")
+  )
+})
+
+
+test_that("rccheck() executes steps in canonical order", {
+  calls <- character()
+
+  local_mocked_bindings(
+    document = function(...) {
+      calls <<- c(calls, "document")
+    },
+    test = function(...) {
+      calls <<- c(calls, "test")
+    },
+    check = function(...) {
+      calls <<- c(calls, "check")
+    },
+    .package = "devtools"
+  )
+
+  local_mocked_bindings(
+    lint_package = function(...) {
+      calls <<- c(calls, "lint")
+    },
+    .package = "lintr"
+  )
+
+  rccheck(
+    steps = c("check", "document", "test", "lint")
+  )
+
+  expect_identical(
+    calls,
+    c("document", "lint", "test", "check")
+  )
+})
+
+
+test_that("rccheck() removes duplicate steps", {
+  calls <- character()
+
+  local_mocked_bindings(
+    document = function(...) {
+      calls <<- c(calls, "document")
+    },
+    .package = "devtools"
+  )
+
+  rccheck(
+    steps = c("document", "document")
+  )
+
+  expect_identical(
+    calls,
+    "document"
+  )
+})
+
+
+test_that("rccheck() passes the lint cache", {
+  received_cache <- NULL
+
+  local_mocked_bindings(
+    lint_package = function(cache, ...) {
+      received_cache <<- cache
+    },
+    .package = "lintr"
+  )
+
+  rccheck(
+    steps = "lint",
+    lint_cache = "my-lintr-cache"
+  )
+
+  expect_identical(
+    received_cache,
+    "my-lintr-cache"
+  )
+})
+
+
+test_that("rccheck() stops when a step fails", {
+  calls <- character()
+
+  local_mocked_bindings(
+    document = function(...) {
+      calls <<- c(calls, "document")
+    },
+    test = function(...) {
+      calls <<- c(calls, "test")
+    },
+    check = function(...) {
+      calls <<- c(calls, "check")
+    },
+    .package = "devtools"
+  )
+
+  local_mocked_bindings(
+    lint_package = function(...) {
+      calls <<- c(calls, "lint")
+      stop("lint failed")
+    },
+    .package = "lintr"
+  )
+
+  expect_error(
+    rccheck(),
+    "^Step 'lint' failed: lint failed$"
+  )
+
+  expect_identical(
+    calls,
+    c("document", "lint")
+  )
+})
+
+
+test_that("rccheck() rejects unknown steps", {
+  expect_error(
+    rccheck(steps = c("test", "foobar")),
+    "Unknown step\\(s\\): foobar"
+  )
+})
+
+
+test_that("rccheck() rejects non-character steps", {
+  expect_error(
+    rccheck(steps = TRUE),
+    "`steps` must be a character vector"
+  )
+})
+
+
+test_that("rccheck() handles an empty selection", {
+  expect_message(
+    expect_identical(
+      rccheck(steps = character()),
+      TRUE
+    ),
+    "No checks selected"
+  )
+})
+
+
+test_that("rccheck() returns TRUE on success", {
+  local_mocked_bindings(
+    test = function(...) {},
+    .package = "devtools"
+  )
+
+  expect_identical(
+    rccheck(steps = "test"),
+    TRUE
+  )
+})

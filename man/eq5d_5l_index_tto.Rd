@@ -24,10 +24,10 @@ eq5d_5l_index_tto(rep(3, 10), rep(4, 10), rep(5, 10), rep(4, 10), rep(3, 10))
 \href{https://link.springer.com/article/10.1007/s40273-020-00905-7/tables/9}{Burström, model 5 TTO}
 }
 \seealso{
-Other eq5d: 
-\code{\link{eq5d_3l_index_tto}()},
-\code{\link{eq5d_3l_index_tto_old}()},
-\code{\link{eq5d_5l_index_vas}()},
-\code{\link{eq5d_index}()}
+Other eq5d:
+\code{\link[=eq5d_3l_index_tto]{eq5d_3l_index_tto()}},
+\code{\link[=eq5d_3l_index_tto_old]{eq5d_3l_index_tto_old()}},
+\code{\link[=eq5d_5l_index_vas]{eq5d_5l_index_vas()}},
+\code{\link[=eq5d_index]{eq5d_index()}}
 }
 \concept{eq5d}

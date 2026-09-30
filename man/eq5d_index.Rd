@@ -44,10 +44,10 @@ eq5d_index(3, 4, 5, 4, 3, levels = 5, type = "VAS")
 \seealso{
 https://github.com/fragla/eq5d
 
-Other eq5d: 
-\code{\link{eq5d_3l_index_tto}()},
-\code{\link{eq5d_3l_index_tto_old}()},
-\code{\link{eq5d_5l_index_tto}()},
-\code{\link{eq5d_5l_index_vas}()}
+Other eq5d:
+\code{\link[=eq5d_3l_index_tto]{eq5d_3l_index_tto()}},
+\code{\link[=eq5d_3l_index_tto_old]{eq5d_3l_index_tto_old()}},
+\code{\link[=eq5d_5l_index_tto]{eq5d_5l_index_tto()}},
+\code{\link[=eq5d_5l_index_vas]{eq5d_5l_index_vas()}}
 }
 \concept{eq5d}

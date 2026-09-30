@@ -33,10 +33,10 @@ eq5d_3l_index_tto_old(c("22223", NA, "22233", "22222"), split = "")
 \seealso{
 \code{\link[=eq5d_3l_index_tto]{eq5d_3l_index_tto()}}
 
-Other eq5d: 
-\code{\link{eq5d_3l_index_tto}()},
-\code{\link{eq5d_5l_index_tto}()},
-\code{\link{eq5d_5l_index_vas}()},
-\code{\link{eq5d_index}()}
+Other eq5d:
+\code{\link[=eq5d_3l_index_tto]{eq5d_3l_index_tto()}},
+\code{\link[=eq5d_5l_index_tto]{eq5d_5l_index_tto()}},
+\code{\link[=eq5d_5l_index_vas]{eq5d_5l_index_vas()}},
+\code{\link[=eq5d_index]{eq5d_index()}}
 }
 \concept{eq5d}

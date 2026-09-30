@@ -1,0 +1,16 @@
+{
+  "name": "R (rocker/r-ver base)",
+  //"image": "registry.gitlab.com/registercentrum/statistikenheten/r-docker-images/r42dev:main",
+  "image": "ghcr.io/rocker-org/devcontainer/r-ver:4",
+  "features": {
+    "ghcr.io/rocker-org/devcontainer-features/r-dependent-packages:latest": {
+      "dependencyTypes": "all,Config/Needs/dev"
+    }
+  },
+  "remoteEnv": {
+    "PKG_SYSREQS": "TRUE",
+    "MOCKDATA": "TRUE",
+    "GITHUB_PAT": "${localEnv:GITHUB_PAT}",
+    "GITHUB_PAT_GITLAB_COM": "${localEnv:GITHUB_PAT_GITLAB_COM}"
+  }
+}

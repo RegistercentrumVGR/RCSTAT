@@ -1,7 +1,7 @@
 Package: RCStat
 Type: Package
 Title: Commonly used
-Version: 1.6.4
+Version: 1.6.5
 Author: Rikard Isaksson
 Maintainer: Rikard Isaksson <rikard.isaksson@vgregion.se>
 Description: Holds functions for standard tables and general 
@@ -21,12 +21,13 @@ Suggests:
     survival
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports: 
     checkmate,
     cli,
     data.table,
     dplyr,
+    devtools,
+    lintr,
     httr,
     jsonlite,
     lubridate,
@@ -44,3 +45,4 @@ Imports:
     memoise,
     forcats,
     lifecycle
+Config/roxygen2/version: 8.1.0

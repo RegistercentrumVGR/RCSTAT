@@ -1,0 +1,9 @@
+{
+  "features": {
+    "ghcr.io/rocker-org/devcontainer-features/r-dependent-packages:latest": {
+      "version": "0.2.0",
+      "resolved": "ghcr.io/rocker-org/devcontainer-features/r-dependent-packages@sha256:1a4e8dc80e6454de3219cd78a64b74bd36ebff2d3ac038766ff6d976c104843e",
+      "integrity": "sha256:1a4e8dc80e6454de3219cd78a64b74bd36ebff2d3ac038766ff6d976c104843e"
+    }
+  }
+}

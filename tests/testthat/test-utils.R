@@ -345,6 +345,141 @@ test_that("prettify_table works", {
 
 })
 
+test_that("prettify_table orders rows", {
+
+  df <- data.frame(
+    Region = factor(
+      c("Dalarna", "Blekinge", "Stockholm"),
+      levels = c("Stockholm", "Dalarna", "Blekinge")
+    ),
+    value = c(1, 2, 3)
+  )
+
+  expect_equal(
+    prettify_table(
+      df,
+      order_cols = "Region",
+      order_direction = "ascending",
+      order_type = "factor_levels"
+    )$Region,
+    factor(
+      c("Stockholm", "Dalarna", "Blekinge"),
+      levels = c("Stockholm", "Dalarna", "Blekinge")
+    )
+  )
+
+  expect_equal(
+    as.character(
+      prettify_table(
+        df,
+        order_cols = "Region",
+        order_direction = "ascending",
+        order_type = "value_labels"
+      )$Region
+    ),
+    c("Blekinge", "Dalarna", "Stockholm")
+  )
+
+  df_totals <- data.frame(
+    Region = factor(
+      c("Dalarna", "Riket", "Blekinge", "Stockholm"),
+      levels = c("Stockholm", "Dalarna", "Blekinge", "Riket")
+    ),
+    value = 1:4
+  )
+
+  expect_equal(
+    as.character(
+      prettify_table(
+        df_totals,
+        order_cols = "Region",
+        order_direction = "ascending",
+        order_type = "value_labels",
+        order_totals = list(Region = "Riket")
+      )$Region
+    ),
+    c("Blekinge", "Dalarna", "Stockholm", "Riket")
+  )
+
+  df_multiple <- data.frame(
+    Region = factor(
+      c("Dalarna", "Blekinge", "Dalarna", "Blekinge")
+    ),
+    Enhet = factor(
+      c("Mora", "Ronneby", "Falun", "Karlskrona")
+    )
+  )
+
+  expect_equal(
+    prettify_table(
+      df_multiple,
+      order_cols = c("Region", "Enhet"),
+      order_direction = c("ascending", "descending"),
+      order_type = "value_labels"
+    ) |>
+      dplyr::transmute(
+        Region = as.character(Region),
+        Enhet = as.character(Enhet)
+      ),
+    data.frame(
+      Region = c("Blekinge", "Blekinge", "Dalarna", "Dalarna"),
+      Enhet = c("Ronneby", "Karlskrona", "Mora", "Falun")
+    )
+  )
+
+})
+
+test_that("prettify_table validates ordering arguments", {
+
+  df <- data.frame(
+    Region = factor(c("Dalarna", "Blekinge")),
+    value = 1:2
+  )
+
+  expect_error(
+    prettify_table(
+      df,
+      order_cols = "does_not_exist",
+      order_direction = "ascending"
+    )
+  )
+
+  expect_error(
+    prettify_table(
+      df,
+      order_cols = "Region",
+      order_direction = "sideways"
+    )
+  )
+
+  expect_error(
+    prettify_table(
+      df,
+      order_cols = "Region",
+      order_direction = c("ascending", "descending")
+    )
+  )
+
+  expect_error(
+    prettify_table(
+      df,
+      order_cols = "Region",
+      order_direction = "ascending",
+      order_type = "raw_values"
+    )
+  )
+
+  expect_error(
+    prettify_table(
+      df,
+      order_cols = "Region",
+      order_direction = "ascending",
+      order_totals = list(does_not_exist = "Riket")
+    )
+  )
+
+})
+
 test_that("prettify_table handles confidence interval columns", {
 
   data.frame(

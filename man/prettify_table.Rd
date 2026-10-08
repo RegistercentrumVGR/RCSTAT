@@ -10,7 +10,11 @@ prettify_table(
   remove_vars = NULL,
   ...,
   tableone = FALSE,
-  prop_vars = NULL
+  prop_vars = NULL,
+  order_cols = NULL,
+  order_direction = NULL,
+  order_type = "factor_levels",
+  order_totals = NULL
 )
 }
 \arguments{
@@ -34,6 +38,17 @@ prettifying both regular tables and the output of \code{\link[=table_one]{table_
 \item{prop_vars}{other variables that should be treated as proportions, i.e.
 be multiplied by 100 and rounded to 1 decimal, should be variable names
 \strong{before} any decoding}
+
+\item{order_cols}{character vector with names of columns to sort by}
+
+\item{order_direction}{character vector with \code{"ascending"} or \code{"descending"}
+for each column in \code{order_cols}}
+
+\item{order_type}{sorting method, either \code{"factor_levels"} to use the
+existing factor level order or \code{"value_labels"} to sort by displayed labels}
+
+\item{order_totals}{optional named list specifying values that should be
+placed last within each ordering column}
 }
 \value{
 prettified data.frame
@@ -47,4 +62,21 @@ confidence interval columns from \code{\link[=get_aggregate_value]{get_aggregate
 into a single \code{"Konfidensintervall ({level}\%)"} range column - the
 confidence level is read out of the column name, not passed in
 separately.
+}
+\examples{
+df <- data.frame(
+  Region = factor(
+    c("Dalarna", "Blekinge", "Stockholm"),
+    levels = c("Stockholm", "Dalarna", "Blekinge")
+  ),
+  value = 1:3
+)
+
+prettify_table(
+  df,
+  order_cols = "Region",
+  order_direction = "ascending",
+  order_type = "value_labels"
+)
+
 }

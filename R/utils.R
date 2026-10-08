@@ -480,15 +480,44 @@ pseudonymize_data <- function(df,
 #' @param prop_vars other variables that should be treated as proportions, i.e.
 #' be multiplied by 100 and rounded to 1 decimal, should be variable names
 #' **before** any decoding
+#' @param order_cols character vector with names of columns to sort by
+#' @param order_direction character vector with `"ascending"` or `"descending"`
+#' for each column in `order_cols`
+#' @param order_type sorting method, either `"factor_levels"` to use the
+#' existing factor level order or `"value_labels"` to sort by displayed labels
+#' @param order_totals optional named list specifying values that should be
+#' placed last within each ordering column
+#'
+#' @examples
+#' df <- data.frame(
+#'   Region = factor(
+#'     c("Dalarna", "Blekinge", "Stockholm"),
+#'     levels = c("Stockholm", "Dalarna", "Blekinge")
+#'   ),
+#'   value = 1:3
+#' )
+#'
+#' prettify_table(
+#'   df,
+#'   order_cols = "Region",
+#'   order_direction = "ascending",
+#'   order_type = "value_labels"
+#' )
 #'
 #' @return prettified data.frame
 #' @export
-prettify_table <- function(df,
-                           vars = NULL,
-                           remove_vars = NULL,
-                           ...,
-                           tableone = FALSE,
-                           prop_vars = NULL) {
+prettify_table <- function(
+  df,
+  vars = NULL,
+  remove_vars = NULL,
+  ...,
+  tableone = FALSE,
+  prop_vars = NULL,
+  order_cols = NULL,
+  order_direction = NULL,
+  order_type = "factor_levels",
+  order_totals = NULL
+) {
 
   checkmate::assert_logical(tableone, len = 1, any.missing = FALSE)
   is_subset <- checkmate::test_subset(prop_vars, names(df))
@@ -504,6 +533,16 @@ prettify_table <- function(df,
   }
 
   if (is.null(df)) return(NULL)
+
+  if (!is.null(order_cols)) {
+    df <- order_table_rows(
+      df = df,
+      order_cols = order_cols,
+      order_direction = order_direction,
+      order_type = order_type,
+      order_totals = order_totals
+    )
+  }
 
   if (!is.null(remove_vars)) {
     df <- df |>
@@ -687,6 +726,97 @@ prettify_table <- function(df,
   }
 
   df
+}
+
+order_table_rows <- function(
+  df,
+  order_cols,
+  order_direction,
+  order_type = c("factor_levels", "value_labels"),
+  order_totals = NULL
+) {
+
+  order_type <- match.arg(order_type)
+
+  checkmate::assert_character(order_cols, min.len = 1)
+  checkmate::assert_character(
+    order_direction,
+    len = length(order_cols)
+  )
+  checkmate::assert_subset(
+    order_direction,
+    c("ascending", "descending")
+  )
+  checkmate::assert_subset(
+    order_cols,
+    names(df)
+  )
+
+  if (!is.null(order_totals)) {
+    checkmate::assert_list(
+      order_totals,
+      names = "named"
+    )
+    checkmate::assert_subset(
+      names(order_totals),
+      order_cols
+    )
+  }
+
+  order_exprs <- list()
+
+  for (i in seq_along(order_cols)) {
+
+    col <- order_cols[i]
+    direction <- order_direction[i]
+
+    if (
+      order_type == "value_labels" &&
+        is.factor(df[[col]])
+    ) {
+      value_expr <- rlang::expr(
+        as.character(.data[[!!col]])
+      )
+    } else {
+      value_expr <- rlang::expr(
+        .data[[!!col]]
+      )
+    }
+
+    if (direction == "descending") {
+      value_expr <- rlang::expr(
+        dplyr::desc(!!value_expr)
+      )
+    }
+
+    total <- NULL
+
+    if (!is.null(order_totals)) {
+      total <- order_totals[[col]]
+    }
+
+    if (!is.null(total)) {
+      order_exprs <- c(
+        order_exprs,
+        list(
+          rlang::expr(
+            .data[[!!col]] %in% !!total
+          )
+        )
+      )
+    }
+
+    order_exprs <- c(
+      order_exprs,
+      list(value_expr)
+    )
+  }
+
+  dplyr::arrange(
+    df,
+    !!!order_exprs,
+    .locale = "sv"
+  )
 }
 
 #' @describeIn round_half_up deprecated Rcpp implementation
